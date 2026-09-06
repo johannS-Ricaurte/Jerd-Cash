@@ -1,0 +1,78 @@
+<!-- apps/users/templates/users/register.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - JERD-Cash</title>
+    <!-- Tailwind CSS (CDN para desarrollo) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+</head>
+<body class="bg-gray-50 flex items-center justify-center min-h-screen">
+
+    <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+        <h2 class="text-2xl font-bold text-center text-blue-800 mb-6">Crear Cuenta JERD-Cash</h2>
+
+        <!-- Mensajes de Django (Éxito/Error) -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="mb-4 p-3 rounded {% if message.tags == 'error' %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST" action="{% url 'registro' %}" class="space-y-4">
+            {% csrf_token %} <!-- Protección CSRF de Django -->
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Nombre de Usuario</label>
+                <input type="text" name="username" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Correo Electrónico</label>
+                <input type="email" name="email" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Cédula / NIT</label>
+                <input type="text" name="cedula" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Contraseña</label>
+                <input type="password" name="password" required minlength="8" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            </div>
+
+            <!-- CHECKBOX OBLIGATORIO DE TÉRMINOS Y CONDICIONES -->
+            <div class="flex items-start">
+                <div class="flex items-center h-5">
+                    <input id="acepta_terminos" name="acepta_terminos" type="checkbox" required 
+                           class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                </div>
+                <div class="ml-3 text-sm">
+                    <label for="acepta_terminos" class="font-medium text-gray-700">
+                        He leído y acepto los 
+                        <a href="{% url 'terminos' %}" target="_blank" class="text-blue-600 hover:text-blue-500 underline">
+                            Términos y Condiciones
+                        </a> 
+                        y la Política de Tratamiento de Datos Personales (Ley 1581 de 2012).
+                    </label>
+                </div>
+            </div>
+
+            <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-800 hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                Registrarme
+            </button>
+        </form>
+
+        <p class="mt-4 text-center text-sm text-gray-600">
+            ¿Ya tienes cuenta? <a href="{% url 'login' %}" class="font-medium text-blue-600 hover:text-blue-500">Inicia sesión aquí</a>
+        </p>
+    </div>
+
+</body>
+</html>

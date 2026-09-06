@@ -1,0 +1,31 @@
+<!-- apps/users/templates/users/terminos.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Términos y Condiciones - JERD-Cash</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-800">
+    <div class="max-w-4xl mx-auto p-8 bg-white shadow-lg my-8 rounded-lg">
+        <a href="{% url 'registro' %}" class="text-blue-600 hover:underline mb-4 inline-block">&larr; Volver al registro</a>
+        
+        <h1 class="text-3xl font-bold text-blue-900 mb-6">TÉRMINOS Y CONDICIONES DE USO DE LA PLATAFORMA JERD-CASH</h1>
+        
+        <div class="prose max-w-none text-sm leading-relaxed space-y-4">
+            <!-- Aquí pegamos el contenido del archivo de texto, formateado para HTML -->
+            <p><strong>Versión:</strong> 1.0 | <strong>Fecha de entrada en vigencia:</strong> [FECHA]</p>
+            
+            <h2 class="text-xl font-semibold text-blue-800 mt-6">1. INFORMACIÓN GENERAL E IDENTIFICACIÓN DEL OPERADOR</h2>
+            <p>Los presentes Términos y Condiciones regulan el acceso, registro y uso de la plataforma tecnológica denominada <strong>JERD-Cash</strong>...</p>
+            
+            <h2 class="text-xl font-semibold text-blue-800 mt-6">4. ACEPTACIÓN DE LOS TÉRMINOS Y CONDICIONES</h2>
+            <p>Al crear una cuenta, acceder, navegar o utilizar las funcionalidades de JERD-Cash, el usuario declara que ha leído, comprende y acepta las condiciones...</p>
+            
+            <!-- NOTA: Para el proyecto final, copia y pega TODO el contenido del archivo .txt que me subiste dentro de este div, usando etiquetas <h2> y <p> para mantener la legibilidad. -->
+            <p class="italic text-gray-500 mt-8">[El resto del documento legal completo se renderiza aquí...]</p>
+        </div>
+    </div>
+</body>
+</html>
