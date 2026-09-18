@@ -86,3 +86,79 @@ def calcular_tabla_amortizacion(monto, tasa_mensual, plazo_meses, fecha_inicio=N
         })
     
     return tabla
+
+def calcular_score_simulador(ingresos, gastos):
+    """
+    Calcula un puntaje ficticio de 0 a 1000 para el
+    simulador público de crédito.
+
+    El puntaje se basa en la capacidad de pago:
+    
+        saldo_disponible = ingresos - gastos
+        capacidad = saldo_disponible / ingresos
+        score = capacidad * 1000
+    """
+
+    ingresos = Decimal(ingresos)
+    gastos = Decimal(gastos)
+
+    # Validación básica
+    if ingresos <= 0:
+        return {
+            'score': 0,
+            'nivel_riesgo': 'Muy Alto',
+            'tasa_interes': None,
+            'saldo_disponible': Decimal('0'),
+            'capacidad_pago': Decimal('0'),
+        }
+
+    # Saldo disponible después de los gastos
+    saldo_disponible = ingresos - gastos
+
+    # Si los gastos superan los ingresos,
+    # la capacidad disponible será 0.
+    if saldo_disponible < 0:
+        saldo_disponible = Decimal('0')
+
+    # Porcentaje de capacidad de pago
+    capacidad_pago = (
+        saldo_disponible / ingresos
+    ) * Decimal('100')
+
+    # Puntaje de 0 a 1000
+    score = int(
+        (capacidad_pago * Decimal('10'))
+    )
+
+    # Limitar el puntaje entre 0 y 1000
+    score = max(0, min(score, 1000))
+
+    # Rangos y tasas existentes de JERD-Cash
+    if score >= 800:
+
+        nivel_riesgo = 'Bajo'
+        tasa_interes = Decimal('1.5')
+
+    elif score >= 600:
+
+        nivel_riesgo = 'Medio'
+        tasa_interes = Decimal('2.0')
+
+    elif score >= 400:
+
+        nivel_riesgo = 'Alto'
+        tasa_interes = Decimal('2.5')
+
+    else:
+
+        nivel_riesgo = 'Muy Alto'
+        tasa_interes = None
+
+    return {
+        'score': score,
+        'nivel_riesgo': nivel_riesgo,
+        'tasa_interes': tasa_interes,
+        'saldo_disponible': saldo_disponible,
+        'capacidad_pago': capacidad_pago,
+    }
+

@@ -1,0 +1,1394 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        JERD-Cash | Simulador de Crédito
+    </title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+
+<body class="bg-gray-100 min-h-screen">
+
+
+    <!-- ========================= -->
+    <!-- NAVBAR -->
+    <!-- ========================= -->
+
+    <header class="bg-white border-b">
+
+        <div
+            class="max-w-7xl mx-auto px-6 py-4"
+        >
+
+            <div
+                class="flex items-center justify-between"
+            >
+
+                <!-- LOGO -->
+
+                <a
+                    href="/"
+                    class="flex items-center gap-2"
+                >
+
+                    <div
+                        class="w-10 h-10
+                               bg-blue-900
+                               rounded-lg
+                               flex items-center
+                               justify-center"
+                    >
+
+                        <span
+                            class="text-white
+                                   font-bold
+                                   text-xl"
+                        >
+                            J
+                        </span>
+
+                    </div>
+
+
+                    <div>
+
+                        <h1
+                            class="text-xl
+                                   font-bold
+                                   text-blue-900"
+                        >
+                            JERD-Cash
+                        </h1>
+
+                        <p
+                            class="text-xs
+                                   text-gray-500"
+                        >
+                            Microcréditos
+                        </p>
+
+                    </div>
+
+                </a>
+
+
+                <!-- BOTONES -->
+
+                <div
+                    class="flex items-center gap-3"
+                >
+
+                    <a
+                        href="{% url 'login' %}"
+                        class="px-4 py-2
+                               text-blue-900
+                               font-semibold
+                               hover:bg-blue-50
+                               rounded-lg"
+                    >
+                        Iniciar sesión
+                    </a>
+
+
+                    <a
+                        href="{% url 'registro' %}"
+                        class="px-4 py-2
+                               bg-blue-900
+                               text-white
+                               font-semibold
+                               rounded-lg
+                               hover:bg-blue-800"
+                    >
+                        Crear cuenta
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+
+    <!-- ========================= -->
+    <!-- CONTENIDO -->
+    <!-- ========================= -->
+
+    <main
+        class="max-w-6xl mx-auto
+               px-6 py-12"
+    >
+
+
+        <!-- TITULO -->
+
+        <div
+            class="text-center mb-10"
+        >
+
+            <h2
+                class="text-4xl
+                       font-bold
+                       text-blue-950"
+            >
+                Simula tu crédito
+            </h2>
+
+
+            <p
+                class="mt-4
+                       text-gray-600
+                       max-w-2xl
+                       mx-auto"
+            >
+                Ingresa tus ingresos, gastos,
+                monto y plazo para obtener
+                una estimación de tus condiciones
+                de crédito.
+            </p>
+
+
+            <p
+                class="mt-3
+                       text-sm
+                       text-gray-500"
+            >
+                El puntaje mostrado es ficticio
+                y se utiliza únicamente para
+                fines de simulación.
+            </p>
+
+        </div>
+
+
+
+        <!-- ========================= -->
+        <!-- FORMULARIO -->
+        <!-- ========================= -->
+
+        <div
+            class="bg-white
+                   rounded-2xl
+                   shadow-md
+                   p-6 md:p-8"
+        >
+
+            <h3
+                class="text-xl
+                       font-bold
+                       text-gray-900
+                       mb-6"
+            >
+                Datos de la simulación
+            </h3>
+
+
+            <form
+                method="POST"
+                id="form-simulador"
+            >
+
+                {% csrf_token %}
+
+
+                <div
+                    class="grid
+                           grid-cols-1
+                           md:grid-cols-2
+                           gap-6"
+                >
+
+
+                    <!-- ================= -->
+                    <!-- INGRESOS -->
+                    <!-- ================= -->
+
+                    <div>
+
+                        <label
+                            for="ingresos"
+                            class="block
+                                   text-sm
+                                   font-medium
+                                   text-gray-700
+                                   mb-2"
+                        >
+                            Ingresos mensuales
+                        </label>
+
+
+                        <input
+                            type="text"
+                            name="ingresos"
+                            id="ingresos"
+                            inputmode="numeric"
+                            value="{% if request.method == 'POST' %}{{ request.POST.ingresos }}{% endif %}"
+                            placeholder="Ej: 3.000.000"
+                            required
+                            class="w-full
+                                   px-4 py-3
+                                   border
+                                   border-gray-300
+                                   rounded-lg
+                                   focus:outline-none
+                                   focus:ring-2
+                                   focus:ring-blue-500"
+                        >
+
+
+                        <p
+                            class="text-xs
+                                   text-gray-500
+                                   mt-2"
+                        >
+                            Ingresa tus ingresos mensuales
+                        </p>
+
+                    </div>
+
+
+
+                    <!-- ================= -->
+                    <!-- GASTOS -->
+                    <!-- ================= -->
+
+                    <div>
+
+                        <label
+                            for="gastos"
+                            class="block
+                                   text-sm
+                                   font-medium
+                                   text-gray-700
+                                   mb-2"
+                        >
+                            Gastos mensuales
+                        </label>
+
+
+                        <input
+                            type="text"
+                            name="gastos"
+                            id="gastos"
+                            inputmode="numeric"
+                            value="{% if request.method == 'POST' %}{{ request.POST.gastos }}{% endif %}"
+                            placeholder="Ej: 1.800.000"
+                            required
+                            class="w-full
+                                   px-4 py-3
+                                   border
+                                   border-gray-300
+                                   rounded-lg
+                                   focus:outline-none
+                                   focus:ring-2
+                                   focus:ring-blue-500"
+                        >
+
+
+                        <p
+                            class="text-xs
+                                   text-gray-500
+                                   mt-2"
+                        >
+                            Ingresa tus gastos mensuales
+                        </p>
+
+                    </div>
+
+
+
+                    <!-- ================= -->
+                    <!-- MONTO -->
+                    <!-- ================= -->
+
+                    <div>
+
+                        <label
+                            for="monto"
+                            class="block
+                                   text-sm
+                                   font-medium
+                                   text-gray-700
+                                   mb-2"
+                        >
+                            Monto del crédito
+                        </label>
+
+
+                        <input
+                            type="text"
+                            name="monto"
+                            id="monto"
+                            inputmode="numeric"
+                            value="{% if request.method == 'POST' %}{{ request.POST.monto }}{% endif %}"
+                            placeholder="Ej: 2.000.000"
+                            required
+                            class="w-full
+                                   px-4 py-3
+                                   border
+                                   border-gray-300
+                                   rounded-lg
+                                   focus:outline-none
+                                   focus:ring-2
+                                   focus:ring-blue-500"
+                        >
+
+
+                        <p
+                            class="text-xs
+                                   text-gray-500
+                                   mt-2"
+                        >
+                            Monto mínimo: $100.000
+                        </p>
+
+                    </div>
+
+
+
+                    <!-- ================= -->
+                    <!-- PLAZO -->
+                    <!-- ================= -->
+
+                    <div>
+
+                        <label
+                            for="plazo"
+                            class="block
+                                   text-sm
+                                   font-medium
+                                   text-gray-700
+                                   mb-2"
+                        >
+                            Plazo
+                        </label>
+
+
+                        <select
+                            name="plazo"
+                            id="plazo"
+                            required
+                            class="w-full
+                                   px-4 py-3
+                                   border
+                                   border-gray-300
+                                   rounded-lg
+                                   focus:outline-none
+                                   focus:ring-2
+                                   focus:ring-blue-500"
+                        >
+
+                            <option value="">
+                                Selecciona un plazo
+                            </option>
+
+                            <option value="3">
+                                3 meses
+                            </option>
+
+                            <option value="6">
+                                6 meses
+                            </option>
+
+                            <option value="12">
+                                12 meses
+                            </option>
+
+                            <option value="24">
+                                24 meses
+                            </option>
+
+                            <option value="36">
+                                36 meses
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- ========================= -->
+                <!-- ERROR -->
+                <!-- ========================= -->
+
+                {% if error %}
+
+                    <div
+                        class="mt-6
+                               p-4
+                               bg-red-50
+                               border
+                               border-red-200
+                               rounded-lg
+                               text-red-700"
+                    >
+
+                        {{ error }}
+
+                    </div>
+
+                {% endif %}
+
+
+
+                <!-- ========================= -->
+                <!-- BOTON -->
+                <!-- ========================= -->
+
+                <button
+                    type="submit"
+                    class="w-full
+                           mt-8
+                           bg-blue-900
+                           text-white
+                           font-semibold
+                           py-3
+                           px-6
+                           rounded-lg
+                           hover:bg-blue-800
+                           transition"
+                >
+
+                    Calcular simulación
+
+                </button>
+
+            </form>
+
+        </div>
+
+
+
+        <!-- ========================= -->
+        <!-- RESULTADO -->
+        <!-- ========================= -->
+
+        {% if score is not None %}
+
+            <div
+                class="bg-white
+                       rounded-2xl
+                       shadow-md
+                       p-6 md:p-8
+                       mt-8"
+            >
+
+
+                <!-- TITULO -->
+
+                <div
+                    class="text-center"
+                >
+
+                    <h3
+                        class="text-2xl
+                               font-bold
+                               text-blue-950"
+                    >
+                        Resultado de la simulación
+                    </h3>
+
+
+                    <p
+                        class="text-gray-500
+                               mt-2"
+                    >
+                        Resultado estimado según
+                        los datos ingresados.
+                    </p>
+
+                </div>
+
+
+
+                <!-- ========================= -->
+                <!-- INFORMACION FINANCIERA -->
+                <!-- ========================= -->
+
+                <div
+                    class="grid
+                           grid-cols-1
+                           md:grid-cols-3
+                           gap-5
+                           mt-8"
+                >
+
+
+                    <!-- INGRESOS -->
+
+                    <div
+                        class="bg-gray-50
+                               rounded-xl
+                               p-5"
+                    >
+
+                        <p
+                            class="text-sm
+                                   text-gray-500"
+                        >
+                            Ingresos
+                        </p>
+
+
+                        <p
+                            class="text-2xl
+                                   font-bold
+                                   text-gray-900
+                                   mt-2"
+                        >
+
+                            $<span
+                                class="formato-pesos"
+                                data-valor="{{ request.POST.ingresos }}"
+                            >
+                                {{ request.POST.ingresos }}
+                            </span>
+
+                        </p>
+
+                    </div>
+
+
+
+                    <!-- GASTOS -->
+
+                    <div
+                        class="bg-gray-50
+                               rounded-xl
+                               p-5"
+                    >
+
+                        <p
+                            class="text-sm
+                                   text-gray-500"
+                        >
+                            Gastos
+                        </p>
+
+
+                        <p
+                            class="text-2xl
+                                   font-bold
+                                   text-gray-900
+                                   mt-2"
+                        >
+
+                            $<span
+                                class="formato-pesos"
+                                data-valor="{{ request.POST.gastos }}"
+                            >
+                                {{ request.POST.gastos }}
+                            </span>
+
+                        </p>
+
+                    </div>
+
+
+
+                    <!-- SALDO -->
+
+                    <div
+                        class="bg-blue-50
+                               rounded-xl
+                               p-5"
+                    >
+
+                        <p
+                            class="text-sm
+                                   text-gray-500"
+                        >
+                            Saldo disponible
+                        </p>
+
+
+                        <p
+                            class="text-2xl
+                                   font-bold
+                                   text-blue-900
+                                   mt-2"
+                        >
+
+                            $<span
+                                class="formato-pesos"
+                                data-valor="{{ saldo_disponible }}"
+                            >
+                                {{ saldo_disponible }}
+                            </span>
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- ========================= -->
+                <!-- SCORE -->
+                <!-- ========================= -->
+
+                <div
+                    class="mt-8
+                           p-8
+                           bg-blue-50
+                           border
+                           border-blue-100
+                           rounded-2xl
+                           text-center"
+                >
+
+                    <p
+                        class="text-sm
+                               font-semibold
+                               text-gray-500
+                               uppercase"
+                    >
+                        Puntaje estimado
+                    </p>
+
+
+                    <p
+                        class="text-6xl
+                               font-bold
+                               text-blue-900
+                               mt-2"
+                    >
+                        {{ score }}
+                    </p>
+
+
+                    <p
+                        class="text-gray-500
+                               mt-1"
+                    >
+                        de 1000 puntos
+                    </p>
+
+
+                    <div
+                        class="inline-block
+                               mt-5
+                               px-5 py-2
+                               bg-white
+                               rounded-full
+                               font-bold
+                               text-blue-900"
+                    >
+
+                        Nivel:
+                        {{ nivel_riesgo }}
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- ========================= -->
+                <!-- CAPACIDAD Y TASA -->
+                <!-- ========================= -->
+
+                <div
+                    class="grid
+                           grid-cols-1
+                           md:grid-cols-2
+                           gap-6
+                           mt-8"
+                >
+
+
+                    <!-- CAPACIDAD -->
+
+                    <div
+                        class="border
+                               rounded-xl
+                               p-6"
+                    >
+
+                        <p
+                            class="text-sm
+                                   text-gray-500"
+                        >
+                            Capacidad de pago
+                        </p>
+
+
+                        <p
+                            class="text-3xl
+                                   font-bold
+                                   text-blue-700
+                                   mt-2"
+                        >
+
+                            {{ capacidad_pago|floatformat:1 }}%
+
+                        </p>
+
+                    </div>
+
+
+
+                    <!-- TASA -->
+
+                    <div
+                        class="border
+                               rounded-xl
+                               p-6"
+                    >
+
+                        <p
+                            class="text-sm
+                                   text-gray-500"
+                        >
+                            Tasa de interés mensual
+                        </p>
+
+
+                        {% if tasa_interes %}
+
+                            <p
+                                class="text-3xl
+                                       font-bold
+                                       text-blue-700
+                                       mt-2"
+                            >
+
+                                {{ tasa_interes }}%
+
+                            </p>
+
+                        {% else %}
+
+                            <p
+                                class="text-3xl
+                                       font-bold
+                                       text-red-600
+                                       mt-2"
+                            >
+
+                                No disponible
+
+                            </p>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- ========================= -->
+                <!-- CREDITO -->
+                <!-- ========================= -->
+
+                {% if tasa_interes %}
+
+                    <div class="mt-8">
+
+                        <h4
+                            class="text-xl
+                                   font-bold
+                                   text-gray-900
+                                   mb-5"
+                        >
+                            Crédito solicitado
+                        </h4>
+
+
+                        <div
+                            class="grid
+                                   grid-cols-1
+                                   md:grid-cols-3
+                                   gap-5"
+                        >
+
+
+                            <!-- MONTO -->
+
+                            <div
+                                class="bg-gray-50
+                                       rounded-xl
+                                       p-5"
+                            >
+
+                                <p
+                                    class="text-sm
+                                           text-gray-500"
+                                >
+                                    Monto solicitado
+                                </p>
+
+
+                                <p
+                                    class="text-2xl
+                                           font-bold
+                                           text-gray-900
+                                           mt-2"
+                                >
+
+                                    $<span
+                                        class="formato-pesos"
+                                        data-valor="{{ monto|floatformat:0 }}"
+                                    >
+                                        {{ monto|floatformat:0 }}
+                                    </span>
+
+                                </p>
+
+                            </div>
+
+
+
+                            <!-- PLAZO -->
+
+                            <div
+                                class="bg-gray-50
+                                       rounded-xl
+                                       p-5"
+                            >
+
+                                <p
+                                    class="text-sm
+                                           text-gray-500"
+                                >
+                                    Plazo
+                                </p>
+
+
+                                <p
+                                    class="text-2xl
+                                           font-bold
+                                           text-gray-900
+                                           mt-2"
+                                >
+
+                                    {{ plazo }} meses
+
+                                </p>
+
+                            </div>
+
+
+
+                            <!-- CUOTA -->
+
+                            <div
+                                class="bg-blue-50
+                                       rounded-xl
+                                       p-5"
+                            >
+
+                                <p
+                                    class="text-sm
+                                           text-gray-500"
+                                >
+                                    Cuota mensual
+                                </p>
+
+
+                                <p
+                                    class="text-2xl
+                                           font-bold
+                                           text-blue-900
+                                           mt-2"
+                                >
+
+                                    $<span
+                                        class="formato-cuota"
+                                        data-valor="{{ cuota_mensual }}"
+                                    >
+                                        {{ cuota_mensual }}
+                                    </span>
+
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- ========================= -->
+                    <!-- CAPACIDAD CUOTA -->
+                    <!-- ========================= -->
+
+                    {% if puede_pagar_cuota %}
+
+                        <div
+                            class="mt-6
+                                   p-5
+                                   bg-green-50
+                                   border
+                                   border-green-200
+                                   rounded-xl"
+                        >
+
+                            <p
+                                class="font-bold
+                                       text-green-700"
+                            >
+                                ✓ La cuota estimada está
+                                dentro de tu saldo disponible.
+                            </p>
+
+
+                            <p
+                                class="text-sm
+                                       text-green-600
+                                       mt-2"
+                            >
+
+                                Saldo disponible:
+
+                                $<span
+                                    class="formato-pesos"
+                                    data-valor="{{ saldo_disponible|floatformat:0 }}"
+                                >
+                                    {{ saldo_disponible|floatformat:0 }}
+                                </span>
+
+                                <br>
+
+                                Cuota mensual:
+
+                                $<span
+                                    class="formato-cuota"
+                                    data-valor="{{ cuota_mensual }}"
+                                >
+                                    {{ cuota_mensual }}
+                                </span>
+
+                            </p>
+
+                        </div>
+
+                    {% else %}
+
+                        <div
+                            class="mt-6
+                                   p-5
+                                   bg-red-50
+                                   border
+                                   border-red-200
+                                   rounded-xl"
+                        >
+
+                            <p
+                                class="font-bold
+                                       text-red-700"
+                            >
+                                ✕ La cuota estimada supera
+                                tu saldo disponible.
+                            </p>
+
+
+                            <p
+                                class="text-sm
+                                       text-red-600
+                                       mt-2"
+                            >
+
+                                Considera solicitar un monto
+                                menor o aumentar el plazo.
+
+                            </p>
+
+                        </div>
+
+                    {% endif %}
+
+
+
+                    <!-- ========================= -->
+                    <!-- CONTINUAR -->
+                    <!-- ========================= -->
+
+                    <div
+                        class="mt-8
+                               p-6
+                               bg-blue-50
+                               border
+                               border-blue-100
+                               rounded-xl
+                               text-center"
+                    >
+
+                        <h4
+                            class="text-xl
+                                   font-bold
+                                   text-blue-950"
+                        >
+                            ¿Te interesa este crédito?
+                        </h4>
+
+
+                        <p
+                            class="text-gray-600
+                                   mt-2"
+                        >
+                            Inicia sesión o crea tu cuenta
+                            para continuar con el proceso.
+                        </p>
+
+
+                        <div
+                            class="grid
+                                   grid-cols-1
+                                   sm:grid-cols-2
+                                   gap-4
+                                   mt-6"
+                        >
+
+                            <a
+                                href="{% url 'login' %}"
+                                class="bg-blue-900
+                                       text-white
+                                       py-3 px-6
+                                       rounded-lg
+                                       font-semibold"
+                            >
+                                Iniciar sesión
+                            </a>
+
+
+                            <a
+                                href="{% url 'registro' %}"
+                                class="border-2
+                                       border-blue-900
+                                       text-blue-900
+                                       py-3 px-6
+                                       rounded-lg
+                                       font-semibold"
+                            >
+                                Crear cuenta
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        {% endif %}
+
+    </main>
+
+
+
+    <!-- ========================= -->
+    <!-- FOOTER -->
+    <!-- ========================= -->
+
+    <footer
+        class="bg-gray-950
+               text-gray-400
+               mt-12"
+    >
+
+        <div
+            class="max-w-7xl
+                   mx-auto
+                   px-6
+                   py-8
+                   text-center"
+        >
+
+            <p
+                class="text-sm"
+            >
+                © 2026 JERD-Cash.
+                Todos los derechos reservados.
+            </p>
+
+        </div>
+
+    </footer>
+
+
+
+    <!-- ========================= -->
+    <!-- JAVASCRIPT -->
+    <!-- ========================= -->
+
+    <script>
+
+        /*
+         * ============================
+         * FORMATO DE CAMPOS DE DINERO
+         * ============================
+         *
+         * El usuario escribe:
+         *
+         * 5000000
+         *
+         * Se muestra:
+         *
+         * 5.000.000
+         */
+
+        function formatearCampo(input) {
+
+            let valor = input.value;
+
+            valor = valor.replace(/\D/g, '');
+
+            if (valor === '') {
+
+                input.value = '';
+
+                return;
+
+            }
+
+            input.value =
+                Number(valor).toLocaleString('es-CO');
+
+        }
+
+
+
+        /*
+         * Campos de entrada
+         */
+
+        const camposDinero = [
+
+            document.getElementById('ingresos'),
+
+            document.getElementById('gastos'),
+
+            document.getElementById('monto')
+
+        ];
+
+
+
+        /*
+         * Formatear mientras escribe
+         */
+
+        camposDinero.forEach(function(campo) {
+
+            if (campo) {
+
+                campo.addEventListener(
+                    'input',
+                    function() {
+
+                        formatearCampo(this);
+
+                    }
+                );
+
+            }
+
+        });
+
+
+
+        /*
+         * ============================
+         * RESULTADOS SIN DECIMALES
+         * ============================
+         *
+         * Para:
+         *
+         * Ingresos
+         * Gastos
+         * Saldo
+         * Monto
+         *
+         * Ejemplo:
+         *
+         * 5000000 → 5.000.000
+         */
+
+        const resultadosPesos =
+            document.querySelectorAll(
+                '.formato-pesos'
+            );
+
+
+        resultadosPesos.forEach(
+            function(elemento) {
+
+                let valor =
+                    elemento.getAttribute(
+                        'data-valor'
+                    );
+
+
+                if (
+                    valor !== null &&
+                    valor !== ''
+                ) {
+
+                    // Convertir el valor
+                    // a número correctamente.
+
+                    valor =
+                        parseFloat(
+                            valor
+                        );
+
+
+                    if (!isNaN(valor)) {
+
+                        elemento.textContent =
+                            Math.round(
+                                valor
+                            ).toLocaleString(
+                                'es-CO'
+                            );
+
+                    }
+
+                }
+
+            }
+        );
+
+
+
+        /*
+         * ============================
+         * RESULTADOS DE CUOTAS
+         * ============================
+         *
+         * Las cuotas pueden tener
+         * decimales.
+         *
+         * Ejemplo:
+         *
+         * 105742.19
+         *
+         * Se muestra:
+         *
+         * 105.742
+         *
+         * No se eliminan los puntos
+         * antes de convertir el número.
+         */
+
+        const resultadosCuota =
+            document.querySelectorAll(
+                '.formato-cuota'
+            );
+
+
+        resultadosCuota.forEach(
+            function(elemento) {
+
+                let valor =
+                    elemento.getAttribute(
+                        'data-valor'
+                    );
+
+
+                if (
+                    valor !== null &&
+                    valor !== ''
+                ) {
+
+                    valor =
+                        parseFloat(
+                            valor
+                        );
+
+
+                    if (!isNaN(valor)) {
+
+                        elemento.textContent =
+                            Math.round(
+                                valor
+                            ).toLocaleString(
+                                'es-CO'
+                            );
+
+                    }
+
+                }
+
+            }
+        );
+
+
+
+        /*
+         * ============================
+         * ENVÍO DEL FORMULARIO
+         * ============================
+         *
+         * Antes de enviar:
+         *
+         * 5.000.000
+         *
+         * se convierte en:
+         *
+         * 5000000
+         *
+         * para que Django lo pueda
+         * convertir a Decimal.
+         */
+
+        const formulario =
+            document.getElementById(
+                'form-simulador'
+            );
+
+
+        if (formulario) {
+
+            formulario.addEventListener(
+                'submit',
+                function() {
+
+                    camposDinero.forEach(
+                        function(campo) {
+
+                            if (campo) {
+
+                                campo.value =
+                                    campo.value.replace(
+                                        /\./g,
+                                        ''
+                                    );
+
+                            }
+
+                        }
+                    );
+
+                }
+            );
+
+        }
+
+    </script>
+
+
+</body>
+
+</html>
+

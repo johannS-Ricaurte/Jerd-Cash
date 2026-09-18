@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Panel administrativo - JERD Cash</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+
+    <nav class="bg-white border-b">
+        <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">
+                    JERD<span class="text-blue-600">-Cash</span>
+                </h1>
+
+                <p class="text-xs text-gray-500">
+                    Panel administrativo
+                </p>
+            </div>
+
+            <div>
+                <span class="text-sm text-gray-600">
+                    Hola, {{ request.user.first_name|default:request.user.username }}
+                </span>
+            </div>
+
+        </div>
+    </nav>
+
+
+    <main class="max-w-6xl mx-auto px-6 py-10">
+
+        <h2 class="text-3xl font-bold text-gray-900">
+            Panel administrativo
+        </h2>
+
+        <p class="text-gray-600 mt-2">
+            Desde aquí podrás administrar los clientes y créditos de JERD Cash.
+        </p>
+
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+
+
+            <div class="bg-white rounded-xl shadow-sm border p-6">
+
+                <div class="text-3xl mb-4">
+                    📋
+                </div>
+
+                <h3 class="text-xl font-semibold">
+                    Solicitudes
+                </h3>
+
+                <p class="text-gray-600 mt-2">
+                    Consulta y gestiona las solicitudes de crédito.
+                </p>
+
+                <a
+                    href="{% url 'administrador_solicitudes' %}"
+                    class="block text-center w-full mt-4 bg-blue-600 text-white py-2.5 rounded-lg hover:bg-blue-700"
+                >
+                    Ver solicitudes
+                </a>
+
+            </div>
+
+
+            <div class="bg-white rounded-xl shadow-sm border p-6">
+
+                <div class="text-3xl mb-4">
+                    👥
+                </div>
+
+                <h3 class="text-xl font-semibold">
+                    Clientes
+                </h3>
+
+                <p class="text-gray-600 mt-2">
+                    Consulta la información de los clientes.
+                </p>
+
+            </div>
+
+
+            <div class="bg-white rounded-xl shadow-sm border p-6">
+
+                <div class="text-3xl mb-4">
+                    💰
+                </div>
+
+                <h3 class="text-xl font-semibold">
+                    Créditos
+                </h3>
+
+                <p class="text-gray-600 mt-2">
+                    Administra los créditos aprobados.
+                </p>
+
+            </div>
+
+
+        </div>
+
+    </main>
+
+</body>
+
+</html>

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi cuenta - JERD Cash</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+
+    <!-- NAVBAR -->
+    <nav class="bg-white border-b">
+        <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">
+                    JERD<span class="text-blue-600">-Cash</span>
+                </h1>
+                <p class="text-xs text-gray-500">
+                    Portal del cliente
+                </p>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <span class="text-sm text-gray-600">
+                    Hola, {{ request.user.first_name|default:request.user.username }}
+                </span>
+
+                <form method="post" action="{% url 'logout' %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit">
+                        Cerrar sesión
+                    </button>
+                </form>
+            </div>
+
+        </div>
+    </nav>
+
+
+    <!-- CONTENIDO -->
+    <main class="max-w-6xl mx-auto px-6 py-10">
+
+        <!-- BIENVENIDA -->
+        <div class="mb-8">
+            <h2 class="text-3xl font-bold text-gray-900">
+                Mi cuenta
+            </h2>
+
+            <p class="text-gray-600 mt-2">
+                Administra tu información y consulta tus créditos.
+            </p>
+        </div>
+
+
+        <!-- TARJETAS -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+
+            <!-- PERFIL -->
+            <div class="bg-white rounded-xl shadow-sm border p-6">
+
+                <div class="text-3xl mb-4">
+                    👤
+                </div>
+
+                <h3 class="text-xl font-semibold text-gray-900">
+                    Mi perfil
+                </h3>
+
+                <p class="text-gray-600 mt-2 mb-5">
+                    Consulta y actualiza tus datos personales.
+                </p>
+
+                <a href="{% url 'perfil' %}"
+                   class="block text-center w-full bg-gray-900 text-white py-2.5 rounded-lg hover:bg-gray-800">
+                   Gestionar perfil
+                </a>
+
+            </div>
+
+
+            <!-- SOLICITAR CRÉDITO -->
+            <div class="bg-white rounded-xl shadow-sm border p-6">
+
+                <div class="text-3xl mb-4">
+                    💰
+                </div>
+
+                <h3 class="text-xl font-semibold text-gray-900">
+                    Solicitar crédito
+                </h3>
+
+                <p class="text-gray-600 mt-2 mb-5">
+                    Solicita un nuevo crédito y conoce las condiciones.
+                </p>
+
+                <a href="{% url 'solicitar_credito' %}"
+                   class="block text-center w-full bg-blue-600 text-white py-2.5 rounded-lg hover:bg-blue-700">
+                   Solicitar crédito
+                </a>
+
+            </div>
+
+
+            <!-- MIS CRÉDITOS -->
+            <div class="bg-white rounded-xl shadow-sm border p-6">
+
+                <div class="text-3xl mb-4">
+                    📋
+                </div>
+
+                <h3 class="text-xl font-semibold text-gray-900">
+                    Mis créditos
+                </h3>
+
+                <p class="text-gray-600 mt-2 mb-5">
+                    Consulta tus créditos actuales y anteriores.
+                </p>
+
+                <button
+                    class="w-full bg-gray-900 text-white py-2.5 rounded-lg hover:bg-gray-800">
+                    Ver mis créditos
+                </button>
+
+            </div>
+
+
+            <!-- SIMULADOR -->
+            <div class="bg-white rounded-xl shadow-sm border p-6">
+
+                <div class="text-3xl mb-4">
+                    🧮
+                </div>
+
+                <h3 class="text-xl font-semibold text-gray-900">
+                    Simulador
+                </h3>
+
+                <p class="text-gray-600 mt-2 mb-5">
+                    Calcula cuánto pagarías por un nuevo crédito.
+                </p>
+
+                <a href="{% url 'simulador' %}"
+                   class="block text-center w-full bg-blue-600 text-white py-2.5 rounded-lg hover:bg-blue-700">
+                    Simular crédito
+                </a>
+
+            </div>
+
+
+            <!-- SOLICITUDES -->
+            <div class="bg-white rounded-xl shadow-sm border p-6">
+
+                <div class="text-3xl mb-4">
+                    ⏳
+                </div>
+
+                <h3 class="text-xl font-semibold text-gray-900">
+                    Mis solicitudes
+                </h3>
+
+                <p class="text-gray-600 mt-2 mb-5">
+                    Consulta el estado de tus solicitudes de crédito.
+                </p>
+
+                <a href="{% url 'mis_solicitudes' %}"
+                   class="block text-center w-full bg-gray-900 text-white py-2.5 rounded-lg hover:bg-gray-800">
+                   Ver solicitudes
+                </a>
+
+            </div>
+
+
+            <!-- ESTADO -->
+            <div class="bg-white rounded-xl shadow-sm border p-6">
+
+                <div class="text-3xl mb-4">
+                    📊
+                </div>
+
+                <h3 class="text-xl font-semibold text-gray-900">
+                    Estado financiero
+                </h3>
+
+                <p class="text-gray-600 mt-2 mb-5">
+                    Consulta la información relacionada con tus créditos.
+                </p>
+
+                <button
+                    class="w-full bg-gray-900 text-white py-2.5 rounded-lg hover:bg-gray-800">
+                    Consultar estado
+                </button>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</body>
+</html>

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Mis solicitudes - JERD-Cash</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 min-h-screen">
+
+    <nav class="bg-blue-700 text-white px-6 py-4">
+
+        <div class="max-w-5xl mx-auto flex justify-between items-center">
+
+            <h1 class="text-2xl font-bold">
+                JERD-Cash
+            </h1>
+
+            <a
+                href="{% url 'cliente_dashboard' %}"
+                class="bg-white text-blue-700 px-4 py-2 rounded-lg"
+            >
+                Volver
+            </a>
+
+        </div>
+
+    </nav>
+
+
+    <main class="max-w-5xl mx-auto px-4 py-8">
+
+        <div class="bg-white rounded-xl shadow-md p-8">
+
+            <h2 class="text-3xl font-bold text-gray-800 mb-2">
+                Mis solicitudes
+            </h2>
+
+            <p class="text-gray-600 mb-8">
+                Aquí puedes consultar el estado de tus solicitudes de crédito.
+            </p>
+
+
+            {% if solicitudes %}
+
+                <div class="space-y-4">
+
+                    {% for solicitud in solicitudes %}
+
+                        <div class="border rounded-lg p-5">
+
+                            <div class="flex justify-between items-center">
+
+                                <div>
+
+                                    <h3 class="text-lg font-bold text-gray-800">
+                                        Solicitud #{{ solicitud.id }}
+                                    </h3>
+
+                                    <p class="text-gray-600">
+                                        Monto solicitado:
+                                        ${{ solicitud.monto_solicitado }}
+                                    </p>
+
+                                    <p class="text-sm text-gray-500">
+                                        Fecha:
+                                        {{ solicitud.fecha_solicitud|date:"d/m/Y H:i" }}
+                                    </p>
+
+                                </div>
+
+
+                                <div>
+
+                                    {% if solicitud.estado == 'PENDIENTE' %}
+
+                                        <span class="bg-yellow-100 text-yellow-800 px-4 py-2 rounded-lg font-semibold">
+                                            Pendiente
+                                        </span>
+
+                                    {% elif solicitud.estado == 'APROBADA' %}
+
+                                        <span class="bg-green-100 text-green-800 px-4 py-2 rounded-lg font-semibold">
+                                            Aprobada
+                                        </span>
+
+                                    {% elif solicitud.estado == 'RECHAZADA' %}
+
+                                        <span class="bg-red-100 text-red-800 px-4 py-2 rounded-lg font-semibold">
+                                            Rechazada
+                                        </span>
+
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            {% else %}
+
+                <div class="bg-gray-50 border rounded-lg p-6 text-center">
+
+                    <p class="text-gray-600 mb-4">
+                        Todavía no tienes solicitudes de crédito.
+                    </p>
+
+                    <a
+                        href="{% url 'solicitar_credito' %}"
+                        class="inline-block bg-blue-700 text-white px-5 py-3 rounded-lg font-semibold hover:bg-blue-800"
+                    >
+                        Solicitar mi primer crédito
+                    </a>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </main>
+
+</body>
+
+</html>

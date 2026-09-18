@@ -26,6 +26,7 @@ SECRET_KEY = 'django-insecure-0mejt(de=0_$8_(ofol%*#!r#7k9s5*@afqjl1)zv&h&2&2z4g
 DEBUG = True
 
 ALLOWED_HOSTS = []
+GOOGLE_CLIENT_ID = '865586248843-u3sk3qqac14eq4dm0u9ldvhsqdvo7koa.apps.googleusercontent.com'
 
 
 # Application definition
@@ -40,6 +41,9 @@ INSTALLED_APPS = [
 
     'jerd_cash_project.apps.users.apps.UsersConfig',
     'jerd_cash_project.apps.loans.apps.LoansConfig',
+    'jerd_cash_project.apps.cliente.apps.ClienteConfig',
+    'jerd_cash_project.apps.administrador',
+
 
     
 ]
@@ -122,6 +126,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -129,3 +135,6 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_URL = '/login/'
+
+SECURE_REFERRER_POLICY = 'no-referrer-when-downgrade'
+SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin-allow-popups'

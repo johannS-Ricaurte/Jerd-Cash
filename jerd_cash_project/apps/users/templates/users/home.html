@@ -155,99 +155,727 @@
                 </div>
 
 
-                <!-- TARJETA VISUAL -->
+                <!-- =========================
+                    SIMULADOR PÚBLICO
+                ========================== -->
                 <div class="flex justify-center">
 
                     <div
-                        class="relative w-full max-w-md
-                               bg-white rounded-2xl
-                               shadow-xl border
-                               border-gray-100 p-8"
+                        class="w-full max-w-md
+                            bg-white rounded-2xl
+                            shadow-xl border
+                            border-gray-100 p-7"
                     >
 
-                        <!-- Decoración -->
-                        <div
-                            class="absolute -top-5 -right-5
-                                   w-20 h-20
-                                   bg-blue-100 rounded-full
-                                   opacity-70"
-                        ></div>
+                        <div class="text-center">
 
+                            <div
+                                class="mx-auto w-12 h-12
+                                    bg-blue-100 rounded-xl
+                                    flex items-center justify-center
+                                    text-2xl"
+                            >
+                                💰
+                            </div>
 
-                        <div class="relative">
-
-                            <p class="text-sm text-gray-500">
+                            <h3
+                                class="mt-4 text-2xl font-bold
+                                    text-blue-950"
+                            >
                                 Simula tu crédito
+                            </h3>
+
+                            <p class="mt-2 text-gray-500 text-sm">
+                                Conoce una estimación de tus condiciones
+                                de crédito sin iniciar sesión.
                             </p>
 
-                            <p class="text-4xl font-bold
-                                      text-blue-900 mt-2">
-                                $500.000
-                            </p>
+                        </div>
 
 
-                            <div class="mt-6 space-y-4">
+                        <!-- FORMULARIO -->
+                        <form
+                            method="POST"
+                            action=""
+                            class="mt-7 space-y-5"
+                            id="simulador-form"
+                        >
 
-                                <div
-                                    class="flex justify-between
-                                           border-b pb-3"
+                            {% csrf_token %}
+
+
+                            <!-- INGRESOS -->
+                            <div>
+
+                                <label
+                                    for="ingresos"
+                                    class="block text-sm font-semibold
+                                        text-gray-700 mb-2"
                                 >
-                                    <span class="text-gray-500">
-                                        Plazo
+                                    Ingresos mensuales
+                                </label>
+
+                                <div class="relative">
+
+                                    <span
+                                        class="absolute left-4 top-1/2
+                                            -translate-y-1/2
+                                            text-gray-500 font-semibold"
+                                    >
+                                        $
                                     </span>
 
-                                    <span class="font-semibold">
-                                        12 meses
-                                    </span>
-                                </div>
+                                    <input
+                                        type="text"
+                                        id="ingresos"
+                                        name="ingresos"
+                                        inputmode="numeric"
+                                        autocomplete="off"
+                                        value="{% if request.method == 'POST' %}{{ request.POST.ingresos }}{% endif %}"
+                                        placeholder="Ej: 3.000.000"
+                                        class="w-full border border-gray-300
+                                            rounded-lg px-4 py-3 pl-9
+                                            focus:outline-none
+                                            focus:ring-2
+                                            focus:ring-blue-500
+                                            focus:border-blue-500"
+                                        required
+                                    >
 
-
-                                <div
-                                    class="flex justify-between
-                                           border-b pb-3"
-                                >
-                                    <span class="text-gray-500">
-                                        Tasa mensual
-                                    </span>
-
-                                    <span class="font-semibold
-                                                 text-blue-700">
-                                        Según tu perfil
-                                    </span>
-                                </div>
-
-
-                                <div
-                                    class="flex justify-between
-                                           border-b pb-3"
-                                >
-                                    <span class="text-gray-500">
-                                        Cuota aproximada
-                                    </span>
-
-                                    <span class="font-bold
-                                                 text-green-700">
-                                        $48.744
-                                    </span>
                                 </div>
 
                             </div>
 
 
-                            <a
-                                href="{% url 'registro' %}"
-                                class="block w-full mt-7
-                                       bg-blue-900 text-white
-                                       text-center py-3
-                                       rounded-lg
-                                       font-semibold
-                                       hover:bg-blue-800
-                                       transition"
-                            >
-                                Comenzar
-                            </a>
+                            <!-- GASTOS -->
+                            <div>
 
-                        </div>
+                                <label
+                                    for="gastos"
+                                    class="block text-sm font-semibold
+                                        text-gray-700 mb-2"
+                                >
+                                    Gastos mensuales
+                                </label>
+
+                                <div class="relative">
+
+                                    <span
+                                        class="absolute left-4 top-1/2
+                                            -translate-y-1/2
+                                            text-gray-500 font-semibold"
+                                    >
+                                        $
+                                    </span>
+
+                                    <input
+                                        type="text"
+                                        id="gastos"
+                                        name="gastos"
+                                        inputmode="numeric"
+                                        autocomplete="off"
+                                        value="{% if request.method == 'POST' %}{{ request.POST.gastos }}{% endif %}"
+                                        placeholder="Ej: 1.800.000"
+                                        class="w-full border border-gray-300
+                                            rounded-lg px-4 py-3 pl-9
+                                            focus:outline-none
+                                            focus:ring-2
+                                            focus:ring-blue-500
+                                            focus:border-blue-500"
+                                        required
+                                    >
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- MONTO -->
+                            <div>
+
+                                <label
+                                    for="monto"
+                                    class="block text-sm font-semibold
+                                        text-gray-700 mb-2"
+                                >
+                                    Monto del crédito
+                                </label>
+
+                                <div class="relative">
+
+                                    <span
+                                        class="absolute left-4 top-1/2
+                                            -translate-y-1/2
+                                            text-gray-500 font-semibold"
+                                    >
+                                        $
+                                    </span>
+
+                                    <input
+                                        type="text"
+                                        id="monto"
+                                        name="monto"
+                                        inputmode="numeric"
+                                        autocomplete="off"
+                                        value="{% if request.method == 'POST' %}{{ request.POST.monto }}{% endif %}"
+                                        placeholder="Ej: 2.000.000"
+                                        class="w-full border border-gray-300
+                                            rounded-lg px-4 py-3 pl-9
+                                            focus:outline-none
+                                            focus:ring-2
+                                            focus:ring-blue-500
+                                            focus:border-blue-500"
+                                        required
+                                    >
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- PLAZO -->
+                            <div>
+
+                                <label
+                                    for="plazo"
+                                    class="block text-sm font-semibold
+                                        text-gray-700 mb-2"
+                                >
+                                    Plazo del crédito
+                                </label>
+
+                                <select
+                                    id="plazo"
+                                    name="plazo"
+                                    class="w-full border border-gray-300
+                                        rounded-lg px-4 py-3
+                                        bg-white
+                                        focus:outline-none
+                                        focus:ring-2
+                                        focus:ring-blue-500
+                                        focus:border-blue-500"
+                                    required
+                                >
+
+                                    <option value="">
+                                        Selecciona un plazo
+                                    </option>
+
+                                    <option value="3"
+                                        {% if request.POST.plazo == '3' %}selected{% endif %}>
+                                        3 meses
+                                    </option>
+
+                                    <option value="6"
+                                        {% if request.POST.plazo == '6' %}selected{% endif %}>
+                                        6 meses
+                                    </option>
+
+                                    <option value="12"
+                                        {% if request.POST.plazo == '12' %}selected{% endif %}>
+                                        12 meses
+                                    </option>
+
+                                    <option value="24"
+                                        {% if request.POST.plazo == '24' %}selected{% endif %}>
+                                        24 meses
+                                    </option>
+
+                                    <option value="36"
+                                        {% if request.POST.plazo == '36' %}selected{% endif %}>
+                                        36 meses
+                                    </option>
+
+                                </select>
+                            </div>
+
+
+                            <!-- ERROR -->
+                            {% if error %}
+
+                                <div
+                                    class="p-4 rounded-lg
+                                        bg-red-50
+                                        border border-red-200
+                                        text-red-700 text-sm"
+                                >
+                                    {{ error }}
+                                </div>
+
+                            {% endif %}
+
+
+                            <!-- BOTÓN -->
+                            <button
+                                type="submit"
+                                class="w-full py-3.5
+                                    bg-blue-900
+                                    text-white
+                                    font-semibold
+                                    rounded-lg
+                                    hover:bg-blue-800
+                                    transition
+                                    shadow-md"
+                            >
+                                Calcular simulación
+                            </button>
+
+                        </form>
+
+
+                        <!-- =========================
+                            RESULTADO
+                        ========================== -->
+                        {% if score is not None %}
+
+                            <div class="mt-8 border-t pt-7">
+
+                                <h4
+                                    class="text-xl font-bold
+                                        text-blue-950 text-center"
+                                >
+                                    Resultado de tu simulación
+                                </h4>
+
+
+                                <!-- DATOS FINANCIEROS -->
+                                <div class="mt-5 space-y-3">
+
+                                    <div
+                                        class="flex justify-between
+                                            border-b pb-3"
+                                    >
+
+                                        <span class="text-gray-500">
+                                            Ingresos
+                                        </span>
+
+                                        <span
+                                            class="font-semibold
+                                                formato-pesos"
+                                        >
+                                            ${{ ingresos }}
+                                        </span>
+
+                                    </div>
+
+
+                                    <div
+                                        class="flex justify-between
+                                            border-b pb-3"
+                                    >
+
+                                        <span class="text-gray-500">
+                                            Gastos
+                                        </span>
+
+                                        <span
+                                            class="font-semibold
+                                                formato-pesos"
+                                        >
+                                            ${{ gastos }}
+                                        </span>
+
+                                    </div>
+
+
+                                    <div
+                                        class="flex justify-between
+                                            border-b pb-3"
+                                    >
+
+                                        <span class="text-gray-500">
+                                            Saldo disponible
+                                        </span>
+
+                                        <span
+                                            class="font-semibold
+                                                text-green-700
+                                                formato-pesos"
+                                        >
+                                            ${{ saldo_disponible }}
+                                        </span>
+
+                                    </div>
+
+                                </div>
+
+
+                                <!-- SCORE PRINCIPAL -->
+                                <div
+                                    class="mt-6 p-5
+                                        bg-blue-50
+                                        border border-blue-100
+                                        rounded-xl"
+                                >
+
+                                    <div class="text-center">
+
+                                        <p class="text-sm text-gray-500">
+                                            Puntaje estimado
+                                        </p>
+
+                                        <p
+                                            class="mt-1 text-5xl
+                                                font-bold text-blue-900"
+                                        >
+                                            {{ score }}
+                                            <span class="text-lg text-gray-500">
+                                                / 1000
+                                            </span>
+                                        </p>
+
+                                        <p
+                                            class="mt-2 text-sm
+                                                text-gray-600"
+                                        >
+                                            Nivel de riesgo:
+                                            <strong class="text-blue-900">
+                                                {{ nivel_riesgo }}
+                                            </strong>
+                                        </p>
+
+                                    </div>
+
+                                </div>
+
+
+                                <!-- DATOS PRINCIPALES -->
+                                {% if tasa_interes is not None %}
+
+                                    <div
+                                        class="grid grid-cols-2
+                                            gap-3 mt-4"
+                                    >
+
+                                        <!-- TASA -->
+                                        <div
+                                            class="p-4
+                                                bg-white
+                                                border border-gray-200
+                                                rounded-xl
+                                                text-center"
+                                        >
+
+                                            <p class="text-xs text-gray-500">
+                                                Tasa mensual
+                                            </p>
+
+                                            <p
+                                                class="mt-1 text-2xl
+                                                    font-bold text-blue-700"
+                                            >
+                                                {{ tasa_interes }}%
+                                            </p>
+
+                                        </div>
+
+
+                                        <!-- CUOTA -->
+                                        <div
+                                            class="p-4
+                                                bg-white
+                                                border border-gray-200
+                                                rounded-xl
+                                                text-center"
+                                        >
+
+                                            <p class="text-xs text-gray-500">
+                                                Cuota mensual
+                                            </p>
+
+                                            <p
+                                                class="mt-1 text-xl
+                                                    font-bold text-green-700
+                                                    formato-cuota"
+                                            >
+                                                ${{ cuota_mensual }}
+                                            </p>
+
+                                        </div>
+
+                                    </div>
+
+                                {% endif %}
+
+
+
+                                <!-- CAPACIDAD -->
+                                <div
+                                    class="mt-4 p-4
+                                        rounded-lg
+                                        bg-gray-50
+                                        text-center"
+                                >
+
+                                    <p class="text-sm text-gray-500">
+                                        Capacidad de pago
+                                    </p>
+
+                                    <p
+                                        class="text-xl font-bold
+                                            text-gray-900"
+                                    >
+                                        {{ capacidad_pago|floatformat:1 }}%
+                                    </p>
+
+                                </div>
+
+
+                                {% if tasa_interes is not None %}
+
+                                    <!-- CONDICIONES -->
+                                    <div class="mt-5 space-y-3">
+
+                                        <div
+                                            class="flex justify-between
+                                                border-b pb-3"
+                                        >
+
+                                            <span class="text-gray-500">
+                                                Tasa mensual
+                                            </span>
+
+                                            <span
+                                                class="font-bold
+                                                    text-blue-700"
+                                            >
+                                                {{ tasa_interes }}%
+                                            </span>
+
+                                        </div>
+
+
+                                        <div
+                                            class="flex justify-between
+                                                border-b pb-3"
+                                        >
+
+                                            <span class="text-gray-500">
+                                                Monto solicitado
+                                            </span>
+
+                                            <span
+                                                class="font-semibold
+                                                    formato-pesos"
+                                            >
+                                                ${{ monto }}
+                                            </span>
+
+                                        </div>
+
+
+                                        <div
+                                            class="flex justify-between
+                                                border-b pb-3"
+                                        >
+
+                                            <span class="text-gray-500">
+                                                Plazo
+                                            </span>
+
+                                            <span class="font-semibold">
+                                                {{ plazo }} meses
+                                            </span>
+
+                                        </div>
+
+
+                                        <div
+                                            class="flex justify-between
+                                                pt-1"
+                                        >
+
+                                            <span
+                                                class="text-gray-700
+                                                    font-semibold"
+                                            >
+                                                Cuota mensual
+                                            </span>
+
+                                            <span
+                                                class="font-bold
+                                                    text-green-700
+                                                    formato-cuota"
+                                            >
+                                                ${{ cuota_mensual }}
+                                            </span>
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <!-- CAPACIDAD DE LA CUOTA -->
+                                    <div class="mt-6">
+
+                                        {% if puede_pagar_cuota %}
+
+                                            <div
+                                                class="p-5 rounded-xl
+                                                    bg-green-50
+                                                    border border-green-200"
+                                            >
+
+                                                <div class="flex items-start gap-3">
+
+                                                    <div
+                                                        class="w-10 h-10
+                                                            flex-shrink-0
+                                                            bg-green-100
+                                                            rounded-full
+                                                            flex items-center
+                                                            justify-center"
+                                                    >
+                                                        ✓
+                                                    </div>
+
+                                                    <div>
+
+                                                        <p
+                                                            class="font-bold
+                                                                text-green-800"
+                                                        >
+                                                            La cuota está dentro de
+                                                            tu capacidad de pago
+                                                        </p>
+
+                                                        <p
+                                                            class="mt-1 text-sm
+                                                                text-green-700"
+                                                        >
+                                                            Tu saldo disponible mensual
+                                                            es de
+                                                            <strong class="formato-pesos">
+                                                                ${{ saldo_disponible }}
+                                                            </strong>.
+                                                        </p>
+
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+
+                                        {% else %}
+
+                                            <div
+                                                class="p-5 rounded-xl
+                                                    bg-yellow-50
+                                                    border border-yellow-200"
+                                            >
+
+                                                <div class="flex items-start gap-3">
+
+                                                    <div
+                                                        class="w-10 h-10
+                                                            flex-shrink-0
+                                                            bg-yellow-100
+                                                            rounded-full
+                                                            flex items-center
+                                                            justify-center"
+                                                    >
+                                                        !
+                                                    </div>
+
+                                                    <div>
+
+                                                        <p
+                                                            class="font-bold
+                                                                text-yellow-800"
+                                                        >
+                                                            La cuota supera tu capacidad
+                                                            disponible
+                                                        </p>
+
+                                                        <p
+                                                            class="mt-1 text-sm
+                                                                text-yellow-700"
+                                                        >
+                                                            Tu saldo disponible mensual es de
+                                                            <strong class="formato-pesos">
+                                                                ${{ saldo_disponible }}
+                                                            </strong>,
+                                                            mientras que la cuota estimada es de
+                                                            <strong class="formato-cuota">
+                                                                ${{ cuota_mensual }}
+                                                            </strong>.
+                                                        </p>
+
+                                                        <p
+                                                            class="mt-2 text-xs
+                                                                text-yellow-700"
+                                                        >
+                                                            Puedes intentar con un monto menor
+                                                            o un plazo diferente.
+                                                        </p>
+
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+
+                                        {% endif %}
+
+                                    </div>
+
+
+                                    <!-- CTA -->
+                                    <div class="mt-6">
+
+                                        <p
+                                            class="text-center text-sm
+                                                text-gray-600"
+                                        >
+                                            ¿Quieres continuar con tu
+                                            solicitud de crédito?
+                                        </p>
+
+                                        <div
+                                            class="mt-4 grid
+                                                grid-cols-1 sm:grid-cols-2
+                                                gap-3"
+                                        >
+
+                                            <a
+                                                href="{% url 'registro' %}"
+                                                class="py-3
+                                                    bg-blue-900
+                                                    text-white
+                                                    text-center
+                                                    font-semibold
+                                                    rounded-lg
+                                                    hover:bg-blue-800
+                                                    transition"
+                                            >
+                                                Crear cuenta
+                                            </a>
+
+                                            <a
+                                                href="{% url 'login' %}"
+                                                class="py-3
+                                                    border-2
+                                                    border-blue-900
+                                                    text-blue-900
+                                                    text-center
+                                                    font-semibold
+                                                    rounded-lg
+                                                    hover:bg-blue-50
+                                                    transition"
+                                            >
+                                                Iniciar sesión
+                                            </a>
+
+                                        </div>
+
+                                    </div>
+
+                                {% endif %}
+
+                            </div>
+
+                        {% endif %}
 
                     </div>
 
@@ -516,9 +1144,16 @@
                 Crear mi cuenta
             </a>
 
+            <p class="mt-4 text-xs text-gray-500 text-center leading-relaxed">
+                La simulación es informativa y no representa una aprobación definitiva.
+                La aprobación final está sujeta a la validación del perfil y los documentos requeridos.
+            </p>
+
         </div>
 
     </section>
+
+    
 
 
     <!-- =========================

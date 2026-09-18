@@ -1,0 +1,11 @@
+﻿from jerd_cash_project.apps.cliente.ocr import extraer_texto_pdf
+ruta = input('Ruta completa del PDF de la cedula: ')
+archivo = open(ruta, 'rb')
+texto = extraer_texto_pdf(archivo)
+archivo.close()
+print('')
+print('=' * 60)
+print('TEXTO DETECTADO POR OCR')
+print('=' * 60)
+print(texto)
+print('=' * 60)

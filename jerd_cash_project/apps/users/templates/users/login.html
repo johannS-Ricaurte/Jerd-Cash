@@ -1,51 +1,208 @@
 <!DOCTYPE html>
+
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Iniciar sesión - JERD-Cash</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+
+```
+<script src="https://cdn.tailwindcss.com"></script>
+
+<!-- Google Identity Services -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+```
+
 </head>
+
 <body class="bg-gray-100 min-h-screen flex items-center justify-center">
 
-    <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        <h1 class="text-2xl font-bold text-center text-blue-800 mb-6">JERD-Cash</h1>
-        <h2 class="text-xl font-semibold text-center mb-4">Iniciar Sesión</h2>
+```
+<div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
 
-        <!-- Mensajes de Django -->
-        {% if messages %}
-            {% for message in messages %}
-                <div class="mb-4 p-3 rounded {% if message.tags == 'error' %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %}">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        {% endif %}
+    <h1 class="text-2xl font-bold text-center text-blue-800 mb-6">
+        JERD-Cash
+    </h1>
 
-        <form method="post" action="{% url 'login' %}">
-            {% csrf_token %}
+    <h2 class="text-xl font-semibold text-center mb-4">
+        Iniciar Sesión
+    </h2>
 
-            <div class="mb-4">
-                <label for="id_username" class="block text-sm font-medium text-gray-700 mb-1">Usuario</label>
-                <input type="text" name="username" id="id_username" required
-                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+    <!-- Mensajes de Django -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="mb-4 p-3 rounded
+                {% if message.tags == 'error' %}
+                    bg-red-100 text-red-700
+                {% else %}
+                    bg-green-100 text-green-700
+                {% endif %}">
+                {{ message }}
             </div>
+        {% endfor %}
+    {% endif %}
 
-            <div class="mb-6">
-                <label for="id_password" class="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
-                <input type="password" name="password" id="id_password" required
-                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-            </div>
+    <!-- LOGIN NORMAL -->
+    <form method="post" action="{% url 'login' %}">
 
-            <button type="submit" class="w-full bg-blue-800 text-white py-2 px-4 rounded-md hover:bg-blue-900 transition">
-                Ingresar
-            </button>
-        </form>
+        {% csrf_token %}
 
-        <p class="text-center text-sm text-gray-600 mt-4">
-            ¿No tienes cuenta? 
-            <a href="{% url 'registro' %}" class="text-blue-800 hover:underline">Regístrate aquí</a>
-        </p>
+        <div class="mb-4">
+
+            <label
+                for="id_username"
+                class="block text-sm font-medium text-gray-700 mb-1">
+                Usuario
+            </label>
+
+            <input
+                type="text"
+                name="username"
+                id="id_username"
+                required
+                class="w-full px-3 py-2 border border-gray-300 rounded-md
+                       focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+        </div>
+
+        <div class="mb-6">
+
+            <label
+                for="id_password"
+                class="block text-sm font-medium text-gray-700 mb-1">
+                Contraseña
+            </label>
+
+            <input
+                type="password"
+                name="password"
+                id="id_password"
+                required
+                class="w-full px-3 py-2 border border-gray-300 rounded-md
+                       focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+        </div>
+
+        <button
+            type="submit"
+            class="w-full bg-blue-800 text-white py-2 px-4 rounded-md
+                   hover:bg-blue-900 transition">
+            Ingresar
+        </button>
+
+    </form>
+
+    <!-- SEPARADOR -->
+
+    <div class="flex items-center my-6">
+
+        <div class="flex-1 border-t border-gray-300"></div>
+
+        <span class="px-3 text-sm text-gray-500">
+            O
+        </span>
+
+        <div class="flex-1 border-t border-gray-300"></div>
+
     </div>
+
+    <!-- LOGIN CON GOOGLE -->
+
+    <div
+        id="g_id_onload"
+        data-client_id="{{ GOOGLE_CLIENT_ID }}"
+        data-callback="manejarRespuestaGoogle"
+        data-auto_prompt="false">
+    </div>
+
+    <div
+        class="g_id_signin"
+        data-type="standard"
+        data-size="large"
+        data-theme="outline"
+        data-text="continue_with"
+        data-shape="rectangular"
+        data-logo_alignment="left"
+        data-ux_mode="popup">
+    </div>
+
+    <script>
+        function manejarRespuestaGoogle(response) {
+
+            console.log("GOOGLE CALLBACK EJECUTADO");
+            console.log("Respuesta de Google:", response);
+
+            alert("Google devolvió correctamente la credencial.");
+
+            const datos = new URLSearchParams();
+
+            datos.append(
+                'credential',
+                response.credential
+            );
+
+            fetch("{% url 'login_google' %}", {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                    "X-CSRFToken": "{{ csrf_token }}"
+                },
+
+                body: datos.toString()
+
+            })
+            .then(response => response.json())
+
+            .then(data => {
+
+                console.log("Respuesta Django:", data);
+
+                if (data.redirect_url) {
+
+                    window.location.href = data.redirect_url;
+
+                    return;
+                }
+
+                alert(
+                    data.error ||
+                    "No fue posible iniciar sesión con Google."
+                );
+
+            })
+
+            .catch(error => {
+
+                console.error(
+                    "Error comunicándose con Django:",
+                    error
+                );
+
+                alert(
+                    "Ocurrió un error al comunicarse con JERD-Cash."
+                );
+
+            });
+        }
+    </script>
+    <!-- REGISTRO -->
+
+    <p class="text-center text-sm text-gray-600 mt-6">
+
+        ¿No tienes cuenta?
+
+        <a
+            href="{% url 'registro' %}"
+            class="text-blue-800 hover:underline">
+            Regístrate aquí
+        </a>
+
+    </p>
+
+</div>
+```
 
 </body>
 </html>

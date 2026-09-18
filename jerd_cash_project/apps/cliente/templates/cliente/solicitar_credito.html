@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Solicitar crédito - JERD-Cash</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+</head>
+
+<body class="bg-gray-100 min-h-screen">
+
+    <!-- NAVBAR -->
+
+    <nav class="bg-white shadow-md">
+
+        <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800">
+                    JERD-Cash
+                </h1>
+
+                <p class="text-sm text-gray-500">
+                    Solicitud de crédito
+                </p>
+            </div>
+
+            <a
+                href="{% url 'cliente_dashboard' %}"
+                class="text-blue-600 hover:text-blue-800 font-medium"
+            >
+                Volver al inicio
+            </a>
+
+        </div>
+
+    </nav>
+
+
+    <!-- CONTENIDO -->
+
+    <main class="max-w-4xl mx-auto px-6 py-10">
+
+        <div class="bg-white rounded-2xl shadow-lg p-8">
+
+            <h2 class="text-3xl font-bold text-gray-800 mb-2">
+                Solicitar crédito
+            </h2>
+
+            <p class="text-gray-500 mb-8">
+                Complete la información y adjunte los documentos solicitados.
+            </p>
+
+
+            <!-- ERRORES GENERALES -->
+
+            {% if form.non_field_errors %}
+
+                <div class="bg-red-100 border border-red-300 text-red-700 px-4 py-3 rounded-lg mb-6">
+
+                    {{ form.non_field_errors }}
+
+                </div>
+
+            {% endif %}
+
+
+            <form
+                method="POST"
+                enctype="multipart/form-data"
+                id="formSolicitud"
+            >
+
+                {% csrf_token %}
+
+
+                <!-- MONTO -->
+
+                <div class="mb-6">
+
+                    <label class="block text-gray-700 font-semibold mb-2">
+                        Monto solicitado
+                    </label>
+
+                    {{ form.monto_solicitado }}
+
+                    {% if form.monto_solicitado.errors %}
+
+                        <div class="text-red-600 text-sm mt-1">
+                            {{ form.monto_solicitado.errors }}
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- CEDULA -->
+
+                <div class="mb-8">
+
+                    <label class="block text-gray-700 font-semibold mb-2">
+                        Cédula de ciudadanía
+                    </label>
+
+                    {{ form.cedula }}
+
+                    <p class="text-sm text-gray-500 mt-1">
+                        Debe adjuntar su cédula en formato PDF.
+                    </p>
+
+                    <div
+                        id="mensajeCedula"
+                        class="mt-3 text-sm font-medium"
+                    ></div>
+
+                    {% if form.cedula.errors %}
+
+                        <div class="text-red-600 text-sm mt-1">
+                            {{ form.cedula.errors }}
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- RECIBO -->
+
+                <div class="mb-8">
+
+                    <label class="block text-gray-700 font-semibold mb-2">
+                        Recibo de servicio público
+                    </label>
+
+                    {{ form.recibo }}
+
+                    <p class="text-sm text-gray-500 mt-1">
+                        Adjunte el recibo en formato PDF.
+                    </p>
+
+                    {% if form.recibo.errors %}
+
+                        <div class="text-red-600 text-sm mt-1">
+                            {{ form.recibo.errors }}
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- CERTIFICACION -->
+
+                <div class="mb-8">
+
+                    <label class="block text-gray-700 font-semibold mb-2">
+                        Certificación bancaria
+                    </label>
+
+                    {{ form.certificacion_bancaria }}
+
+                    <p class="text-sm text-gray-500 mt-1">
+                        Adjunte la certificación bancaria en formato PDF.
+                    </p>
+
+                    {% if form.certificacion_bancaria.errors %}
+
+                        <div class="text-red-600 text-sm mt-1">
+                            {{ form.certificacion_bancaria.errors }}
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- EXTRACTOS -->
+
+                <div class="border-t pt-8 mt-8">
+
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">
+                        Extractos bancarios
+                    </h3>
+
+                    <p class="text-gray-500 mb-6">
+                        Debe adjuntar sus últimos tres extractos bancarios.
+                        Si el PDF está protegido, ingrese la contraseña
+                        correspondiente.
+                    </p>
+
+
+                    <!-- EXTRACTO 1 -->
+
+                    <div class="bg-gray-50 border rounded-xl p-5 mb-6">
+
+                        <h4 class="font-bold text-gray-800 mb-4">
+                            Extracto bancario 1
+                        </h4>
+
+                        <label class="block text-gray-700 font-semibold mb-2">
+                            Archivo PDF
+                        </label>
+
+                        {{ form.extracto_bancario_1 }}
+
+                        <label class="block text-gray-700 font-semibold mt-4 mb-2">
+                            Contraseña del PDF
+                        </label>
+
+                        <input
+                            type="password"
+                            id="contrasena_extracto_1"
+                            name="contrasena_extracto_1"
+                            class="w-full border rounded-lg px-4 py-2"
+                            placeholder="Ingrese la contraseña"
+                        >
+
+                        <div
+                            id="mensajeExtracto1"
+                            class="mt-3 text-sm font-medium"
+                        ></div>
+
+                        {% if form.extracto_bancario_1.errors %}
+
+                            <div class="text-red-600 text-sm mt-1">
+                                {{ form.extracto_bancario_1.errors }}
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- EXTRACTO 2 -->
+
+                    <div class="bg-gray-50 border rounded-xl p-5 mb-6">
+
+                        <h4 class="font-bold text-gray-800 mb-4">
+                            Extracto bancario 2
+                        </h4>
+
+                        <label class="block text-gray-700 font-semibold mb-2">
+                            Archivo PDF
+                        </label>
+
+                        {{ form.extracto_bancario_2 }}
+
+                        <label class="block text-gray-700 font-semibold mt-4 mb-2">
+                            Contraseña del PDF
+                        </label>
+
+                        <input
+                            type="password"
+                            id="contrasena_extracto_2"
+                            name="contrasena_extracto_2"
+                            class="w-full border rounded-lg px-4 py-2"
+                            placeholder="Ingrese la contraseña"
+                        >
+
+                        <div
+                            id="mensajeExtracto2"
+                            class="mt-3 text-sm font-medium"
+                        ></div>
+
+                        {% if form.extracto_bancario_2.errors %}
+
+                            <div class="text-red-600 text-sm mt-1">
+                                {{ form.extracto_bancario_2.errors }}
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- EXTRACTO 3 -->
+
+                    <div class="bg-gray-50 border rounded-xl p-5 mb-6">
+
+                        <h4 class="font-bold text-gray-800 mb-4">
+                            Extracto bancario 3
+                        </h4>
+
+                        <label class="block text-gray-700 font-semibold mb-2">
+                            Archivo PDF
+                        </label>
+
+                        {{ form.extracto_bancario_3 }}
+
+                        <label class="block text-gray-700 font-semibold mt-4 mb-2">
+                            Contraseña del PDF
+                        </label>
+
+                        <input
+                            type="password"
+                            id="contrasena_extracto_3"
+                            name="contrasena_extracto_3"
+                            class="w-full border rounded-lg px-4 py-2"
+                            placeholder="Ingrese la contraseña"
+                        >
+
+                        <div
+                            id="mensajeExtracto3"
+                            class="mt-3 text-sm font-medium"
+                        ></div>
+
+                        {% if form.extracto_bancario_3.errors %}
+
+                            <div class="text-red-600 text-sm mt-1">
+                                {{ form.extracto_bancario_3.errors }}
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+                <!-- AVISO -->
+
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
+
+                    <p class="text-sm text-blue-800">
+                        Los documentos serán analizados automáticamente
+                        para comprobar que correspondan al tipo de documento
+                        solicitado.
+                    </p>
+
+                </div>
+
+
+                <!-- BOTON -->
+
+                <button
+                    type="submit"
+                    id="btnEnviar"
+                    disabled
+                    class="w-full bg-gray-400 text-white font-bold py-3 rounded-lg cursor-not-allowed"
+                >
+                    Enviar solicitud
+                </button>
+
+            </form>
+
+        </div>
+
+    </main>
+
+
+    <!-- JAVASCRIPT -->
+
+    <script>
+
+        const form = document.getElementById('formSolicitud');
+
+        const btnEnviar = document.getElementById('btnEnviar');
+
+        const cedula = document.getElementById('id_cedula');
+
+        const mensajeCedula = document.getElementById('mensajeCedula');
+
+
+        const extracto1 = document.getElementById(
+            'id_extracto_bancario_1'
+        );
+
+        const extracto2 = document.getElementById(
+            'id_extracto_bancario_2'
+        );
+
+        const extracto3 = document.getElementById(
+            'id_extracto_bancario_3'
+        );
+
+
+        const contrasena1 = document.getElementById(
+            'contrasena_extracto_1'
+        );
+
+        const contrasena2 = document.getElementById(
+            'contrasena_extracto_2'
+        );
+
+        const contrasena3 = document.getElementById(
+            'contrasena_extracto_3'
+        );
+
+
+        const mensajeExtracto1 = document.getElementById(
+            'mensajeExtracto1'
+        );
+
+        const mensajeExtracto2 = document.getElementById(
+            'mensajeExtracto2'
+        );
+
+        const mensajeExtracto3 = document.getElementById(
+            'mensajeExtracto3'
+        );
+
+
+        let cedulaValida = false;
+
+        let extracto1Valido = false;
+
+        let extracto2Valido = false;
+
+        let extracto3Valido = false;
+
+
+        function actualizarBoton() {
+
+            if (
+                cedulaValida &&
+                extracto1Valido &&
+                extracto2Valido &&
+                extracto3Valido
+            ) {
+
+                btnEnviar.disabled = false;
+
+                btnEnviar.classList.remove(
+                    'bg-gray-400',
+                    'cursor-not-allowed'
+                );
+
+                btnEnviar.classList.add(
+                    'bg-blue-600',
+                    'hover:bg-blue-700'
+                );
+
+            } else {
+
+                btnEnviar.disabled = true;
+
+                btnEnviar.classList.remove(
+                    'bg-blue-600',
+                    'hover:bg-blue-700'
+                );
+
+                btnEnviar.classList.add(
+                    'bg-gray-400',
+                    'cursor-not-allowed'
+                );
+
+            }
+
+        }
+
+
+        function validarCedula() {
+
+            const archivo = cedula.files[0];
+
+            cedulaValida = false;
+
+            actualizarBoton();
+
+            if (!archivo) {
+
+                mensajeCedula.textContent = '';
+
+                return;
+            }
+
+
+            const datos = new FormData();
+
+            datos.append(
+                'cedula',
+                archivo
+            );
+
+
+            mensajeCedula.textContent =
+                'Analizando cédula...';
+
+            mensajeCedula.className =
+                'mt-3 text-sm font-medium text-blue-600';
+
+
+            fetch(
+                "{% url 'validar_cedula' %}",
+                {
+                    method: 'POST',
+                    body: datos,
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    }
+                }
+            )
+            .then(
+                respuesta => respuesta.json()
+            )
+            .then(
+                resultado => {
+
+                    if (resultado.valida) {
+
+                        cedulaValida = true;
+
+                        mensajeCedula.textContent =
+                            '✓ Cédula validada correctamente.';
+
+                        mensajeCedula.className =
+                            'mt-3 text-sm font-medium text-green-600';
+
+                    } else {
+
+                        cedulaValida = false;
+
+                        mensajeCedula.textContent =
+                            '✗ ' + resultado.mensaje;
+
+                        mensajeCedula.className =
+                            'mt-3 text-sm font-medium text-red-600';
+
+                    }
+
+                    actualizarBoton();
+
+                }
+            )
+            .catch(
+                () => {
+
+                    cedulaValida = false;
+
+                    mensajeCedula.textContent =
+                        '✗ Error al validar la cédula.';
+
+                    mensajeCedula.className =
+                        'mt-3 text-sm font-medium text-red-600';
+
+                    actualizarBoton();
+
+                }
+            );
+
+        }
+
+
+        function validarExtracto(
+            archivoInput,
+            contrasenaInput,
+            mensaje,
+            numero
+        ) {
+
+            const archivo = archivoInput.files[0];
+
+            const contrasena = contrasenaInput.value;
+
+            if (numero === 1) {
+                extracto1Valido = false;
+            }
+
+            if (numero === 2) {
+                extracto2Valido = false;
+            }
+
+            if (numero === 3) {
+                extracto3Valido = false;
+            }
+
+            actualizarBoton();
+
+
+            if (!archivo) {
+
+                mensaje.textContent = '';
+
+                return;
+            }
+
+
+            if (!contrasena) {
+
+                mensaje.textContent =
+                    '✗ Debe ingresar la contraseña del PDF.';
+
+                mensaje.className =
+                    'mt-3 text-sm font-medium text-red-600';
+
+                return;
+            }
+
+
+            const datos = new FormData();
+
+            datos.append(
+                'extracto',
+                archivo
+            );
+
+            datos.append(
+                'contrasena',
+                contrasena
+            );
+
+
+            mensaje.textContent =
+                'Analizando extracto...';
+
+            mensaje.className =
+                'mt-3 text-sm font-medium text-blue-600';
+
+
+            fetch(
+                "{% url 'validar_extracto' %}",
+                {
+                    method: 'POST',
+                    body: datos,
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    }
+                }
+            )
+            .then(
+                respuesta => respuesta.json()
+            )
+            .then(
+                resultado => {
+
+                    if (resultado.valida) {
+
+                        if (numero === 1) {
+                            extracto1Valido = true;
+                        }
+
+                        if (numero === 2) {
+                            extracto2Valido = true;
+                        }
+
+                        if (numero === 3) {
+                            extracto3Valido = true;
+                        }
+
+                        mensaje.textContent =
+                            '✓ Extracto validado correctamente.';
+
+                        mensaje.className =
+                            'mt-3 text-sm font-medium text-green-600';
+
+                    } else {
+
+                        mensaje.textContent =
+                            '✗ ' + resultado.mensaje;
+
+                        mensaje.className =
+                            'mt-3 text-sm font-medium text-red-600';
+
+                    }
+
+                    actualizarBoton();
+
+                }
+            )
+            .catch(
+                () => {
+
+                    mensaje.textContent =
+                        '✗ Error al analizar el extracto.';
+
+                    mensaje.className =
+                        'mt-3 text-sm font-medium text-red-600';
+
+                    actualizarBoton();
+
+                }
+            );
+
+        }
+
+
+        cedula.addEventListener(
+            'change',
+            validarCedula
+        );
+
+
+        extracto1.addEventListener(
+            'change',
+            () => validarExtracto(
+                extracto1,
+                contrasena1,
+                mensajeExtracto1,
+                1
+            )
+        );
+
+
+        extracto2.addEventListener(
+            'change',
+            () => validarExtracto(
+                extracto2,
+                contrasena2,
+                mensajeExtracto2,
+                2
+            )
+        );
+
+
+        extracto3.addEventListener(
+            'change',
+            () => validarExtracto(
+                extracto3,
+                contrasena3,
+                mensajeExtracto3,
+                3
+            )
+        );
+
+
+        contrasena1.addEventListener(
+            'input',
+            () => {
+
+                if (extracto1.files[0]) {
+
+                    validarExtracto(
+                        extracto1,
+                        contrasena1,
+                        mensajeExtracto1,
+                        1
+                    );
+
+                }
+
+            }
+        );
+
+
+        contrasena2.addEventListener(
+            'input',
+            () => {
+
+                if (extracto2.files[0]) {
+
+                    validarExtracto(
+                        extracto2,
+                        contrasena2,
+                        mensajeExtracto2,
+                        2
+                    );
+
+                }
+
+            }
+        );
+
+
+        contrasena3.addEventListener(
+            'input',
+            () => {
+
+                if (extracto3.files[0]) {
+
+                    validarExtracto(
+                        extracto3,
+                        contrasena3,
+                        mensajeExtracto3,
+                        3
+                    );
+
+                }
+
+            }
+        );
+
+
+        form.addEventListener(
+            'submit',
+            function(event) {
+
+                if (
+                    !cedulaValida ||
+                    !extracto1Valido ||
+                    !extracto2Valido ||
+                    !extracto3Valido
+                ) {
+
+                    event.preventDefault();
+
+                    alert(
+                        'Debe validar la cédula y los tres extractos bancarios antes de enviar la solicitud.'
+                    );
+
+                }
+
+            }
+        );
+
+
+        actualizarBoton();
+
+    </script>
+
+</body>
+
+</html>

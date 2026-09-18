@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil - JERD-Cash</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+
+```
+<!-- NAVBAR -->
+<nav class="bg-white border-b border-gray-200 shadow-sm">
+    <div class="w-full px-8 py-4">
+        <div class="flex items-center justify-between">
+
+            <!-- LOGO -->
+            <a href="{% url 'cliente_dashboard' %}"
+               class="text-2xl font-bold text-blue-600">
+                JERD-Cash
+            </a>
+
+            <!-- DERECHA -->
+            <div class="flex items-center gap-6">
+                <span class="text-gray-600">
+                    Hola, {{ user.first_name|default:user.username }}
+                </span>
+
+                <form method="post" action="{% url 'logout' %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit">
+                        Cerrar sesión
+                    </button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</nav>
+
+
+<!-- CONTENIDO -->
+<main class="w-full px-8 py-10">
+
+    <!-- ENCABEZADO -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-800">
+            Mi perfil
+        </h1>
+
+        <p class="text-gray-500 mt-2">
+            Completa y actualiza tu información personal.
+        </p>
+    </div>
+
+
+    <!-- FORMULARIO -->
+    <form method="POST" class="space-y-8">
+
+        {% csrf_token %}
+
+        <!-- ERRORES GENERALES -->
+        {% if form.non_field_errors %}
+            <div class="bg-red-50 border border-red-200
+                        text-red-700 px-5 py-4 rounded-xl">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+
+
+        <!-- ============================== -->
+        <!-- INFORMACIÓN PERSONAL -->
+        <!-- ============================== -->
+
+        <section class="bg-white rounded-2xl shadow-sm
+                        border border-gray-200 p-8">
+
+            <div class="mb-6">
+                <h2 class="text-xl font-bold text-gray-800">
+                    Información personal
+                </h2>
+
+                <p class="text-gray-500 text-sm mt-1">
+                    Información básica del cliente.
+                </p>
+            </div>
+
+
+            <div class="grid grid-cols-1 md:grid-cols-2
+                        lg:grid-cols-4 gap-6">
+
+                <!-- PRIMER NOMBRE -->
+                <div>
+                    <label class="block text-sm font-medium
+                                  text-gray-700 mb-2">
+                        Primer nombre
+                        <span class="text-red-500">*</span>
+                    </label>
+
+                    {{ form.primer_nombre }}
+
+                    {% if form.primer_nombre.errors %}
+                        <p class="text-red-500 text-sm mt-1">
+                            {{ form.primer_nombre.errors }}
+                        </p>
+                    {% endif %}
+                </div>
+
+
+                <!-- SEGUNDO NOMBRE -->
+                <div>
+                    <label class="block text-sm font-medium
+                                  text-gray-700 mb-2">
+                        Segundo nombre
+                    </label>
+
+                    {{ form.segundo_nombre }}
+
+                    {% if form.segundo_nombre.errors %}
+                        <p class="text-red-500 text-sm mt-1">
+                            {{ form.segundo_nombre.errors }}
+                        </p>
+                    {% endif %}
+                </div>
+
+
+                <!-- PRIMER APELLIDO -->
+                <div>
+                    <label class="block text-sm font-medium
+                                  text-gray-700 mb-2">
+                        Primer apellido
+                        <span class="text-red-500">*</span>
+                    </label>
+
+                    {{ form.primer_apellido }}
+
+                    {% if form.primer_apellido.errors %}
+                        <p class="text-red-500 text-sm mt-1">
+                            {{ form.primer_apellido.errors }}
+                        </p>
+                    {% endif %}
+                </div>
+
+
+                <!-- SEGUNDO APELLIDO -->
+                <div>
+                    <label class="block text-sm font-medium
+                                  text-gray-700 mb-2">
+                        Segundo apellido
+                    </label>
+
+                    {{ form.segundo_apellido }}
+
+                    {% if form.segundo_apellido.errors %}
+                        <p class="text-red-500 text-sm mt-1">
+                            {{ form.segundo_apellido.errors }}
+                        </p>
+                    {% endif %}
+                </div>
+
+
+                <!-- EMAIL -->
+                <div class="lg:col-span-2">
+                    <label class="block text-sm font-medium
+                                  text-gray-700 mb-2">
+                        Correo electrónico
+                        <span class="text-red-500">*</span>
+                    </label>
+
+                    {{ form.email }}
+
+                    {% if form.email.errors %}
+                        <p class="text-red-500 text-sm mt-1">
+                            {{ form.email.errors }}
+                        </p>
+                    {% endif %}
+                </div>
+
+
+                <!-- NACIONALIDAD -->
+                <div>
+                    <label class="block text-sm font-medium
+                                  text-gray-700 mb-2">
+                        Nacionalidad
+                        <span class="text-red-500">*</span>
+                    </label>
+
+                    {{ form.nacionalidad }}
+
+                    {% if form.nacionalidad.errors %}
+                        <p class="text-red-500 text-sm mt-1">
+                            {{ form.nacionalidad.errors }}
+                        </p>
+                    {% endif %}
+                </div>
+
+
+                <!-- CIUDAD NACIMIENTO -->
+                <div>
+                    <label class="block text-sm font-medium
+                                  text-gray-700 mb-2">
+                        Ciudad de nacimiento
+                        <span class="text-red-500">*</span>
+                    </label>
+
+                    {{ form.ciudad_nacimiento }}
+
+                    {% if form.ciudad_nacimiento.errors %}
+                        <p class="text-red-500 text-sm mt-1">
+                            {{ form.ciudad_nacimiento.errors }}
+                        </p>
+                    {% endif %}
+                </div>
+
+            </div>
+        </section>
+
+
+        <!-- ============================== -->
+        <!-- RESIDENCIA -->
+        <!-- ============================== -->
+
+        <section class="bg-white rounded-2xl shadow-sm
+                        border border-gray-200 p-8">
+
+            <div class="mb-6">
+                <h2 class="text-xl font-bold text-gray-800">
+                    Información de residencia
+                </h2>
+
+                <p class="text-gray-500 text-sm mt-1">
+                    Información sobre tu lugar actual de residencia.
+                </p>
+            </div>
+
+
+            <div class="grid grid-cols-1 md:grid-cols-2
+                        lg:grid-cols-4 gap-6">
+
+                <!-- PAÍS RESIDENCIA -->
+                <div>
+                    <label class="block text-sm font-medium
+                                  text-gray-700 mb-2">
+                        País de residencia
+                        <span class="text-red-500">*</span>
+                    </label>
+
+                    {{ form.pais_residencia }}
+
+                    {% if form.pais_residencia.errors %}
+                        <p class="text-red-500 text-sm mt-1">
+                            {{ form.pais_residencia.errors }}
+                        </p>
+                    {% endif %}
+                </div>
+
+
+                <!-- CIUDAD RESIDENCIA -->
+                <div>
+                    <label class="block text-sm font-medium
+                                  text-gray-700 mb-2">
+                        Ciudad de residencia
+                        <span class="text-red-500">*</span>
+                    </label>
+
+                    {{ form.ciudad_residencia }}
+
+                    {% if form.ciudad_residencia.errors %}
+                        <p class="text-red-500 text-sm mt-1">
+                            {{ form.ciudad_residencia.errors }}
+                        </p>
+                    {% endif %}
+                </div>
+
+
+                <!-- TELÉFONO -->
+                <div>
+                    <label class="block text-sm font-medium
+                                  text-gray-700 mb-2">
+                        Teléfono
+                        <span class="text-red-500">*</span>
+                    </label>
+
+                    {{ form.telefono }}
+
+                    {% if form.telefono.errors %}
+                        <p class="text-red-500 text-sm mt-1">
+                            {{ form.telefono.errors }}
+                        </p>
+                    {% endif %}
+                </div>
+
+
+                <!-- DIRECCIÓN -->
+                <div>
+                    <label class="block text-sm font-medium
+                                  text-gray-700 mb-2">
+                        Dirección
+                        <span class="text-red-500">*</span>
+                    </label>
+
+                    {{ form.direccion }}
+
+                    {% if form.direccion.errors %}
+                        <p class="text-red-500 text-sm mt-1">
+                            {{ form.direccion.errors }}
+                        </p>
+                    {% endif %}
+                </div>
+
+            </div>
+        </section>
+
+
+        <!-- ============================== -->
+        <!-- INFORMACIÓN FINANCIERA -->
+        <!-- ============================== -->
+
+        <section class="bg-white rounded-2xl shadow-sm
+                        border border-gray-200 p-8">
+
+            <div class="mb-6">
+                <h2 class="text-xl font-bold text-gray-800">
+                    Información financiera
+                </h2>
+
+                <p class="text-gray-500 text-sm mt-1">
+                    Información sobre tus ingresos y gastos mensuales.
+                </p>
+            </div>
+
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                <!-- INGRESOS MENSUALES -->
+                <div>
+                    <label class="block text-sm font-medium
+                                  text-gray-700 mb-2">
+                        Ingresos mensuales
+                        <span class="text-red-500">*</span>
+                    </label>
+
+                    {{ form.ingresos_mensuales }}
+
+                    {% if form.ingresos_mensuales.errors %}
+                        <p class="text-red-500 text-sm mt-1">
+                            {{ form.ingresos_mensuales.errors }}
+                        </p>
+                    {% endif %}
+                </div>
+
+
+                <!-- GASTOS MENSUALES -->
+                <div>
+                    <label class="block text-sm font-medium
+                                  text-gray-700 mb-2">
+                        Gastos mensuales
+                        <span class="text-red-500">*</span>
+                    </label>
+
+                    {{ form.gastos_mensuales }}
+
+                    {% if form.gastos_mensuales.errors %}
+                        <p class="text-red-500 text-sm mt-1">
+                            {{ form.gastos_mensuales.errors }}
+                        </p>
+                    {% endif %}
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ============================== -->
+        <!-- CONTACTO DE RESPALDO -->
+        <!-- ============================== -->
+
+        <section class="bg-white rounded-2xl shadow-sm
+                        border border-gray-200 p-8">
+
+            <div class="mb-6">
+                <h2 class="text-xl font-bold text-gray-800">
+                    Contacto de respaldo
+                </h2>
+
+                <p class="text-gray-500 text-sm mt-1">
+                    Persona de contacto en caso de ser necesario.
+                </p>
+            </div>
+
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+                <!-- NOMBRE -->
+                <div>
+                    <label class="block text-sm font-medium
+                                  text-gray-700 mb-2">
+                        Nombre completo
+                        <span class="text-red-500">*</span>
+                    </label>
+
+                    {{ form.contacto_respaldo_nombre }}
+
+                    {% if form.contacto_respaldo_nombre.errors %}
+                        <p class="text-red-500 text-sm mt-1">
+                            {{ form.contacto_respaldo_nombre.errors }}
+                        </p>
+                    {% endif %}
+                </div>
+
+
+                <!-- TELÉFONO -->
+                <div>
+                    <label class="block text-sm font-medium
+                                  text-gray-700 mb-2">
+                        Teléfono
+                        <span class="text-red-500">*</span>
+                    </label>
+
+                    {{ form.contacto_respaldo_telefono }}
+
+                    {% if form.contacto_respaldo_telefono.errors %}
+                        <p class="text-red-500 text-sm mt-1">
+                            {{ form.contacto_respaldo_telefono.errors }}
+                        </p>
+                    {% endif %}
+                </div>
+
+
+                <!-- PARENTESCO -->
+                <div>
+                    <label class="block text-sm font-medium
+                                  text-gray-700 mb-2">
+                        Parentesco
+                        <span class="text-red-500">*</span>
+                    </label>
+
+                    {{ form.contacto_respaldo_parentesco }}
+
+                    {% if form.contacto_respaldo_parentesco.errors %}
+                        <p class="text-red-500 text-sm mt-1">
+                            {{ form.contacto_respaldo_parentesco.errors }}
+                        </p>
+                    {% endif %}
+                </div>
+
+            </div>
+        </section>
+
+
+        <!-- ============================== -->
+        <!-- BOTONES -->
+        <!-- ============================== -->
+
+        <div class="flex justify-end gap-4">
+
+            <a href="{% url 'cliente_dashboard' %}"
+               class="px-6 py-3 rounded-xl border
+                      border-gray-300 text-gray-700
+                      font-medium hover:bg-gray-100
+                      transition">
+                Cancelar
+            </a>
+
+            <button type="submit"
+                    class="px-8 py-3 rounded-xl
+                           bg-blue-600 text-white
+                           font-semibold
+                           hover:bg-blue-700
+                           transition shadow-sm">
+                Guardar cambios
+            </button>
+
+        </div>
+
+    </form>
+
+</main>
+
+
+<!-- ============================== -->
+<!-- JAVASCRIPT CIUDADES -->
+<!-- ============================== -->
+
+{{ ciudades_por_pais|json_script:"ciudades-data" }}
+
+<script>
+
+    const ciudadesPorPais = JSON.parse(
+        document.getElementById('ciudades-data').textContent
+    );
+
+
+    function actualizarCiudades(paisId, ciudadId) {
+
+        const pais = document.getElementById(paisId);
+        const ciudad = document.getElementById(ciudadId);
+
+        if (!pais || !ciudad) {
+            return;
+        }
+
+        const ciudades = ciudadesPorPais[pais.value] || [];
+
+        ciudad.innerHTML = '';
+
+        const opcionInicial = document.createElement('option');
+
+        opcionInicial.value = '';
+
+        if (ciudades.length > 0) {
+            opcionInicial.textContent = 'Seleccione una ciudad';
+        } else {
+            opcionInicial.textContent = 'Seleccione primero un país';
+        }
+
+        ciudad.appendChild(opcionInicial);
+
+
+        ciudades.forEach(function(nombreCiudad) {
+
+            const opcion = document.createElement('option');
+
+            opcion.value = nombreCiudad;
+            opcion.textContent = nombreCiudad;
+
+            ciudad.appendChild(opcion);
+
+        });
+
+    }
+
+
+    document.addEventListener('DOMContentLoaded', function() {
+
+        const nacionalidad = document.getElementById(
+            'id_nacionalidad'
+        );
+
+        const paisResidencia = document.getElementById(
+            'id_pais_residencia'
+        );
+
+
+        if (nacionalidad) {
+
+            nacionalidad.addEventListener('change', function() {
+
+                actualizarCiudades(
+                    'id_nacionalidad',
+                    'id_ciudad_nacimiento'
+                );
+
+            });
+
+        }
+
+
+        if (paisResidencia) {
+
+            paisResidencia.addEventListener('change', function() {
+
+                actualizarCiudades(
+                    'id_pais_residencia',
+                    'id_ciudad_residencia'
+                );
+
+            });
+
+        }
+
+
+        actualizarCiudades(
+            'id_nacionalidad',
+            'id_ciudad_nacimiento'
+        );
+
+
+        actualizarCiudades(
+            'id_pais_residencia',
+            'id_ciudad_residencia'
+        );
+
+    });
+
+</script>
+```
+
+</body>
+</html>
