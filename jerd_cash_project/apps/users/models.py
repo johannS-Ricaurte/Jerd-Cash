@@ -15,8 +15,40 @@ class CustomUser(AbstractUser):
     )
     
     # Campos adicionales requeridos por el dominio financiero
-    cedula = models.CharField(max_length=20, unique=True, verbose_name="Cédula / NIT")
-    role = models.CharField(max_length=15, choices=ROLE_CHOICES, default='cliente')
+    cedula = models.CharField(
+        max_length=20, 
+        unique=True, 
+        verbose_name="Cédula / NIT")
+
+    google_id = models.CharField(
+        max_length=255,
+        unique=True,
+        null=True,
+        blank=True
+    )
+
+    segundo_nombre = models.CharField(
+        max_length=100,
+        blank=True,
+        verbose_name="Segundo nombre"
+    )
+
+    primer_apellido = models.CharField(
+        max_length=100,
+        blank=True,
+        verbose_name="Primer apellido"
+    )
+
+    segundo_apellido = models.CharField(
+        max_length=100,
+        blank=True,
+        verbose_name="Segundo apellido"
+    )
+    
+    role = models.CharField(
+        max_length=15, 
+        choices=ROLE_CHOICES, 
+        default='cliente')
     
     # NOTA PARA SUSTENTACIÓN: En la Fase 2, el campo 'cedula' se envolverá 
     # con un decorador de cifrado (ej. django-cryptography) para cumplir 
