@@ -12,9 +12,11 @@
 
 <body class="bg-gray-50 min-h-screen">
 
+    <!-- NAVBAR -->
+
     <nav class="bg-white border-b">
 
-        <div class="max-w-5xl mx-auto px-6 py-4 flex justify-between items-center">
+        <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
 
             <div>
 
@@ -32,7 +34,7 @@
                 href="{% url 'administrador_solicitudes' %}"
                 class="text-sm text-blue-600 hover:text-blue-800"
             >
-                Volver a solicitudes
+                ← Volver a solicitudes
             </a>
 
         </div>
@@ -40,18 +42,81 @@
     </nav>
 
 
-    <main class="max-w-5xl mx-auto px-6 py-10">
+    <main class="max-w-6xl mx-auto px-6 py-10">
 
-        <h2 class="text-3xl font-bold text-gray-900">
-            Solicitud #{{ solicitud.id }}
-        </h2>
+                <!-- MENSAJES DEL SISTEMA -->
 
-        <p class="text-gray-600 mt-2">
-            Detalle de la solicitud de crédito.
-        </p>
+        {% if messages %}
+
+        <div class="space-y-3 mb-6">
+
+            {% for message in messages %}
+
+                <div class="p-4 rounded-lg border
+                    {% if message.tags == 'success' %}
+                        bg-green-50 border-green-200 text-green-800
+                    {% elif message.tags == 'error' %}
+                        bg-red-50 border-red-200 text-red-800
+                    {% elif message.tags == 'warning' %}
+                        bg-yellow-50 border-yellow-200 text-yellow-800
+                    {% else %}
+                        bg-blue-50 border-blue-200 text-blue-800
+                    {% endif %}
+                ">
+
+                    {{ message }}
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+        {% endif %}
+
+        <!-- TITULO -->
+
+        <div>
+
+            <h2 class="text-3xl font-bold text-gray-900">
+                Solicitud #{{ solicitud.id }}
+            </h2>
+
+            <p class="text-gray-600 mt-2">
+                Evaluación de la solicitud de crédito.
+            </p>
+
+        </div>
 
 
-        <!-- Información del cliente -->
+        <!-- ESTADO DE LA SOLICITUD -->
+
+        <div class="mt-6">
+
+            {% if solicitud.estado == "PENDIENTE" %}
+
+                <span class="inline-flex px-4 py-2 rounded-full bg-yellow-100 text-yellow-800 font-medium">
+                    Solicitud pendiente de evaluación
+                </span>
+
+            {% elif solicitud.estado == "APROBADA" %}
+
+                <span class="inline-flex px-4 py-2 rounded-full bg-green-100 text-green-800 font-medium">
+                    Solicitud aprobada
+                </span>
+
+            {% elif solicitud.estado == "RECHAZADA" %}
+
+                <span class="inline-flex px-4 py-2 rounded-full bg-red-100 text-red-800 font-medium">
+                    Solicitud rechazada
+                </span>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- INFORMACIÓN DEL CLIENTE -->
 
         <div class="bg-white rounded-xl shadow-sm border p-6 mt-8">
 
@@ -59,7 +124,7 @@
                 Información del cliente
             </h3>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
 
                 <div>
 
@@ -67,9 +132,12 @@
                         Nombre completo
                     </p>
 
-                    <p class="font-medium text-gray-900">
+                    <p class="font-medium text-gray-900 mt-1">
+
                         {{ solicitud.usuario.first_name }}
+
                         {{ solicitud.usuario.primer_apellido }}
+
                     </p>
 
                 </div>
@@ -81,8 +149,21 @@
                         Correo electrónico
                     </p>
 
-                    <p class="font-medium text-gray-900">
+                    <p class="font-medium text-gray-900 mt-1">
                         {{ solicitud.usuario.email }}
+                    </p>
+
+                </div>
+
+
+                <div>
+
+                    <p class="text-sm text-gray-500">
+                        Usuario
+                    </p>
+
+                    <p class="font-medium text-gray-900 mt-1">
+                        {{ solicitud.usuario.username }}
                     </p>
 
                 </div>
@@ -92,7 +173,7 @@
         </div>
 
 
-        <!-- Información de la solicitud -->
+        <!-- INFORMACIÓN DEL CRÉDITO -->
 
         <div class="bg-white rounded-xl shadow-sm border p-6 mt-6">
 
@@ -108,10 +189,17 @@
                         Monto solicitado
                     </p>
 
-                    <p class="text-2xl font-bold text-gray-900">
+                    <p class="text-2xl font-bold text-gray-900 mt-1">
                         ${{ solicitud.monto_solicitado }}
                     </p>
 
+                </div>
+
+                <div>
+                    <p class="text-sm text-gray-500">Plazo solicitado</p>
+                    <p class="text-lg font-semibold">
+                        {{ solicitud.plazo_meses }} meses
+                    </p>
                 </div>
 
 
@@ -121,7 +209,7 @@
                         Estado
                     </p>
 
-                    <p class="font-medium text-gray-900">
+                    <p class="font-medium text-gray-900 mt-1">
                         {{ solicitud.get_estado_display }}
                     </p>
 
@@ -131,10 +219,10 @@
                 <div>
 
                     <p class="text-sm text-gray-500">
-                        Fecha
+                        Fecha de solicitud
                     </p>
 
-                    <p class="font-medium text-gray-900">
+                    <p class="font-medium text-gray-900 mt-1">
                         {{ solicitud.fecha_solicitud|date:"d/m/Y H:i" }}
                     </p>
 
@@ -145,69 +233,890 @@
         </div>
 
 
-        <!-- Documentos -->
+        <!-- EVALUACIÓN DE RIESGO -->
 
         <div class="bg-white rounded-xl shadow-sm border p-6 mt-6">
 
-            <h3 class="text-xl font-semibold text-gray-900">
-                Documentos
-            </h3>
+            <div class="flex justify-between items-start">
 
-            <div class="space-y-4 mt-6">
+                <div>
 
-                <div class="flex justify-between items-center border p-4 rounded-lg">
+                    <h3 class="text-xl font-semibold text-gray-900">
+                        Evaluación de riesgo
+                    </h3>
 
-                    <span>
-                        Cédula
-                    </span>
-
-                    <a
-                        href="{{ solicitud.cedula.url }}"
-                        target="_blank"
-                        class="text-blue-600 hover:text-blue-800 font-medium"
-                    >
-                        Ver documento
-                    </a>
-
-                </div>
-
-
-                <div class="flex justify-between items-center border p-4 rounded-lg">
-
-                    <span>
-                        Recibo
-                    </span>
-
-                    <a
-                        href="{{ solicitud.recibo.url }}"
-                        target="_blank"
-                        class="text-blue-600 hover:text-blue-800 font-medium"
-                    >
-                        Ver documento
-                    </a>
-
-                </div>
-
-
-                <div class="flex justify-between items-center border p-4 rounded-lg">
-
-                    <span>
-                        Certificación bancaria
-                    </span>
-
-                    <a
-                        href="{{ solicitud.certificacion_bancaria.url }}"
-                        target="_blank"
-                        class="text-blue-600 hover:text-blue-800 font-medium"
-                    >
-                        Ver documento
-                    </a>
+                    <p class="text-sm text-gray-500 mt-1">
+                        Información calculada por el sistema para apoyar la evaluación administrativa.
+                    </p>
 
                 </div>
 
             </div>
 
+
+            <!-- CLIENTE NUEVO / ANTIGUO -->
+
+            <div class="mt-6">
+
+                {% if es_cliente_nuevo %}
+
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+
+                        <p class="font-semibold text-blue-800">
+                            Cliente nuevo
+                        </p>
+
+                        <p class="text-sm text-blue-700 mt-1">
+                            Este cliente no tiene préstamos anteriores registrados.
+                        </p>
+
+                    </div>
+
+                {% else %}
+
+                    <div class="bg-purple-50 border border-purple-200 rounded-lg p-4">
+
+                        <p class="font-semibold text-purple-800">
+                            Cliente con historial
+                        </p>
+
+                        <p class="text-sm text-purple-700 mt-1">
+                            Este cliente tiene préstamos anteriores registrados.
+                            Revise su comportamiento de pago antes de tomar una decisión.
+                        </p>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- SCORE -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+
+                <!-- SCORE FINAL -->
+                <div class="border rounded-lg p-5">
+                    <p class="text-sm text-gray-500">
+                        Score calculado
+                    </p>
+
+                    <p class="text-3xl font-bold text-gray-900 mt-2">
+                        {{ score }}
+                    </p>
+
+                    <p class="text-xs text-gray-500 mt-1">
+                        Escala de 0 a 1000
+                    </p>
+                </div>
+
+                <!-- NIVEL DE RIESGO -->
+                <div class="border rounded-lg p-5">
+                    <p class="text-sm text-gray-500">
+                        Nivel de riesgo
+                    </p>
+
+                    <p class="text-2xl font-bold text-gray-900 mt-2">
+                        {{ nivel_riesgo }}
+                    </p>
+                </div>
+
+                <!-- TASA -->
+                <div class="border rounded-lg p-5">
+                    <p class="text-sm text-gray-500">
+                        Tasa de interés mensual
+                    </p>
+
+                    {% if tasa_interes %}
+                        <p class="text-2xl font-bold text-gray-900 mt-2">
+                            {{ tasa_interes }}%
+                        </p>
+                    {% else %}
+                        <p class="text-2xl font-bold text-red-600 mt-2">
+                            No disponible
+                        </p>
+                    {% endif %}
+                </div>
+
+            </div>
+
+
+            <!-- DESGLOSE DEL SCORE -->
+            <div class="mt-8">
+
+                <h4 class="text-lg font-semibold text-gray-900">
+                    Desglose del score
+                </h4>
+
+                <p class="text-sm text-gray-500 mt-1">
+                    Factores utilizados por el sistema para calcular el score.
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-5">
+
+                    <!-- ANTIGÜEDAD -->
+                    <div class="border rounded-lg p-5 bg-gray-50">
+
+                        <p class="font-semibold text-gray-900">
+                            1. Antigüedad del cliente
+                        </p>
+
+                        <p class="text-sm text-gray-500 mt-2">
+                            Antigüedad:
+                            <span class="font-medium text-gray-900">
+                                {{ detalle_score.meses_antiguedad }} meses
+                            </span>
+                        </p>
+
+                        <p class="text-sm text-gray-500 mt-1">
+                            Puntaje:
+                            <span class="font-medium text-gray-900">
+                                {{ detalle_score.score_antiguedad }} / 100
+                            </span>
+                        </p>
+
+                        <p class="text-xs text-gray-500 mt-3">
+                            Peso en el score final: 20%
+                        </p>
+
+                    </div>
+
+
+                    <!-- HISTORIAL -->
+                    <div class="border rounded-lg p-5 bg-gray-50">
+
+                        <p class="font-semibold text-gray-900">
+                            2. Historial de cumplimiento
+                        </p>
+
+                        <p class="text-sm text-gray-500 mt-2">
+                            Cuotas pagadas:
+                            <span class="font-medium text-gray-900">
+                                {{ detalle_score.cuotas_pagadas }}
+                            </span>
+                        </p>
+
+                        <p class="text-sm text-gray-500 mt-1">
+                            Cuotas totales:
+                            <span class="font-medium text-gray-900">
+                                {{ detalle_score.cuotas_totales }}
+                            </span>
+                        </p>
+
+                        <p class="text-sm text-gray-500 mt-1">
+                            Cumplimiento:
+                            <span class="font-medium text-gray-900">
+                                {{ detalle_score.porcentaje_cumplimiento }}%
+                            </span>
+                        </p>
+
+                        <p class="text-sm text-gray-500 mt-1">
+                            Puntaje:
+                            <span class="font-medium text-gray-900">
+                                {{ detalle_score.score_cumplimiento }} / 100
+                            </span>
+                        </p>
+
+                        <p class="text-xs text-gray-500 mt-3">
+                            Peso en el score final: 30%
+                        </p>
+
+                    </div>
+
+
+                    <!-- CAPACIDAD -->
+                    <div class="border rounded-lg p-5 bg-gray-50">
+
+                        <p class="font-semibold text-gray-900">
+                            3. Capacidad financiera
+                        </p>
+
+                        <p class="text-sm text-gray-500 mt-2">
+                            Ingresos mensuales:
+                            <span class="font-medium text-gray-900">
+                                ${{ detalle_score.ingresos_mensuales }}
+                            </span>
+                        </p>
+
+                        <p class="text-sm text-gray-500 mt-1">
+                            Gastos mensuales:
+                            <span class="font-medium text-gray-900">
+                                ${{ detalle_score.gastos_mensuales }}
+                            </span>
+                        </p>
+
+                        <p class="text-sm text-gray-500 mt-1">
+                            Gastos / ingresos:
+                            <span class="font-medium text-gray-900">
+                                {{ detalle_score.ratio_endeudamiento }}%
+                            </span>
+                        </p>
+
+                        <p class="text-sm text-gray-500 mt-1">
+                            Puntaje:
+                            <span class="font-medium text-gray-900">
+                                {{ detalle_score.score_capacidad }} / 100
+                            </span>
+                        </p>
+
+                        <p class="text-xs text-gray-500 mt-3">
+                            Peso en el score final: 20%
+                        </p>
+
+                    </div>
+
+                    <!-- CAPACIDAD DEL NUEVO CRÉDITO -->
+                    <div class="border rounded-lg p-5 bg-gray-50">
+
+                        <p class="font-semibold text-gray-900">
+                            4. Capacidad para asumir el nuevo crédito
+                        </p>
+
+                        <p class="text-sm text-gray-500 mt-2">
+                            Monto solicitado:
+                            <span class="font-medium text-gray-900">
+                                ${{ detalle_score.monto_solicitado }}
+                            </span>
+                        </p>
+
+                        <p class="text-sm text-gray-500 mt-1">
+                            Plazo:
+                            <span class="font-medium text-gray-900">
+                                {{ detalle_score.plazo_meses }} meses
+                            </span>
+                        </p>
+
+                        <p class="text-sm text-gray-500 mt-1">
+                            Cuota estimada:
+                            <span class="font-medium text-gray-900">
+                                ${{ detalle_score.cuota_estimada }}
+                            </span>
+                        </p>
+
+                        <p class="text-sm text-gray-500 mt-1">
+                            Disponible antes de la cuota:
+                            <span class="font-medium text-gray-900">
+                                ${{ detalle_score.disponible_actual }}
+                            </span>
+                        </p>
+
+                        <p class="text-sm text-gray-500 mt-1">
+                            Disponible después de la cuota:
+                            <span class="font-medium text-gray-900">
+                                ${{ detalle_score.disponible_despues_cuota }}
+                            </span>
+                        </p>
+
+                        <p class="text-sm text-gray-500 mt-1">
+                            Cuota / disponible:
+                            <span class="font-medium text-gray-900">
+                                {{ detalle_score.porcentaje_cuota_disponible }}%
+                            </span>
+                        </p>
+
+                        <p class="text-sm text-gray-500 mt-1">
+                            Puntaje:
+                            <span class="font-medium text-gray-900">
+                                {{ detalle_score.score_capacidad_nuevo }} / 100
+                            </span>
+                        </p>
+
+                        <p class="text-xs text-gray-500 mt-3">
+                            Peso en el score final: 30%
+                        </p>
+
+                        <p class="text-xs text-gray-400 mt-1">
+                            La cuota es estimada utilizando una tasa de referencia del 2% mensual.
+                        </p>
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+
+        <!-- HISTORIAL DE PRÉSTAMOS -->
+
+        {% if not es_cliente_nuevo %}
+
+        <div class="bg-white rounded-xl shadow-sm border p-6 mt-6">
+
+            <h3 class="text-xl font-semibold text-gray-900">
+                Historial de préstamos
+            </h3>
+
+            <p class="text-sm text-gray-500 mt-1">
+                Historial registrado para este cliente.
+            </p>
+
+
+            <div class="overflow-x-auto mt-6">
+
+                <table class="w-full text-sm">
+
+                    <thead>
+
+                        <tr class="border-b text-left">
+
+                            <th class="pb-3 pr-4">
+                                Préstamo
+                            </th>
+
+                            <th class="pb-3 pr-4">
+                                Monto
+                            </th>
+
+                            <th class="pb-3 pr-4">
+                                Estado
+                            </th>
+
+                            <th class="pb-3 pr-4">
+                                Score
+                            </th>
+
+                            <th class="pb-3">
+                                Cuotas
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {% for prestamo in prestamos_anteriores %}
+
+                        <tr class="border-b">
+
+                            <td class="py-4 pr-4 font-medium">
+                                #{{ prestamo.id }}
+                            </td>
+
+
+                            <td class="py-4 pr-4">
+                                ${{ prestamo.monto_solicitado }}
+                            </td>
+
+
+                            <td class="py-4 pr-4">
+
+                                {% if prestamo.estado == "pagado" %}
+
+                                    <span class="px-3 py-1 rounded-full bg-green-100 text-green-800">
+                                        Pagado
+                                    </span>
+
+                                {% elif prestamo.estado == "mora" %}
+
+                                    <span class="px-3 py-1 rounded-full bg-red-100 text-red-800">
+                                        En mora
+                                    </span>
+
+                                {% elif prestamo.estado == "desembolsado" %}
+
+                                    <span class="px-3 py-1 rounded-full bg-blue-100 text-blue-800">
+                                        Desembolsado
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="px-3 py-1 rounded-full bg-gray-100 text-gray-800">
+                                        {{ prestamo.get_estado_display }}
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <td class="py-4 pr-4">
+
+                                {% if prestamo.score_calculado %}
+
+                                    {{ prestamo.score_calculado }}
+
+                                {% else %}
+
+                                    -
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <td class="py-4">
+
+                                {{ prestamo.cuotas.all|length }}
+
+                            </td>
+
+                        </tr>
+
+
+                        <!-- DETALLE DE CUOTAS -->
+
+                        {% if prestamo.cuotas.all %}
+
+                        <tr>
+
+                            <td colspan="5" class="pb-5">
+
+                                <div class="bg-gray-50 rounded-lg p-4">
+
+                                    <p class="font-medium text-gray-700 mb-3">
+                                        Cuotas del préstamo #{{ prestamo.id }}
+                                    </p>
+
+                                    <div class="overflow-x-auto">
+
+                                        <table class="w-full text-xs">
+
+                                            <thead>
+
+                                                <tr class="border-b">
+
+                                                    <th class="text-left py-2">
+                                                        #
+                                                    </th>
+
+                                                    <th class="text-left py-2">
+                                                        Vencimiento
+                                                    </th>
+
+                                                    <th class="text-left py-2">
+                                                        Valor
+                                                    </th>
+
+                                                    <th class="text-left py-2">
+                                                        Capital
+                                                    </th>
+
+                                                    <th class="text-left py-2">
+                                                        Interés
+                                                    </th>
+
+                                                    <th class="text-left py-2">
+                                                        Estado
+                                                    </th>
+
+                                                </tr>
+
+                                            </thead>
+
+
+                                            <tbody>
+
+                                                {% for cuota in prestamo.cuotas.all %}
+
+                                                <tr class="border-b last:border-0">
+
+                                                    <td class="py-2">
+                                                        {{ cuota.numero_cuota }}
+                                                    </td>
+
+                                                    <td class="py-2">
+                                                        {{ cuota.fecha_vencimiento|date:"d/m/Y" }}
+                                                    </td>
+
+                                                    <td class="py-2">
+                                                        ${{ cuota.valor_cuota }}
+                                                    </td>
+
+                                                    <td class="py-2">
+                                                        ${{ cuota.abono_capital }}
+                                                    </td>
+
+                                                    <td class="py-2">
+                                                        ${{ cuota.interes }}
+                                                    </td>
+
+                                                    <td class="py-2">
+
+                                                        {% if cuota.pagada %}
+
+                                                            <span class="text-green-700 font-medium">
+                                                                Pagada
+                                                            </span>
+
+                                                        {% else %}
+
+                                                            <span class="text-red-700 font-medium">
+                                                                Pendiente
+                                                            </span>
+
+                                                        {% endif %}
+
+                                                    </td>
+
+                                                </tr>
+
+                                                {% endfor %}
+
+                                            </tbody>
+
+                                        </table>
+
+                                    </div>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                        {% endif %}
+
+                        {% empty %}
+
+                        <tr>
+
+                            <td colspan="5" class="py-6 text-center text-gray-500">
+                                No existen préstamos anteriores.
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
         </div>
+
+        {% endif %}
+
+
+                <!-- DOCUMENTOS -->
+
+        <div class="bg-white rounded-xl shadow-sm border p-6 mt-6">
+
+            <h3 class="text-xl font-semibold text-gray-900">
+                Documentos y extractos bancarios
+            </h3>
+
+            <p class="text-sm text-gray-500 mt-1">
+                Revise los documentos enviados por el cliente para validar
+                su información personal, financiera y bancaria.
+            </p>
+
+
+            <div class="space-y-4 mt-6">
+
+
+                <!-- CÉDULA -->
+
+                <div class="flex justify-between items-center border p-4 rounded-lg">
+
+                    <div>
+
+                        <p class="font-medium text-gray-900">
+                            Cédula de ciudadanía
+                        </p>
+
+                        <p class="text-sm text-gray-500">
+                            Documento de identidad del cliente
+                        </p>
+
+                    </div>
+
+                    <a
+                        href="{{ solicitud.cedula.url }}"
+                        target="_blank"
+                        class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                    >
+                        Ver documento
+                    </a>
+
+                </div>
+
+
+                <!-- RECIBO -->
+
+                <div class="flex justify-between items-center border p-4 rounded-lg">
+
+                    <div>
+
+                        <p class="font-medium text-gray-900">
+                            Recibo
+                        </p>
+
+                        <p class="text-sm text-gray-500">
+                            Documento utilizado para validar la información de residencia
+                        </p>
+
+                    </div>
+
+                    <a
+                        href="{{ solicitud.recibo.url }}"
+                        target="_blank"
+                        class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                    >
+                        Ver documento
+                    </a>
+
+                </div>
+
+
+                <!-- CERTIFICACIÓN BANCARIA -->
+
+                <div class="flex justify-between items-center border p-4 rounded-lg">
+
+                    <div>
+
+                        <p class="font-medium text-gray-900">
+                            Certificación bancaria
+                        </p>
+
+                        <p class="text-sm text-gray-500">
+                            Documento utilizado para validar la cuenta bancaria
+                        </p>
+
+                    </div>
+
+                    <a
+                        href="{{ solicitud.certificacion_bancaria.url }}"
+                        target="_blank"
+                        class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                    >
+                        Ver documento
+                    </a>
+
+                </div>
+
+
+                <!-- SEPARADOR -->
+
+                <div class="pt-4">
+
+                    <h4 class="text-lg font-semibold text-gray-900">
+                        Extractos bancarios
+                    </h4>
+
+                    <p class="text-sm text-gray-500 mt-1">
+                        Revise los extractos para analizar los movimientos financieros
+                        del cliente.
+                    </p>
+
+                </div>
+
+
+                <!-- EXTRACTO 1 -->
+
+                {% if solicitud.extracto_bancario_1 %}
+
+                <div class="flex justify-between items-center border p-4 rounded-lg bg-gray-50">
+
+                    <div>
+
+                        <p class="font-medium text-gray-900">
+                            Extracto bancario 1
+                        </p>
+
+                        <p class="text-sm text-gray-500">
+                            Primer extracto bancario enviado por el cliente
+                        </p>
+
+                    </div>
+
+                    <a
+                        href="{{ solicitud.extracto_bancario_1.url }}"
+                        target="_blank"
+                        class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700"
+                    >
+                        Ver extracto
+                    </a>
+
+                </div>
+
+                {% else %}
+
+                <div class="border border-yellow-200 bg-yellow-50 p-4 rounded-lg">
+
+                    <p class="text-sm text-yellow-800">
+                        El cliente no proporcionó el extracto bancario 1.
+                    </p>
+
+                </div>
+
+                {% endif %}
+
+
+                <!-- EXTRACTO 2 -->
+
+                {% if solicitud.extracto_bancario_2 %}
+
+                <div class="flex justify-between items-center border p-4 rounded-lg bg-gray-50">
+
+                    <div>
+
+                        <p class="font-medium text-gray-900">
+                            Extracto bancario 2
+                        </p>
+
+                        <p class="text-sm text-gray-500">
+                            Segundo extracto bancario enviado por el cliente
+                        </p>
+
+                    </div>
+
+                    <a
+                        href="{{ solicitud.extracto_bancario_2.url }}"
+                        target="_blank"
+                        class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700"
+                    >
+                        Ver extracto
+                    </a>
+
+                </div>
+
+                {% else %}
+
+                <div class="border border-yellow-200 bg-yellow-50 p-4 rounded-lg">
+
+                    <p class="text-sm text-yellow-800">
+                        El cliente no proporcionó el extracto bancario 2.
+                    </p>
+
+                </div>
+
+                {% endif %}
+
+
+                <!-- EXTRACTO 3 -->
+
+                {% if solicitud.extracto_bancario_3 %}
+
+                <div class="flex justify-between items-center border p-4 rounded-lg bg-gray-50">
+
+                    <div>
+
+                        <p class="font-medium text-gray-900">
+                            Extracto bancario 3
+                        </p>
+
+                        <p class="text-sm text-gray-500">
+                            Tercer extracto bancario enviado por el cliente
+                        </p>
+
+                    </div>
+
+                    <a
+                        href="{{ solicitud.extracto_bancario_3.url }}"
+                        target="_blank"
+                        class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700"
+                    >
+                        Ver extracto
+                    </a>
+
+                </div>
+
+                {% else %}
+
+                <div class="border border-yellow-200 bg-yellow-50 p-4 rounded-lg">
+
+                    <p class="text-sm text-yellow-800">
+                        El cliente no proporcionó el extracto bancario 3.
+                    </p>
+
+                </div>
+
+                {% endif %}
+
+
+            </div>
+
+        </div>
+
+                <!-- ACCIONES ADMINISTRATIVAS -->
+
+        {% if solicitud.estado == "PENDIENTE" %}
+
+        <div class="bg-white rounded-xl shadow-sm border p-6 mt-6">
+
+            <h3 class="text-xl font-semibold text-gray-900">
+                Decisión sobre la solicitud
+            </h3>
+
+            <p class="text-sm text-gray-500 mt-2">
+                Después de revisar la información del cliente, los documentos,
+                los extractos bancarios y el historial de pagos, puede tomar
+                una decisión sobre esta solicitud.
+            </p>
+
+
+            <div class="flex flex-col md:flex-row gap-4 mt-6">
+
+
+                <!-- APROBAR -->
+
+                <form
+                    method="POST"
+                    action="{% url 'administrador_aprobar_solicitud' solicitud.id %}"
+                    class="flex-1"
+                >
+
+                    {% csrf_token %}
+
+                    <button
+                        type="submit"
+                        class="w-full bg-green-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-green-700 transition"
+                        onclick="return confirm('¿Está seguro de que desea aprobar esta solicitud?');"
+                    >
+                        ✓ Aprobar solicitud
+                    </button>
+
+                </form>
+
+
+                <!-- RECHAZAR -->
+
+                <form
+                    method="POST"
+                    action="{% url 'administrador_rechazar_solicitud' solicitud.id %}"
+                    class="flex-1"
+                >
+
+                    {% csrf_token %}
+
+                    <button
+                        type="submit"
+                        class="w-full bg-red-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-red-700 transition"
+                        onclick="return confirm('¿Está seguro de que desea rechazar esta solicitud?');"
+                    >
+                        ✕ Rechazar solicitud
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+        {% endif %}
+
+        <!-- MENSAJE PARA EL ADMINISTRADOR -->
+
+        <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-6 mt-6">
+
+            <h3 class="font-semibold text-yellow-900">
+                Evaluación administrativa
+            </h3>
+
+            <p class="text-sm text-yellow-800 mt-2">
+                El score y nivel de riesgo son información de apoyo.
+                El administrador debe revisar la información del cliente,
+                los documentos y, cuando exista, el historial de pagos
+                antes de tomar una decisión sobre la solicitud.
+            </p>
+
+        </div>
+
 
     </main>
 
