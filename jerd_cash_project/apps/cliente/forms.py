@@ -528,12 +528,13 @@ class PerfilClienteForm(forms.ModelForm):
 
 class SolicitudCreditoForm(forms.ModelForm):
 
-
     class Meta:
+
         model = SolicitudCredito
 
         fields = [
             'monto_solicitado',
+            'plazo_meses',
             'cedula',
             'recibo',
             'certificacion_bancaria',
@@ -543,11 +544,25 @@ class SolicitudCreditoForm(forms.ModelForm):
         ]
 
         widgets = {
+
             'monto_solicitado': forms.NumberInput(attrs={
                 'class': 'w-full border rounded-lg px-4 py-2',
                 'placeholder': 'Ingrese el monto solicitado',
                 'min': '1',
             }),
+
+            'plazo_meses': forms.Select(
+                choices=[
+                    (6, '6 meses'),
+                    (12, '12 meses'),
+                    (18, '18 meses'),
+                    (24, '24 meses'),
+                    (36, '36 meses'),
+                ],
+                attrs={
+                    'class': 'w-full border rounded-lg px-4 py-2',
+                }
+            ),
 
             'cedula': forms.ClearableFileInput(attrs={
                 'class': 'w-full border rounded-lg px-4 py-2',
@@ -584,25 +599,29 @@ class SolicitudCreditoForm(forms.ModelForm):
         }
 
     def clean_cedula(self):
+
         archivo = self.cleaned_data.get('cedula')
 
         if archivo:
+
             if not archivo.name.lower().endswith('.pdf'):
                 raise forms.ValidationError(
-                    'La cedula debe estar en formato PDF.'
+                    'La cédula debe estar en formato PDF.'
                 )
 
             if archivo.content_type != 'application/pdf':
                 raise forms.ValidationError(
-                    'El archivo de la cedula debe ser un PDF valido.'
+                    'El archivo de la cédula debe ser un PDF válido.'
                 )
 
         return archivo
 
     def clean_recibo(self):
+
         archivo = self.cleaned_data.get('recibo')
 
         if archivo:
+
             if not archivo.name.lower().endswith('.pdf'):
                 raise forms.ValidationError(
                     'El recibo debe estar en formato PDF.'
@@ -610,38 +629,43 @@ class SolicitudCreditoForm(forms.ModelForm):
 
             if archivo.content_type != 'application/pdf':
                 raise forms.ValidationError(
-                    'El archivo del recibo debe ser un PDF valido.'
+                    'El archivo del recibo debe ser un PDF válido.'
                 )
 
         return archivo
 
     def clean_certificacion_bancaria(self):
+
         archivo = self.cleaned_data.get('certificacion_bancaria')
 
         if archivo:
+
             if not archivo.name.lower().endswith('.pdf'):
                 raise forms.ValidationError(
-                    'La certificacion bancaria debe estar en formato PDF.'
+                    'La certificación bancaria debe estar en formato PDF.'
                 )
 
             if archivo.content_type != 'application/pdf':
                 raise forms.ValidationError(
-                    'El archivo de la certificacion bancaria debe ser un PDF valido.'
+                    'El archivo de la certificación bancaria debe ser un PDF válido.'
                 )
 
         return archivo
 
     def clean_extracto_bancario_1(self):
+
         return self.validar_extracto(
             self.cleaned_data.get('extracto_bancario_1')
         )
 
     def clean_extracto_bancario_2(self):
+
         return self.validar_extracto(
             self.cleaned_data.get('extracto_bancario_2')
         )
 
     def clean_extracto_bancario_3(self):
+
         return self.validar_extracto(
             self.cleaned_data.get('extracto_bancario_3')
         )
@@ -660,57 +684,7 @@ class SolicitudCreditoForm(forms.ModelForm):
 
         if archivo.content_type != 'application/pdf':
             raise forms.ValidationError(
-                'El archivo debe ser un PDF valido.'
+                'El archivo debe ser un PDF válido.'
             )
-
-        return archivo
-
-
-
-    def clean_cedula(self):
-        archivo = self.cleaned_data.get('cedula')
-
-        if archivo:
-            if not archivo.name.lower().endswith('.pdf'):
-                raise forms.ValidationError(
-                    'La cédula debe estar en formato PDF.'
-                )
-
-            if archivo.content_type != 'application/pdf':
-                raise forms.ValidationError(
-                    'El archivo de la cédula debe ser un PDF válido.'
-                )
-
-        return archivo
-
-    def clean_recibo(self):
-        archivo = self.cleaned_data.get('recibo')
-
-        if archivo:
-            if not archivo.name.lower().endswith('.pdf'):
-                raise forms.ValidationError(
-                    'El recibo debe estar en formato PDF.'
-                )
-
-            if archivo.content_type != 'application/pdf':
-                raise forms.ValidationError(
-                    'El archivo del recibo debe ser un PDF válido.'
-                )
-
-        return archivo
-
-    def clean_certificacion_bancaria(self):
-        archivo = self.cleaned_data.get('certificacion_bancaria')
-
-        if archivo:
-            if not archivo.name.lower().endswith('.pdf'):
-                raise forms.ValidationError(
-                    'La certificación bancaria debe estar en formato PDF.'
-                )
-
-            if archivo.content_type != 'application/pdf':
-                raise forms.ValidationError(
-                    'El archivo de la certificación bancaria debe ser un PDF válido.'
-                )
 
         return archivo

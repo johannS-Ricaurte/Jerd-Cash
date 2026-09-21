@@ -92,6 +92,10 @@ class SolicitudCredito(models.Model):
         decimal_places=2
     )
 
+    plazo_meses = models.IntegerField(
+    default=12
+)
+
     cedula = models.FileField(
         upload_to='solicitudes/cedulas/'
     )
