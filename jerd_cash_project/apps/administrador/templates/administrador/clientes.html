@@ -1,0 +1,173 @@
+
+{% load formatos %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clientes - JERD Cash</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+
+    <nav class="bg-white border-b">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">
+                    JERD<span class="text-blue-600">-Cash</span>
+                </h1>
+                <p class="text-xs text-gray-500">Administración de clientes</p>
+            </div>
+
+            <a href="{% url 'administrador_dashboard' %}"
+               class="text-sm text-blue-600 hover:text-blue-800">
+                Volver al panel
+            </a>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-6 py-10">
+
+        <div class="mb-8">
+            <h2 class="text-3xl font-bold text-gray-900">Clientes</h2>
+            <p class="text-gray-600 mt-2">
+                Consulta la información y el comportamiento de pago de tus clientes.
+            </p>
+        </div>
+
+        <!-- BUSCADOR -->
+        <div class="bg-white rounded-xl shadow-sm border p-6 mb-8">
+            <form method="GET" action="{% url 'administrador_clientes' %}"
+                  class="flex flex-col sm:flex-row gap-3">
+
+                <input
+                    type="text"
+                    name="buscar"
+                    value="{{ busqueda }}"
+                    placeholder="Buscar por nombre, apellido o usuario..."
+                    class="flex-1 border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+
+                <button type="submit"
+                        class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-semibold">
+                    Buscar cliente
+                </button>
+
+                {% if busqueda %}
+                    <a href="{% url 'administrador_clientes' %}"
+                       class="border border-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-50 text-center">
+                        Limpiar
+                    </a>
+                {% endif %}
+            </form>
+        </div>
+
+        <!-- LISTADO -->
+        {% if clientes %}
+            <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-100 border-b">
+                            <tr>
+                                <th class="text-left px-6 py-4 text-sm font-semibold text-gray-700">
+                                    Cliente
+                                </th>
+                                <th class="text-center px-6 py-4 text-sm font-semibold text-gray-700">
+                                    Créditos
+                                </th>
+                                <th class="text-center px-6 py-4 text-sm font-semibold text-gray-700">
+                                    Créditos pagados
+                                </th>
+                                <th class="text-center px-6 py-4 text-sm font-semibold text-gray-700">
+                                    Cuotas pagadas
+                                </th>
+                                <th class="text-center px-6 py-4 text-sm font-semibold text-gray-700">
+                                    Cuotas con mora
+                                </th>
+                                <th class="text-center px-6 py-4 text-sm font-semibold text-gray-700">
+                                    Acción
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody class="divide-y">
+                            {% for item in clientes %}
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-6 py-4">
+                                        <p class="font-semibold text-gray-900">
+                                            {{ item.nombre }}
+                                        </p>
+                                        <p class="text-xs text-gray-500 mt-1">
+                                            Usuario: {{ item.cliente.username }}
+                                        </p>
+                                    </td>
+
+                                    <td class="px-6 py-4 text-center">
+                                        <span class="inline-flex bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-semibold">
+                                            {{ item.cantidad_creditos }}
+                                        </span>
+                                    </td>
+
+                                    <td class="px-6 py-4 text-center">
+                                        <span class="font-semibold text-green-700">
+                                            {{ item.creditos_pagados }}
+                                        </span>
+                                    </td>
+
+                                    <td class="px-6 py-4 text-center">
+                                        <span class="font-semibold text-gray-800">
+                                            {{ item.cuotas_pagadas }} / {{ item.cuotas_totales }}
+                                        </span>
+                                    </td>
+
+                                    <td class="px-6 py-4 text-center">
+                                        {% if item.cuotas_pagadas_con_mora > 0 %}
+                                            <span class="inline-flex bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm font-semibold">
+                                                {{ item.cuotas_pagadas_con_mora }}
+                                            </span>
+                                        {% else %}
+                                            <span class="text-green-700 font-semibold">0</span>
+                                        {% endif %}
+                                    </td>
+
+                                    <td class="px-6 py-4 text-center">
+                                        <a
+                                            href="{% url 'administrador_cliente_detalle' item.cliente.id %}"
+                                            class="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm font-semibold">
+                                            Ver cliente
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% else %}
+            <div class="bg-white rounded-xl shadow-sm border p-10 text-center">
+                <div class="text-5xl mb-4">👥</div>
+
+                {% if busqueda %}
+                    <h3 class="text-xl font-semibold text-gray-900">
+                        No se encontraron clientes
+                    </h3>
+                    <p class="text-gray-600 mt-2">
+                        Prueba con otro nombre o nombre de usuario.
+                    </p>
+                {% else %}
+                    <h3 class="text-xl font-semibold text-gray-900">
+                        No hay clientes con créditos
+                    </h3>
+                    <p class="text-gray-600 mt-2">
+                        Los clientes aparecerán aquí cuando tengan créditos registrados.
+                    </p>
+                {% endif %}
+            </div>
+        {% endif %}
+
+    </main>
+
+</body>
+</html>

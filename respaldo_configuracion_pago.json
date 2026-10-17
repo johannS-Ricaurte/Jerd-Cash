@@ -1,0 +1,18 @@
+[
+{
+    "model": "loans.configuracionpago",
+    "pk": 1,
+    "fields": {
+        "banco": "NEQUI",
+        "tipo_cuenta": "Llave digital",
+        "numero_cuenta": "3212336353",
+        "titular": "Johann Ricaurte",
+        "documento_titular": "1002460157",
+        "llave_transferencia": "1002460157",
+        "codigo_qr": "pagos/codigos_qr/Captura_de_pantalla_2024-11-14_211406.png",
+        "instrucciones": "Debe realizar la transferencia usando cualquiera de los metodos suministrados, subir el pantallazo correctamente legible y con el valor de la transaccion",
+        "activo": true,
+        "fecha_actualizacion": "2026-10-14T23:37:14.809Z"
+    }
+}
+]

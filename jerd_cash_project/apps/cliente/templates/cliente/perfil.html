@@ -1,5 +1,7 @@
 <!DOCTYPE html>
 
+{% load formatos %}
+
 <html lang="es">
 
 <head>
@@ -11,7 +13,6 @@
 
 <body class="bg-gray-50 min-h-screen">
 
-```
 <!-- NAVBAR -->
 <nav class="bg-white border-b border-gray-200 shadow-sm">
     <div class="w-full px-8 py-4">
@@ -46,19 +47,28 @@
 <main class="w-full px-8 py-10">
 
     <!-- ENCABEZADO -->
-    <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-800">
-            Mi perfil
-        </h1>
+    <div class="mb-8 flex items-start justify-between">
 
-        <p class="text-gray-500 mt-2">
-            Completa y actualiza tu información personal.
-        </p>
+        <div>
+            <h1 class="text-3xl font-bold text-gray-800">
+                Mi perfil
+            </h1>
+
+            <p class="text-gray-500 mt-2">
+                Completa y actualiza tu información personal.
+            </p>
+        </div>
+
+        <a href="{% url 'cliente_dashboard' %}"
+            class="text-blue-600 hover:text-blue-800 font-medium">
+            Volver al inicio
+        </a>
+
     </div>
 
 
     <!-- FORMULARIO -->
-    <form method="POST" class="space-y-8">
+    <form method="POST" class="space-y-8" id="perfil-form">
 
         {% csrf_token %}
 
@@ -337,13 +347,32 @@
 
                 <!-- INGRESOS MENSUALES -->
                 <div>
-                    <label class="block text-sm font-medium
+                    <label for="ingresos_display"
+                           class="block text-sm font-medium
                                   text-gray-700 mb-2">
                         Ingresos mensuales
                         <span class="text-red-500">*</span>
                     </label>
 
-                    {{ form.ingresos_mensuales }}
+                    <input
+                        type="text"
+                        id="ingresos_display"
+                        value="{{ form.ingresos_mensuales.value|floatformat:0 }}"
+                        inputmode="decimal"
+                        autocomplete="off"
+                        class="w-full border border-gray-300 rounded-lg
+                               px-4 py-2.5
+                               focus:ring-2 focus:ring-blue-500
+                               focus:border-blue-500"
+                        placeholder="$0"
+                    >
+
+                    <input
+                        type="hidden"
+                        name="ingresos_mensuales"
+                        id="id_ingresos_mensuales"
+                        value="{{ form.ingresos_mensuales.value|floatformat:0 }}"
+                    >
 
                     {% if form.ingresos_mensuales.errors %}
                         <p class="text-red-500 text-sm mt-1">
@@ -355,13 +384,32 @@
 
                 <!-- GASTOS MENSUALES -->
                 <div>
-                    <label class="block text-sm font-medium
+                    <label for="gastos_display"
+                           class="block text-sm font-medium
                                   text-gray-700 mb-2">
                         Gastos mensuales
                         <span class="text-red-500">*</span>
                     </label>
 
-                    {{ form.gastos_mensuales }}
+                    <input
+                        type="text"
+                        id="gastos_display"
+                        value="{{ form.gastos_mensuales.value|floatformat:0 }}"
+                        inputmode="decimal"
+                        autocomplete="off"
+                        class="w-full border border-gray-300 rounded-lg
+                               px-4 py-2.5
+                               focus:ring-2 focus:ring-blue-500
+                               focus:border-blue-500"
+                        placeholder="$0"
+                    >
+
+                    <input
+                        type="hidden"
+                        name="gastos_mensuales"
+                        id="id_gastos_mensuales"
+                        value="{{ form.gastos_mensuales.value|floatformat:0 }}"
+                    >
 
                     {% if form.gastos_mensuales.errors %}
                         <p class="text-red-500 text-sm mt-1">
@@ -483,12 +531,95 @@
 
 
 <!-- ============================== -->
-<!-- JAVASCRIPT CIUDADES -->
+<!-- JAVASCRIPT -->
 <!-- ============================== -->
 
 {{ ciudades_por_pais|json_script:"ciudades-data" }}
 
 <script>
+
+    /* ========================================= */
+    /* FORMATO DE PESOS COLOMBIANOS             */
+    /* ========================================= */
+function formatearPesos(valor) {
+
+    if (!valor) {
+        return '';
+    }
+
+    // Solo números
+    let limpio = valor.toString().replace(/[^\d]/g, '');
+
+    if (!limpio) {
+        return '';
+    }
+
+    // Separador de miles colombiano
+    limpio = limpio.replace(
+        /\B(?=(\d{3})+(?!\d))/g,
+        '.'
+    );
+
+    return '$' + limpio;
+}
+
+
+function prepararCampoPesos(displayId, hiddenId) {
+
+    const campoVisible = document.getElementById(displayId);
+    const campoOculto = document.getElementById(hiddenId);
+
+    if (!campoVisible || !campoOculto) {
+        return;
+    }
+
+    // Valor inicial que viene de Django
+    if (campoVisible.value) {
+
+        const valorInicial = campoVisible.value
+            .replace(/[^\d]/g, '');
+
+        campoOculto.value = valorInicial;
+
+        campoVisible.value = formatearPesos(
+            valorInicial
+        );
+    }
+
+
+    // Mientras escribe
+    campoVisible.addEventListener('input', function() {
+
+        const valor = this.value.replace(
+            /[^\d]/g,
+            ''
+        );
+
+        campoOculto.value = valor;
+
+    });
+
+
+    // Al salir del campo
+    campoVisible.addEventListener('blur', function() {
+
+        const valor = this.value.replace(
+            /[^\d]/g,
+            ''
+        );
+
+        campoOculto.value = valor;
+
+        this.value = formatearPesos(valor);
+
+    });
+
+}
+
+
+    /* ========================================= */
+    /* CIUDADES                                  */
+    /* ========================================= */
 
     const ciudadesPorPais = JSON.parse(
         document.getElementById('ciudades-data').textContent
@@ -504,8 +635,12 @@
             return;
         }
 
+        // Guardamos la ciudad que Django ya tiene almacenada
+        const ciudadActual = ciudad.value;
+
         const ciudades = ciudadesPorPais[pais.value] || [];
 
+        // Limpiamos las opciones actuales
         ciudad.innerHTML = '';
 
         const opcionInicial = document.createElement('option');
@@ -520,13 +655,18 @@
 
         ciudad.appendChild(opcionInicial);
 
-
+        // Creamos nuevamente las ciudades
         ciudades.forEach(function(nombreCiudad) {
 
             const opcion = document.createElement('option');
 
             opcion.value = nombreCiudad;
             opcion.textContent = nombreCiudad;
+
+            // Si esta era la ciudad guardada, la dejamos seleccionada
+            if (nombreCiudad === ciudadActual) {
+                opcion.selected = true;
+            }
 
             ciudad.appendChild(opcion);
 
@@ -536,6 +676,25 @@
 
 
     document.addEventListener('DOMContentLoaded', function() {
+
+        /* ========================================= */
+        /* CAMPOS DE DINERO                          */
+        /* ========================================= */
+
+        prepararCampoPesos(
+            'ingresos_display',
+            'id_ingresos_mensuales'
+        );
+
+        prepararCampoPesos(
+            'gastos_display',
+            'id_gastos_mensuales'
+        );
+
+
+        /* ========================================= */
+        /* CIUDADES                                  */
+        /* ========================================= */
 
         const nacionalidad = document.getElementById(
             'id_nacionalidad'
@@ -588,7 +747,6 @@
     });
 
 </script>
-```
 
 </body>
 </html>

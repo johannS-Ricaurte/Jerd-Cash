@@ -1,9 +1,10 @@
-﻿
+﻿import io
 import re
 import unicodedata
 import pymupdf
 import pytesseract
-from PIL import Image
+from PIL import Image, ImageOps, ImageEnhance
+
 
 
 pytesseract.pytesseract.tesseract_cmd = (
@@ -28,6 +29,11 @@ def normalizar_texto(texto):
 
 
 def extraer_texto_pdf(archivo, contrasena=None):
+    """
+    Extrae texto directamente del PDF cuando es posible.
+    Si el PDF no contiene texto digital suficiente,
+    utiliza OCR en español.
+    """
 
     contenido = archivo.read()
 
@@ -36,44 +42,70 @@ def extraer_texto_pdf(archivo, contrasena=None):
         filetype="pdf"
     )
 
-    if documento.needs_pass:
+    try:
+        # Desbloquear PDF protegido, si es necesario.
+        if documento.needs_pass:
+            if not contrasena:
+                raise ValueError(
+                    "El PDF está protegido y requiere contraseña."
+                )
 
-        if not contrasena:
-            documento.close()
+            if not documento.authenticate(contrasena):
+                raise ValueError(
+                    "La contraseña del PDF es incorrecta."
+                )
 
-            raise ValueError(
-                "El PDF esta protegido con contraseña."
+        # 1. Intentar extraer texto digital.
+        paginas_texto = []
+
+        for pagina in documento:
+            texto = pagina.get_text(
+                "text",
+                sort=True
+            )
+            paginas_texto.append(texto)
+
+        texto_digital = "\n\n".join(paginas_texto).strip()
+
+        # Si existe texto digital suficiente, utilizarlo.
+        if len(texto_digital) >= 100:
+            return texto_digital
+
+        # 2. Si el documento es escaneado, utilizar OCR.
+        paginas_ocr = []
+
+        for pagina in documento:
+            pixmap = pagina.get_pixmap(
+                matrix=pymupdf.Matrix(3, 3),
+                alpha=False
             )
 
-        if not documento.authenticate(contrasena):
-            documento.close()
-
-            raise ValueError(
-                "La contraseña del PDF no es correcta."
+            imagen = Image.frombytes(
+                "RGB",
+                [pixmap.width, pixmap.height],
+                pixmap.samples
             )
 
-    texto = ""
+            # Mejorar la imagen antes del reconocimiento.
+            imagen = ImageOps.grayscale(imagen)
+            imagen = ImageOps.autocontrast(imagen)
 
-    for pagina in documento:
+            imagen = ImageEnhance.Contrast(
+                imagen
+            ).enhance(1.5)
 
-        pixmap = pagina.get_pixmap(
-            matrix=pymupdf.Matrix(2, 2)
-        )
+            texto_ocr = pytesseract.image_to_string(
+                imagen,
+                lang="spa",
+                config="--psm 3"
+            )
 
-        imagen = Image.frombytes(
-            "RGB",
-            [pixmap.width, pixmap.height],
-            pixmap.samples
-        )
+            paginas_ocr.append(texto_ocr)
 
-        texto = texto + pytesseract.image_to_string(
-            imagen,
-            lang="spa"
-        )
+        return "\n\n".join(paginas_ocr).strip()
 
-    documento.close()
-
-    return texto
+    finally:
+        documento.close()
 
 
 def validar_cedula(texto):
@@ -155,21 +187,49 @@ def analizar_cedula(archivo, contrasena=None):
     }
 
 
-def analizar_extracto_bancario(
-    archivo,
-    contrasena=None
-):
+def analizar_extracto_bancario(archivo):
+    """
+    Valida si una imagen corresponde aparentemente
+    a un extracto bancario mediante OCR.
 
-    texto = extraer_texto_pdf(
-        archivo,
-        contrasena
-    )
+    No almacena ni devuelve el texto extraído.
+    """
 
-    es_extracto = validar_extracto_bancario(
-        texto
-    )
+    try:
+        # Volver al inicio del archivo.
+        archivo.seek(0)
 
-    return {
-        "es_extracto": es_extracto,
-        "texto": texto
-    }
+        # Abrir y validar que el archivo sea una imagen.
+        with Image.open(archivo) as imagen:
+            if imagen.format not in ("JPEG", "PNG"):
+                return {"es_extracto": False}
+
+            imagen.load()
+
+            # Convertir a RGB para facilitar el OCR.
+            imagen = imagen.convert("RGB")
+
+            # Extraer texto temporalmente para validar.
+            texto = pytesseract.image_to_string(
+                imagen,
+                lang="spa"
+            )
+
+        # Validar el contenido con la función existente.
+        es_extracto = validar_extracto_bancario(texto)
+
+        return {
+            "es_extracto": es_extracto
+        }
+
+    except Exception:
+        return {
+            "es_extracto": False
+        }
+
+    finally:
+        # Permitir que Django guarde el archivo completo.
+        try:
+            archivo.seek(0)
+        except Exception:
+            pass

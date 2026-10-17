@@ -1,3 +1,5 @@
+{% load formatos %}
+
 <!DOCTYPE html>
 <html lang="es">
 
@@ -69,6 +71,10 @@
                         >
                             JERD-Cash
                         </h1>
+
+                        <p style="color: red; font-weight: bold;">
+                            PRUEBA DE PLANTILLA JERD-CASH
+                        </p>
 
                         <p
                             class="text-xs
@@ -552,12 +558,7 @@
                                    mt-2"
                         >
 
-                            $<span
-                                class="formato-pesos"
-                                data-valor="{{ request.POST.ingresos }}"
-                            >
-                                {{ request.POST.ingresos }}
-                            </span>
+                            {{ request.POST.ingresos|pesos }}
 
                         </p>
 
@@ -588,12 +589,7 @@
                                    mt-2"
                         >
 
-                            $<span
-                                class="formato-pesos"
-                                data-valor="{{ request.POST.gastos }}"
-                            >
-                                {{ request.POST.gastos }}
-                            </span>
+                            {{ request.POST.gastos|pesos }}
 
                         </p>
 
@@ -624,12 +620,7 @@
                                    mt-2"
                         >
 
-                            $<span
-                                class="formato-pesos"
-                                data-valor="{{ saldo_disponible }}"
-                            >
-                                {{ saldo_disponible }}
-                            </span>
+                            PRUEBA: {{ 2000000|pesos }}
 
                         </p>
 
@@ -843,12 +834,7 @@
                                            mt-2"
                                 >
 
-                                    $<span
-                                        class="formato-pesos"
-                                        data-valor="{{ monto|floatformat:0 }}"
-                                    >
-                                        {{ monto|floatformat:0 }}
-                                    </span>
+                                    {{ monto|pesos }}
 
                                 </p>
 
@@ -910,12 +896,7 @@
                                            mt-2"
                                 >
 
-                                    $<span
-                                        class="formato-cuota"
-                                        data-valor="{{ cuota_mensual }}"
-                                    >
-                                        {{ cuota_mensual }}
-                                    </span>
+                                    {{ cuota_mensual|pesos }}
 
                                 </p>
 
@@ -959,23 +940,13 @@
 
                                 Saldo disponible:
 
-                                $<span
-                                    class="formato-pesos"
-                                    data-valor="{{ saldo_disponible|floatformat:0 }}"
-                                >
-                                    {{ saldo_disponible|floatformat:0 }}
-                                </span>
+                                {{ saldo_disponible|pesos }}
 
                                 <br>
 
                                 Cuota mensual:
 
-                                $<span
-                                    class="formato-cuota"
-                                    data-valor="{{ cuota_mensual }}"
-                                >
-                                    {{ cuota_mensual }}
-                                </span>
+                                {{ cuota_mensual|pesos }}
 
                             </p>
 
@@ -1147,24 +1118,20 @@
          * 5.000.000
          */
 
+        
+        
         function formatearCampo(input) {
+            const valor = input.value.replace(/\D/g, '');
 
-            let valor = input.value;
-
-            valor = valor.replace(/\D/g, '');
-
-            if (valor === '') {
-
+            if (!valor) {
                 input.value = '';
-
                 return;
-
             }
 
-            input.value =
-                Number(valor).toLocaleString('es-CO');
-
+            input.value = valor.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
         }
+
+
 
 
 
@@ -1224,50 +1191,6 @@
          * 5000000 → 5.000.000
          */
 
-        const resultadosPesos =
-            document.querySelectorAll(
-                '.formato-pesos'
-            );
-
-
-        resultadosPesos.forEach(
-            function(elemento) {
-
-                let valor =
-                    elemento.getAttribute(
-                        'data-valor'
-                    );
-
-
-                if (
-                    valor !== null &&
-                    valor !== ''
-                ) {
-
-                    // Convertir el valor
-                    // a número correctamente.
-
-                    valor =
-                        parseFloat(
-                            valor
-                        );
-
-
-                    if (!isNaN(valor)) {
-
-                        elemento.textContent =
-                            Math.round(
-                                valor
-                            ).toLocaleString(
-                                'es-CO'
-                            );
-
-                    }
-
-                }
-
-            }
-        );
 
 
 
@@ -1290,48 +1213,6 @@
          * No se eliminan los puntos
          * antes de convertir el número.
          */
-
-        const resultadosCuota =
-            document.querySelectorAll(
-                '.formato-cuota'
-            );
-
-
-        resultadosCuota.forEach(
-            function(elemento) {
-
-                let valor =
-                    elemento.getAttribute(
-                        'data-valor'
-                    );
-
-
-                if (
-                    valor !== null &&
-                    valor !== ''
-                ) {
-
-                    valor =
-                        parseFloat(
-                            valor
-                        );
-
-
-                    if (!isNaN(valor)) {
-
-                        elemento.textContent =
-                            Math.round(
-                                valor
-                            ).toLocaleString(
-                                'es-CO'
-                            );
-
-                    }
-
-                }
-
-            }
-        );
 
 
 
@@ -1364,21 +1245,11 @@
                 'submit',
                 function() {
 
-                    camposDinero.forEach(
-                        function(campo) {
-
-                            if (campo) {
-
-                                campo.value =
-                                    campo.value.replace(
-                                        /\./g,
-                                        ''
-                                    );
-
-                            }
-
+                    camposDinero.forEach(function(campo) {
+                        if (campo) {
+                            campo.value = campo.value.replace(/\D/g, '');
                         }
-                    );
+                    });
 
                 }
             );

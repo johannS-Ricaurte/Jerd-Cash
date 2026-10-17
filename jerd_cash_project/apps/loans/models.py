@@ -98,6 +98,14 @@ class Cuota(models.Model):
 
     pagada = models.BooleanField(default=False, verbose_name="¿Pagada?")
 
+    dias_mora = models.IntegerField(default=0)
+    monto_mora = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        default=0
+    )
+    
+
     class Meta:
         verbose_name = "Cuota"
         verbose_name_plural = "Cuotas"
@@ -106,3 +114,107 @@ class Cuota(models.Model):
 
     def __str__(self):
         return f"Cuota {self.numero_cuota} - Préstamo #{self.prestamo.id}"
+
+
+class Pago(models.Model):
+
+    ESTADOS = [
+        ('pendiente', 'Pendiente'),
+        ('pendiente_confirmacion', 'Pendiente de confirmación'),
+        ('exitoso', 'Pago exitoso'),
+        ('rechazado', 'Rechazado'),
+    ]
+
+    cliente = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='pagos',
+        verbose_name='Cliente'
+    )
+
+    monto = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        verbose_name='Monto del pago'
+    )
+
+    comprobante = models.FileField(
+        upload_to='pagos/comprobantes/',
+        null=True,
+        blank=True,
+        verbose_name='Comprobante de pago'
+    )
+
+    estado = models.CharField(
+        max_length=30,
+        choices=ESTADOS,
+        default='pendiente',
+        verbose_name='Estado'
+    )
+
+    fecha_pago = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name='Fecha del pago'
+    )
+
+    fecha_creacion = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Fecha de creación'
+    )
+
+    fecha_actualizacion = models.DateTimeField(
+        auto_now=True,
+        verbose_name='Última actualización'
+    )
+
+    motivo_rechazo = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name='Motivo del rechazo'
+    )
+
+    def __str__(self):
+        return (
+            f'Pago #{self.id} - '
+            f'{self.cliente.username} - '
+            f'${self.monto}'
+        )
+    
+
+class PagoCuota(models.Model):
+    pago = models.ForeignKey(
+        Pago,
+        on_delete=models.CASCADE,
+        related_name='cuotas_pagadas'
+    )
+
+    cuota = models.ForeignKey(
+        Cuota,
+        on_delete=models.CASCADE,
+        related_name='pagos'
+    )
+
+    monto_aplicado = models.DecimalField(
+        max_digits=12,
+        decimal_places=2
+    )
+
+    # Datos históricos de la mora al momento del pago
+    dias_mora = models.IntegerField(default=0)
+
+    monto_mora = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        default=0
+    )
+
+    fecha_aplicacion = models.DateTimeField(auto_now_add=True)
+
+    
+    def __str__(self):
+        return (
+            f'Pago #{self.pago.id} → '
+            f'Cuota #{self.cuota.numero_cuota}'
+        )
+    

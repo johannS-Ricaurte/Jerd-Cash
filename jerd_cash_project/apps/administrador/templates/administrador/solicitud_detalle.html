@@ -1,3 +1,5 @@
+{% load formatos %}
+
 <!DOCTYPE html>
 <html lang="es">
 
@@ -190,7 +192,7 @@
                     </p>
 
                     <p class="text-2xl font-bold text-gray-900 mt-1">
-                        ${{ solicitud.monto_solicitado }}
+                        {{ solicitud.monto_solicitado|pesos }}
                     </p>
 
                 </div>
@@ -434,28 +436,28 @@
                         <p class="text-sm text-gray-500 mt-2">
                             Ingresos mensuales:
                             <span class="font-medium text-gray-900">
-                                ${{ detalle_score.ingresos_mensuales }}
+                                {{ detalle_score.ingresos_mensuales|pesos }}
                             </span>
                         </p>
 
                         <p class="text-sm text-gray-500 mt-1">
                             Gastos mensuales:
                             <span class="font-medium text-gray-900">
-                                ${{ detalle_score.gastos_mensuales }}
+                                {{ detalle_score.gastos_mensuales|pesos }}
                             </span>
                         </p>
 
                         <p class="text-sm text-gray-500 mt-1">
                             Gastos / ingresos:
                             <span class="font-medium text-gray-900">
-                                {{ detalle_score.ratio_endeudamiento }}%
+                                {{ detalle_score.ratio_gastos }}%
                             </span>
                         </p>
 
                         <p class="text-sm text-gray-500 mt-1">
                             Puntaje:
                             <span class="font-medium text-gray-900">
-                                {{ detalle_score.score_capacidad }} / 100
+                                {{ detalle_score.score_gastos }} / 100
                             </span>
                         </p>
 
@@ -475,7 +477,7 @@
                         <p class="text-sm text-gray-500 mt-2">
                             Monto solicitado:
                             <span class="font-medium text-gray-900">
-                                ${{ detalle_score.monto_solicitado }}
+                                {{ detalle_score.monto_solicitado|pesos }}
                             </span>
                         </p>
 
@@ -489,21 +491,21 @@
                         <p class="text-sm text-gray-500 mt-1">
                             Cuota estimada:
                             <span class="font-medium text-gray-900">
-                                ${{ detalle_score.cuota_estimada }}
+                                {{ detalle_score.cuota_estimada|pesos }}
                             </span>
                         </p>
 
                         <p class="text-sm text-gray-500 mt-1">
                             Disponible antes de la cuota:
                             <span class="font-medium text-gray-900">
-                                ${{ detalle_score.disponible_actual }}
+                                {{ detalle_score.disponible_actual|pesos }}
                             </span>
                         </p>
 
                         <p class="text-sm text-gray-500 mt-1">
                             Disponible después de la cuota:
                             <span class="font-medium text-gray-900">
-                                ${{ detalle_score.disponible_despues_cuota }}
+                                {{ detalle_score.disponible_despues_cuota|pesos }}
                             </span>
                         </p>
 
@@ -597,7 +599,7 @@
 
 
                             <td class="py-4 pr-4">
-                                ${{ prestamo.monto_solicitado }}
+                                {{ prestamo.monto_solicitado|pesos }}
                             </td>
 
 
@@ -722,15 +724,15 @@
                                                     </td>
 
                                                     <td class="py-2">
-                                                        ${{ cuota.valor_cuota }}
+                                                        {{ cuota.valor_cuota|pesos }}
                                                     </td>
 
                                                     <td class="py-2">
-                                                        ${{ cuota.abono_capital }}
+                                                        {{ cuota.abono_capital|pesos }}
                                                     </td>
 
                                                     <td class="py-2">
-                                                        ${{ cuota.interes }}
+                                                        {{ cuota.interes|pesos }}
                                                     </td>
 
                                                     <td class="py-2">

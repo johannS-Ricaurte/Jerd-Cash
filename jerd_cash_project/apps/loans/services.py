@@ -2,8 +2,112 @@
 from decimal import Decimal, ROUND_HALF_UP
 from datetime import date
 from dateutil.relativedelta import relativedelta
-from .models import Prestamo, Cuota
+from .models import Prestamo, Cuota, PagoCuota
 from django.conf import settings
+from datetime import date
+from decimal import Decimal, ROUND_HALF_UP
+
+
+# Fecha simulada utilizada para evaluar la mora.
+FECHA_SIMULADA_SCORE = date(2026, 12, 25)
+
+
+def calcular_score_comportamiento_pago(cliente):
+    """
+    Evalúa el comportamiento de pago del cliente.
+
+    - Premia las cuotas pagadas a tiempo.
+    - Reduce la puntuación de las cuotas pagadas tarde.
+    - Penaliza las cuotas vencidas que siguen sin pagar.
+    - No evalúa cuotas que todavía no han vencido.
+    """
+
+    cuotas = Cuota.objects.filter(
+        prestamo__cliente=cliente
+    ).select_related(
+        'prestamo'
+    ).order_by(
+        'fecha_vencimiento'
+    )
+
+    puntuaciones = []
+    cuotas_pagadas = 0
+    cuotas_evaluadas = 0
+
+    for cuota in cuotas:
+
+        # Caso 1: cuota pagada.
+        if cuota.pagada:
+
+            pago_historico = PagoCuota.objects.filter(
+                cuota=cuota,
+                pago__estado='exitoso'
+            ).order_by(
+                '-fecha_aplicacion'
+            ).first()
+
+            cuotas_evaluadas += 1
+            cuotas_pagadas += 1
+
+            # Si existe historial confirmado, evaluamos
+            # los días de mora registrados al pagar.
+            if pago_historico:
+
+                dias_mora = pago_historico.dias_mora
+
+                if dias_mora <= 0:
+                    puntuacion = 100
+                elif dias_mora <= 5:
+                    puntuacion = 80
+                elif dias_mora <= 15:
+                    puntuacion = 60
+                elif dias_mora <= 30:
+                    puntuacion = 40
+                else:
+                    puntuacion = 20
+
+            else:
+                # Cuota pagada sin registro histórico.
+                # Se asigna un valor neutral para no
+                # penalizar registros antiguos incompletos.
+                puntuacion = 80
+
+            puntuaciones.append(puntuacion)
+
+        # Caso 2: cuota vencida y todavía sin pagar.
+        elif cuota.fecha_vencimiento < FECHA_SIMULADA_SCORE:
+
+            cuotas_evaluadas += 1
+            puntuaciones.append(0)
+
+        # Caso 3: cuota pendiente que todavía no vence.
+        # No se evalúa ni penaliza.
+        else:
+            continue
+
+    if not puntuaciones:
+        return {
+            'score_cumplimiento': 80,
+            'cuotas_totales': 0,
+            'cuotas_pagadas': 0,
+            'pct_cumplimiento': 80,
+        }
+
+    score_cumplimiento = round(
+        sum(puntuaciones) / len(puntuaciones)
+    )
+
+    pct_cumplimiento = round(
+        (cuotas_pagadas / cuotas_evaluadas) * 100
+    )
+
+    return {
+        'score_cumplimiento': score_cumplimiento,
+        'cuotas_totales': cuotas_evaluadas,
+        'cuotas_pagadas': cuotas_pagadas,
+        'pct_cumplimiento': pct_cumplimiento,
+    }
+
 
 
 def calcular_score_deterministico(cliente, solicitud=None):
@@ -27,7 +131,7 @@ def calcular_score_deterministico(cliente, solicitud=None):
         # ==========================================================
 
         meses_antiguedad = (
-            date.today() - cliente.date_joined.date()
+            FECHA_SIMULADA_SCORE - cliente.date_joined.date()
         ).days // 30
 
         if meses_antiguedad >= 12:
@@ -39,39 +143,18 @@ def calcular_score_deterministico(cliente, solicitud=None):
         else:
             score_ant = 20
 
+        
         # ==========================================================
         # 2. HISTORIAL DE CUMPLIMIENTO
         # ==========================================================
 
-        prestamos_anteriores = Prestamo.objects.filter(
-            cliente=cliente,
-            estado__in=['pagado', 'desembolsado']
+        historial_pago = calcular_score_comportamiento_pago(
+            cliente
         )
 
-        if prestamos_anteriores.exists():
-
-            cuotas_totales = Cuota.objects.filter(
-                prestamo__in=prestamos_anteriores
-            ).count()
-
-            cuotas_pagadas = Cuota.objects.filter(
-                prestamo__in=prestamos_anteriores,
-                pagada=True
-            ).count()
-
-            pct_cumplimiento = (
-                cuotas_pagadas / cuotas_totales * 100
-            ) if cuotas_totales > 0 else 100
-
-        else:
-            # Cliente sin historial:
-            # se utiliza un valor de referencia neutral.
-            pct_cumplimiento = 80
-
-        score_cumplimiento = min(
-            pct_cumplimiento,
-            100
-        )
+        score_cumplimiento = historial_pago[
+            'score_cumplimiento'
+        ]
 
         # ==========================================================
         # 3. GASTOS FRENTE A INGRESOS
@@ -244,7 +327,7 @@ def calcular_detalle_score(cliente, solicitud=None):
         # ==========================================================
 
         meses_antiguedad = (
-            date.today() - cliente.date_joined.date()
+            FECHA_SIMULADA_SCORE - cliente.date_joined.date()
         ).days // 30
 
         if meses_antiguedad >= 12:
@@ -256,44 +339,31 @@ def calcular_detalle_score(cliente, solicitud=None):
         else:
             score_ant = 20
 
+        
         # ==========================================================
-        # 2. HISTORIAL
+        # 2. HISTORIAL DE CUMPLIMIENTO
         # ==========================================================
 
-        prestamos_anteriores = Prestamo.objects.filter(
-            cliente=cliente,
-            estado__in=['pagado', 'desembolsado']
+        historial_pago = calcular_score_comportamiento_pago(
+            cliente
         )
 
-        if prestamos_anteriores.exists():
+        cuotas_totales = historial_pago[
+            'cuotas_totales'
+        ]
 
-            cuotas_totales = Cuota.objects.filter(
-                prestamo__in=prestamos_anteriores
-            ).count()
+        cuotas_pagadas = historial_pago[
+            'cuotas_pagadas'
+        ]
 
-            cuotas_pagadas = Cuota.objects.filter(
-                prestamo__in=prestamos_anteriores,
-                pagada=True
-            ).count()
+        pct_cumplimiento = historial_pago[
+            'pct_cumplimiento'
+        ]
 
-            pct_cumplimiento = (
-                cuotas_pagadas / cuotas_totales * 100
-            ) if cuotas_totales > 0 else 100
+        score_cumplimiento = historial_pago[
+            'score_cumplimiento'
+        ]
 
-        else:
-
-            cuotas_totales = 0
-            cuotas_pagadas = 0
-
-            # Cliente sin historial.
-            # Es un valor de referencia, no un porcentaje
-            # real de cuotas pagadas.
-            pct_cumplimiento = 80
-
-        score_cumplimiento = min(
-            pct_cumplimiento,
-            100
-        )
 
         # ==========================================================
         # 3. GASTOS FRENTE A INGRESOS
@@ -628,3 +698,65 @@ def calcular_score_simulador(ingresos, gastos):
         'capacidad_pago': capacidad_pago,
     }
 
+def calcular_dias_mora(fecha_vencimiento, fecha_actual=None):
+    """
+    Calcula los días de mora de una cuota.
+
+    La fecha de vencimiento es el último día permitido para pagar.
+    La mora comienza al día siguiente.
+
+    Ejemplo:
+        Vencimiento: 20/10/2026
+        Pago:        20/10/2026 -> 0 días
+        Pago:        21/10/2026 -> 1 día
+        Pago:        22/10/2026 -> 2 días
+    """
+
+    if fecha_actual is None:
+        fecha_actual = date.today()
+
+    if fecha_actual <= fecha_vencimiento:
+        return 0
+
+    return (fecha_actual - fecha_vencimiento).days
+
+TASA_MORA_ANUAL = Decimal('0.2859')
+
+
+def calcular_monto_mora(
+    valor_cuota,
+    dias_mora,
+    tasa_anual=TASA_MORA_ANUAL
+):
+    """
+    Calcula el valor de la mora sobre el valor original
+    de la cuota.
+
+    La tasa anual se maneja como tasa efectiva anual.
+
+    No se cobra interés sobre la mora acumulada.
+    """
+
+    if dias_mora <= 0:
+        return Decimal('0.00')
+
+    valor_cuota = Decimal(valor_cuota)
+    tasa_anual = Decimal(tasa_anual)
+
+    # Conversión de tasa efectiva anual
+    # a tasa efectiva diaria.
+    tasa_diaria = (
+        (Decimal('1') + tasa_anual)
+        ** (Decimal('1') / Decimal('365'))
+    ) - Decimal('1')
+
+    mora = (
+        valor_cuota
+        * tasa_diaria
+        * Decimal(dias_mora)
+    )
+
+    return mora.quantize(
+        Decimal('0.01'),
+        rounding=ROUND_HALF_UP
+    )

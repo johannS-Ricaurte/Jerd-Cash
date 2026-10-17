@@ -19,5 +19,6 @@ urlpatterns = [
         views.simulador_publico_view,
         name='simulador_publico'
     ),
+
 ]
 

@@ -1,0 +1,957 @@
+{% load formatos %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Mis Créditos - JERD-Cash</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+</head>
+
+
+<body class="bg-gray-100 min-h-screen">
+
+
+    <!-- NAVBAR -->
+
+    <nav class="bg-white shadow-sm">
+
+        <div class="max-w-7xl mx-auto px-6 py-4">
+
+            <div class="flex justify-between items-center">
+
+                <div>
+
+                    <h1 class="text-xl font-bold text-gray-800">
+                        JERD-Cash
+                    </h1>
+
+                    <p class="text-sm text-gray-500">
+                        Mis créditos
+                    </p>
+
+                </div>
+
+                <a
+                    href="{% url 'cliente_dashboard' %}"
+                    class="text-sm text-blue-600 hover:text-blue-800"
+                >
+                    Volver al inicio
+                </a>
+
+            </div>
+
+        </div>
+
+    </nav>
+
+
+    <!-- CONTENIDO PRINCIPAL -->
+
+    <main class="max-w-7xl mx-auto px-6 py-8">
+
+
+        <!-- TITULO -->
+
+        <div class="mb-8">
+
+            <h2 class="text-3xl font-bold text-gray-800">
+                Mis créditos
+            </h2>
+
+            <p class="text-gray-600 mt-2">
+                Consulta el estado y el historial de tus créditos.
+            </p>
+
+        </div>
+
+
+        <!-- TOTAL A PAGAR -->
+
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+
+            <div class="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-6">
+
+
+                <!-- INFORMACIÓN DEL TOTAL -->
+
+                <div>
+
+                    <p class="text-sm font-medium text-blue-600">
+                        Total a pagar
+                    </p>
+
+                    <h3 class="text-3xl font-bold text-gray-800 mt-1">
+                        {{ total_a_pagar|pesos }}
+                    </h3>
+
+
+                    {% if total_a_pagar > 0 %}
+
+                        <a
+                            href="{% url 'pagar' %}"
+                            class="inline-block mt-4 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition"
+                        >
+                            Pagar total
+                        </a>
+
+                    {% else %}
+
+                        <span
+                            class="inline-flex mt-4 items-center px-4 py-2 rounded-full text-sm font-semibold bg-green-100 text-green-700"
+                        >
+                            ✓ No tienes pagos pendientes
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- INFORMACIÓN DEL CICLO -->
+
+                {% if proxima_fecha_limite %}
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+                        <!-- FECHA DE CORTE -->
+
+                        <div class="bg-blue-50 border border-blue-100 rounded-lg px-5 py-4">
+
+                            <p class="text-xs font-semibold text-blue-600 uppercase">
+                                Fecha de corte
+                            </p>
+
+                            <p class="text-lg font-bold text-gray-800 mt-1">
+                                {{ proxima_fecha_corte|date:"d/m/Y" }}
+                            </p>
+
+                            <p class="text-xs text-gray-500 mt-1">
+                                Inicio del período de pago
+                            </p>
+
+                        </div>
+
+
+                        <!-- FECHA LÍMITE -->
+
+                        <div class="bg-orange-50 border border-orange-100 rounded-lg px-5 py-4">
+
+                            <p class="text-xs font-semibold text-orange-600 uppercase">
+                                Fecha límite
+                            </p>
+
+                            <p class="text-lg font-bold text-gray-800 mt-1">
+                                {{ proxima_fecha_limite|date:"d/m/Y" }}
+                            </p>
+
+                            <p class="text-xs text-gray-500 mt-1">
+                                Último día para pagar
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                {% endif %}
+
+
+                <!-- BOTÓN DE PAGO -->
+
+                <div>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+
+        {% if prestamos %}
+
+            <div class="space-y-8">
+
+
+                {% for prestamo in prestamos %}
+
+
+                    <!-- ALERTA DE MORA -->
+
+                    {% if prestamo.tiene_mora %}
+
+                        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+
+                            <div class="w-full max-w-md bg-white rounded-2xl shadow-2xl p-6">
+
+                                <div class="flex items-start gap-4">
+
+                                    <div class="flex-shrink-0 w-12 h-12 rounded-full bg-red-100 flex items-center justify-center text-2xl">
+                                        ⚠️
+                                    </div>
+
+                                    <div class="flex-1">
+
+                                        <h3 class="text-lg font-bold text-red-700">
+                                            Tienes un pago en mora
+                                        </h3>
+
+                                        <p class="mt-2 text-sm text-gray-600 leading-relaxed">
+
+                                            Una o más cuotas de tu crédito se encuentran vencidas.
+
+                                            El valor pendiente puede aumentar mientras continúe el retraso.
+
+                                        </p>
+
+                                        <p class="mt-2 text-sm font-semibold text-gray-700">
+                                            Te recomendamos realizar el pago lo antes posible.
+                                        </p>
+
+
+                                        <div class="mt-4 bg-red-50 border border-red-100 rounded-xl p-3">
+
+                                            <p class="text-sm text-red-700">
+
+                                                Actualmente tienes
+
+                                                <strong>{{ prestamo.cuotas_en_mora }}</strong>
+
+                                                cuota{{ prestamo.cuotas_en_mora|pluralize }} en mora.
+
+                                            </p>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+
+                                <div class="mt-6 flex justify-end">
+
+                                    <button
+                                        type="button"
+                                        onclick="this.closest('.fixed').remove()"
+                                        class="px-5 py-2.5 rounded-xl bg-red-600 text-white text-sm font-semibold hover:bg-red-700 transition"
+                                    >
+                                        Entendido
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    {% endif %}
+
+
+                    <!-- TARJETA DEL CREDITO -->
+
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+
+
+                        <!-- INFORMACION PRINCIPAL -->
+
+                        <div class="p-6 border-b border-gray-200">
+
+                            <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+
+
+                                <!-- CREDITO Y MONTO -->
+
+                                <div>
+
+                                    <p class="text-sm text-gray-500">
+                                        Crédito #{{ prestamo.id }}
+                                    </p>
+
+                                    <h3 class="text-2xl font-bold text-gray-800 mt-1">
+                                        {{ prestamo.monto_solicitado|pesos }}
+                                    </h3>
+
+                                </div>
+
+
+                                <!-- ESTADO GENERAL -->
+
+                                <div>
+
+                                    {% if prestamo.estado_pago == 'pagado' %}
+
+                                        <span
+                                            class="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-green-100 text-green-700"
+                                        >
+                                            ✓ Pagado
+                                        </span>
+
+                                    {% elif prestamo.tiene_pago_rechazado %}
+
+                                        <span
+                                            class="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-red-100 text-red-700"
+                                        >
+                                            ✕ Pago rechazado
+                                        </span>
+
+                                    {% elif prestamo.estado_pago == 'mora' %}
+
+                                        <span
+                                            class="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-red-100 text-red-700"
+                                        >
+                                            ⚠ En mora
+                                        </span>
+
+                                    {% elif prestamo.estado_pago == 'sin_cuotas' %}
+
+                                        <span
+                                            class="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-gray-100 text-gray-600"
+                                        >
+                                            ○ Sin cuotas generadas
+                                        </span>
+
+                                    {% else %}
+
+                                        <span
+                                            class="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-blue-100 text-blue-700"
+                                        >
+                                            ● Al día
+                                        </span>
+
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- DATOS DEL CREDITO -->
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mt-6">
+
+
+                                <!-- PLAZO -->
+
+                                <div class="bg-gray-50 rounded-lg p-4">
+
+                                    <p class="text-sm text-gray-500">
+                                        Plazo
+                                    </p>
+
+                                    <p class="font-semibold text-gray-800 mt-1">
+                                        {{ prestamo.plazo_meses }} meses
+                                    </p>
+
+                                </div>
+
+
+                                <!-- TASA -->
+
+                                <div class="bg-gray-50 rounded-lg p-4">
+
+                                    <p class="text-sm text-gray-500">
+                                        Tasa mensual
+                                    </p>
+
+                                    <p class="font-semibold text-gray-800 mt-1">
+                                        {{ prestamo.tasa_interes_mensual }}%
+                                    </p>
+
+                                </div>
+
+
+                                <!-- CUOTAS PAGADAS -->
+
+                                <div class="bg-gray-50 rounded-lg p-4">
+
+                                    <p class="text-sm text-gray-500">
+                                        Cuotas pagadas
+                                    </p>
+
+                                    <p class="font-semibold text-green-600 mt-1">
+
+                                        {{ prestamo.cuotas_pagadas }}
+
+                                        /
+
+                                        {{ prestamo.total_cuotas }}
+
+                                    </p>
+
+                                </div>
+
+
+                                <!-- CUOTAS PENDIENTES -->
+
+                                <div class="bg-gray-50 rounded-lg p-4">
+
+                                    <p class="text-sm text-gray-500">
+                                        Cuotas pendientes
+                                    </p>
+
+                                    <p class="font-semibold text-orange-600 mt-1">
+                                        {{ prestamo.cuotas_pendientes }}
+                                    </p>
+
+                                </div>
+
+
+                                <!-- PAGOS EN MORA -->
+
+                                <div class="bg-red-50 border border-red-100 rounded-lg p-4">
+
+                                    <p class="text-sm text-red-600">
+                                        Pagos en mora
+                                    </p>
+
+                                    <p class="font-semibold text-red-700 mt-1">
+                                        {{ prestamo.cuotas_en_mora }}
+                                    </p>
+
+                                </div>
+
+
+                            </div>
+
+
+                            <!-- PROXIMA CUOTA -->
+
+                            {% if prestamo.proxima_cuota %}
+
+                                <div
+                                    class="mt-4 bg-blue-50 border border-blue-100 rounded-lg p-5"
+                                >
+
+                                    <div
+                                        class="flex flex-col md:flex-row md:justify-between md:items-center gap-4"
+                                    >
+
+
+                                        <!-- VALOR -->
+
+                                        <div>
+
+                                            <p class="text-sm text-blue-600 font-medium">
+                                                Próxima cuota
+                                            </p>
+
+                                            <p class="text-2xl font-bold text-gray-800 mt-1">
+                                                {{ prestamo.proxima_cuota.valor_cuota|pesos }}
+                                            </p>
+
+                                            <p class="text-sm text-gray-600 mt-1">
+                                                Cuota #{{ prestamo.proxima_cuota.numero_cuota }}
+                                            </p>
+
+                                        </div>
+
+
+                                        <!-- FECHA Y ESTADO -->
+
+                                        <div class="text-left md:text-right">
+
+                                            <p class="text-sm text-gray-500">
+                                                Fecha de vencimiento
+                                            </p>
+
+                                            <p class="font-semibold text-gray-800 mt-1">
+                                                {{ prestamo.proxima_cuota.fecha_vencimiento|date:"d/m/Y" }}
+                                            </p>
+
+
+                                            {% if prestamo.proxima_cuota.pagada %}
+
+                                                <span
+                                                    class="inline-flex mt-2 px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700"
+                                                >
+                                                    Pagada
+                                                </span>
+
+                                            {% elif prestamo.proxima_cuota.fecha_vencimiento < today %}
+
+                                                <span
+                                                    class="inline-flex mt-2 px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700"
+                                                >
+                                                    Vencida
+                                                </span>
+
+                                            {% else %}
+
+                                                <span
+                                                    class="inline-flex mt-2 px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700"
+                                                >
+                                                    Pendiente de pago
+                                                </span>
+
+                                            {% endif %}
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            {% endif %}
+
+
+                        </div>
+
+
+                        <!-- HISTORIAL DE CUOTAS -->
+
+                        <div class="p-6">
+
+                            <div class="flex justify-between items-center mb-4">
+
+                                <h4 class="text-lg font-semibold text-gray-800">
+                                    Historial de cuotas
+                                </h4>
+
+                            </div>
+
+
+                            {% if prestamo.total_cuotas %}
+
+                                <div class="overflow-x-auto">
+
+                                    <table class="w-full text-sm">
+
+
+                                        <!-- ENCABEZADOS -->
+
+                                        <thead>
+
+                                            <tr
+                                                class="border-b border-gray-200 text-left"
+                                            >
+
+                                                <th class="py-3 px-3 text-gray-500 font-medium">
+                                                    Cuota
+                                                </th>
+
+                                                <th class="py-3 px-3 text-gray-500 font-medium">
+                                                    Vencimiento
+                                                </th>
+
+                                                <th class="py-3 px-3 text-gray-500 font-medium">
+                                                    Valor
+                                                </th>
+
+                                                <th class="py-3 px-3 text-gray-500 font-medium">
+                                                    Interés
+                                                </th>
+
+                                                <th class="py-3 px-3 text-gray-500 font-medium">
+                                                    Capital
+                                                </th>
+
+                                                <th class="py-3 px-3 text-gray-500 font-medium">
+                                                    Saldo
+                                                </th>
+
+                                                <th class="py-3 px-3 text-gray-500 font-medium">
+                                                    Estado
+                                                </th>
+
+                                            </tr>
+
+                                        </thead>
+
+
+                                        <!-- CUOTAS -->
+
+                                        <tbody>
+
+                                            {% for cuota in prestamo.cuotas.all %}
+
+                                                <tr class="border-b border-gray-100 hover:bg-gray-50">
+
+
+                                                    <!-- NUMERO -->
+
+                                                    <td
+                                                        class="py-3 px-3 font-medium text-gray-800"
+                                                    >
+                                                        #{{ cuota.numero_cuota }}
+                                                    </td>
+
+
+                                                    <!-- FECHA -->
+
+                                                    <td
+                                                        class="py-3 px-3 text-gray-600"
+                                                    >
+                                                        {{ cuota.fecha_vencimiento|date:"d/m/Y" }}
+                                                    </td>
+
+
+                                                    <!-- VALOR -->
+
+                                                    <td class="py-3 px-3 text-gray-800">
+
+                                                        <div>
+                                                            {{ cuota.valor_cuota|pesos }}
+                                                        </div>
+
+
+                                                        {% if cuota.en_mora %}
+
+                                                            <div class="mt-1 text-xs text-red-600">
+                                                                Mora: {{ cuota.monto_mora_actual|pesos }}
+                                                            </div>
+
+                                                            <div class="text-xs font-semibold text-red-700">
+                                                                Total: {{ cuota.total_con_mora|pesos }}
+                                                            </div>
+
+                                                        {% endif %}
+
+                                                    </td>
+
+
+                                                    <!-- INTERES -->
+
+                                                    <td
+                                                        class="py-3 px-3 text-gray-600"
+                                                    >
+                                                        {{ cuota.interes|pesos }}
+                                                    </td>
+
+
+                                                    <!-- CAPITAL -->
+
+                                                    <td
+                                                        class="py-3 px-3 text-gray-600"
+                                                    >
+                                                        {{ cuota.abono_capital|pesos }}
+                                                    </td>
+
+
+                                                    <!-- SALDO -->
+
+                                                    <td
+                                                        class="py-3 px-3 text-gray-600"
+                                                    >
+                                                        {{ cuota.saldo_pendiente|pesos }}
+                                                    </td>
+
+
+                                                    <!-- ESTADO -->
+
+                                                    <td class="py-3 px-3">
+
+
+                                                        {% if cuota.pagada %}
+
+                                                            <div class="flex flex-col gap-1">
+
+                                                                <span
+                                                                    class="inline-flex w-fit px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700"
+                                                                >
+                                                                    ✓ Pagada
+                                                                </span>
+
+                                                                {% if cuota.mora_historica %}
+
+                                                                    <span class="text-xs text-red-600">
+                                                                        {{ cuota.mora_historica.dias_mora }} días de mora
+                                                                    </span>
+
+                                                                    <span class="text-xs font-semibold text-red-600">
+                                                                        Mora: {{ cuota.mora_historica.monto_mora|pesos }}
+                                                                    </span>
+
+                                                                {% endif %}
+
+                                                            </div>
+
+                                                        {% elif cuota.pago_pendiente_confirmacion %}
+
+                                                            <span
+                                                                class="inline-flex px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700"
+                                                            >
+                                                                ⏳ Pendiente de confirmación
+                                                            </span>
+
+
+                                                        {% elif cuota.en_mora %}
+
+                                                            <div class="flex flex-col gap-1">
+
+                                                                <span
+                                                                    class="inline-flex w-fit px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700"
+                                                                >
+                                                                    ⚠ En mora
+                                                                </span>
+
+                                                                <span class="text-xs text-red-600">
+                                                                    {{ cuota.dias_mora_actual }} días de mora
+                                                                </span>
+
+                                                            </div>
+
+
+                                                        {% elif cuota.fecha_vencimiento < today %}
+
+                                                            <span
+                                                                class="inline-flex px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700"
+                                                            >
+                                                                ⚠ Vencida
+                                                            </span>
+
+
+                                                        {% else %}
+
+                                                            <span
+                                                                class="inline-flex px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700"
+                                                            >
+                                                                Pendiente
+                                                            </span>
+
+                                                        {% endif %}
+
+
+                                                    </td>
+
+
+                                                </tr>
+
+                                            {% endfor %}
+
+                                        </tbody>
+
+                                    </table>
+
+                                </div>
+
+
+                            {% else %}
+
+                                <p class="text-gray-500 text-sm">
+                                    Este crédito todavía no tiene cuotas registradas.
+                                </p>
+
+                            {% endif %}
+
+
+                            <!-- ================================================= -->
+                            <!-- HISTORIAL DE MORA -->
+                            <!-- ================================================= -->
+
+                            {% if prestamo.historial_mora %}
+
+                                <div class="mt-8 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+
+
+                                    <!-- ENCABEZADO -->
+
+                                    <div class="px-6 py-5 border-b border-gray-200 bg-gray-50">
+
+                                        <div class="flex items-center gap-3">
+
+                                            <div class="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center text-xl">
+                                                📋
+                                            </div>
+
+                                            <div>
+
+                                                <h3 class="text-lg font-bold text-gray-800">
+                                                    Historial de mora
+                                                </h3>
+
+                                                <p class="text-sm text-gray-500 mt-1">
+                                                    Pagos realizados después de la fecha de vencimiento.
+                                                </p>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <!-- TABLA HISTORIAL DE MORA -->
+
+                                    <div class="overflow-x-auto">
+
+                                        <table class="w-full text-sm">
+
+
+                                            <!-- ENCABEZADOS -->
+
+                                            <thead class="bg-gray-50 border-b border-gray-200">
+
+                                                <tr>
+
+                                                    <th class="px-5 py-3 text-left font-semibold text-gray-600">
+                                                        Cuota
+                                                    </th>
+
+                                                    <th class="px-5 py-3 text-left font-semibold text-gray-600">
+                                                        Vencimiento
+                                                    </th>
+
+                                                    <th class="px-5 py-3 text-left font-semibold text-gray-600">
+                                                        Fecha de pago
+                                                    </th>
+
+                                                    <th class="px-5 py-3 text-left font-semibold text-gray-600">
+                                                        Días en mora
+                                                    </th>
+
+                                                    <th class="px-5 py-3 text-left font-semibold text-gray-600">
+                                                        Mora
+                                                    </th>
+
+                                                    <th class="px-5 py-3 text-left font-semibold text-gray-600">
+                                                        Total pagado
+                                                    </th>
+
+                                                </tr>
+
+                                            </thead>
+
+
+                                            <!-- DATOS -->
+
+                                            <tbody class="divide-y divide-gray-100">
+
+                                                {% for mora in prestamo.historial_mora %}
+
+                                                    <tr class="hover:bg-gray-50">
+
+
+                                                        <!-- CUOTA -->
+
+                                                        <td class="px-5 py-4 font-semibold text-gray-800">
+
+                                                            #{{ mora.numero_cuota }}
+
+                                                        </td>
+
+
+                                                        <!-- VENCIMIENTO -->
+
+                                                        <td class="px-5 py-4 text-gray-600">
+
+                                                            {{ mora.fecha_vencimiento|date:"d/m/Y" }}
+
+                                                        </td>
+
+
+                                                        <!-- FECHA DE PAGO -->
+
+                                                        <td class="px-5 py-4 text-gray-600">
+
+                                                            {{ mora.fecha_pago|date:"d/m/Y" }}
+
+                                                        </td>
+
+
+                                                        <!-- DIAS EN MORA -->
+
+                                                        <td class="px-5 py-4">
+
+                                                            <span
+                                                                class="inline-flex items-center px-2.5 py-1 rounded-full bg-red-100 text-red-700 font-semibold"
+                                                            >
+
+                                                                {{ mora.dias_mora }}
+                                                                día{{ mora.dias_mora|pluralize }}
+
+                                                            </span>
+
+                                                        </td>
+
+
+                                                        <!-- MORA -->
+
+                                                        <td class="px-5 py-4 font-semibold text-red-600">
+
+                                                            {{ mora.monto_mora|pesos }}
+
+                                                        </td>
+
+
+                                                        <!-- TOTAL PAGADO -->
+
+                                                        <td class="px-5 py-4 font-bold text-gray-800">
+
+                                                            {{ mora.monto_aplicado|pesos }}
+
+                                                        </td>
+
+
+                                                    </tr>
+
+                                                {% endfor %}
+
+                                            </tbody>
+
+                                        </table>
+
+                                    </div>
+
+                                </div>
+
+                            {% endif %}
+
+
+                        </div>
+
+
+                    </div>
+
+
+                {% endfor %}
+
+
+            </div>
+
+
+        {% else %}
+
+
+            <!-- SIN CREDITOS -->
+
+            <div
+                class="bg-white rounded-xl shadow-sm border border-gray-200 p-10 text-center"
+            >
+
+                <div class="text-5xl mb-4">
+                    💳
+                </div>
+
+                <h3 class="text-xl font-semibold text-gray-800">
+                    No tienes créditos registrados
+                </h3>
+
+                <p class="text-gray-500 mt-2">
+                    Cuando tengas un crédito aprobado aparecerá aquí.
+                </p>
+
+                <a
+                    href="{% url 'solicitar_credito' %}"
+                    class="inline-block mt-6 px-5 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                >
+                    Solicitar crédito
+                </a>
+
+            </div>
+
+
+        {% endif %}
+
+
+    </main>
+
+
+</body>
+
+</html>

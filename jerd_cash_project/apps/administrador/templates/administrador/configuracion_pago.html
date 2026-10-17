@@ -1,0 +1,199 @@
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Configuración de pagos - JERD-Cash</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="min-h-screen bg-gray-50">
+
+    <nav class="border-b bg-white">
+        <div class="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
+            <div>
+                <h1 class="text-xl font-bold text-gray-900">
+                    JERD-Cash
+                </h1>
+                <p class="text-sm text-gray-500">
+                    Configuración de pagos
+                </p>
+            </div>
+
+            <a href="{% url 'administrador_dashboard' %}"
+               class="rounded-lg border px-4 py-2 text-sm font-medium hover:bg-gray-50">
+                Volver al panel
+            </a>
+        </div>
+    </nav>
+
+    <main class="mx-auto max-w-5xl px-4 py-8">
+
+        <div class="mb-6">
+            <h2 class="text-2xl font-bold text-gray-900">
+                Datos para recibir pagos
+            </h2>
+
+            <p class="mt-2 text-gray-600">
+                Administra la entidad o billetera, la llave de transferencia
+                y el código QR que visualizarán los clientes.
+            </p>
+        </div>
+
+        {% if messages %}
+            <div class="mb-6 space-y-2">
+                {% for message in messages %}
+                    <div class="rounded-lg border px-4 py-3
+                        {% if message.tags == 'error' %}
+                            border-red-200 bg-red-50 text-red-700
+                        {% else %}
+                            border-green-200 bg-green-50 text-green-700
+                        {% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <form method="POST"
+              enctype="multipart/form-data"
+              class="space-y-6 rounded-2xl border bg-white p-6 shadow-sm">
+
+            {% csrf_token %}
+
+            <section>
+                <h3 class="mb-4 text-lg font-semibold text-gray-900">
+                    Información de pago
+                </h3>
+
+                <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+
+                    <div>
+                        <label for="entidad"
+                               class="mb-1 block text-sm font-medium text-gray-700">
+                            Entidad o billetera *
+                        </label>
+
+                        <input type="text"
+                               id="entidad"
+                               name="entidad"
+                               required
+                               value="{{ configuracion.entidad|default:'' }}"
+                               placeholder="Ej. Bancolombia, Nequi o Daviplata"
+                               class="w-full rounded-lg border px-3 py-2 focus:border-blue-500 focus:outline-none">
+                    </div>
+
+                    <div>
+                        <label for="llave"
+                               class="mb-1 block text-sm font-medium text-gray-700">
+                            Llave de transferencia *
+                        </label>
+
+                        <input type="text"
+                               id="llave"
+                               name="llave"
+                               required
+                               value="{{ configuracion.llave|default:'' }}"
+                               class="w-full rounded-lg border px-3 py-2 focus:border-blue-500 focus:outline-none">
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label for="titular"
+                               class="mb-1 block text-sm font-medium text-gray-700">
+                            Titular de la cuenta *
+                        </label>
+
+                        <input type="text"
+                               id="titular"
+                               name="titular"
+                               required
+                               value="{{ configuracion.titular|default:'' }}"
+                               class="w-full rounded-lg border px-3 py-2 focus:border-blue-500 focus:outline-none">
+                    </div>
+
+                </div>
+            </section>
+
+            <hr>
+
+            <section>
+                <h3 class="mb-2 text-lg font-semibold text-gray-900">
+                    Código QR de pago
+                </h3>
+
+                <p class="mb-4 text-sm text-gray-600">
+                    Sube el código QR que utilizarán los clientes.
+                    Si ya existe uno, puedes conservarlo o reemplazarlo.
+                </p>
+
+                {% if configuracion and configuracion.qr %}
+                    <div class="mb-4 rounded-xl border bg-gray-50 p-4">
+                        <p class="mb-3 text-sm font-medium text-gray-700">
+                            QR actual
+                        </p>
+
+                        <img src="{{ configuracion.qr.url }}"
+                             alt="Código QR para pagos"
+                             class="max-h-64 max-w-full rounded-lg border bg-white p-2">
+
+                        <p class="mt-2 text-xs text-gray-500">
+                            Selecciona otro archivo abajo para reemplazarlo.
+                        </p>
+                    </div>
+                {% endif %}
+
+                <label for="qr"
+                       class="mb-1 block text-sm font-medium text-gray-700">
+                    Imagen QR {% if not configuracion or not configuracion.qr %}*{% endif %}
+                </label>
+
+                <input type="file"
+                       id="qr"
+                       name="qr"
+                       accept="image/*"
+                       {% if not configuracion or not configuracion.qr %}required{% endif %}
+                       class="block w-full rounded-lg border p-3 text-sm">
+
+                <p class="mt-2 text-xs text-gray-500">
+                    Formatos de imagen comunes: PNG, JPG o WEBP.
+                    Si ya tienes un QR guardado, no es obligatorio subirlo otra vez.
+                </p>
+            </section>
+
+            <hr>
+
+            <section>
+                <label for="instrucciones"
+                       class="mb-1 block text-sm font-medium text-gray-700">
+                    Instrucciones para el cliente
+                </label>
+
+                <textarea id="instrucciones"
+                          name="instrucciones"
+                          rows="4"
+                          class="w-full rounded-lg border px-3 py-2 focus:border-blue-500 focus:outline-none"
+                          placeholder="Explica cómo realizar el pago y enviar el comprobante.">{{ configuracion.instrucciones|default:'' }}</textarea>
+            </section>
+
+            <div class="flex flex-wrap justify-end gap-3">
+                <a href="{% url 'administrador_dashboard' %}"
+                   class="rounded-lg border px-5 py-3 font-medium text-gray-700 hover:bg-gray-50">
+                    Cancelar
+                </a>
+
+                <button type="submit"
+                        class="rounded-lg bg-blue-700 px-5 py-3 font-semibold text-white hover:bg-blue-800">
+                    Guardar configuración
+                </button>
+            </div>
+
+        </form>
+
+    </main>
+
+</body>
+</html>

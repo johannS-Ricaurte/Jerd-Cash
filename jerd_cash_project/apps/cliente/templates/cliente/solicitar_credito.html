@@ -84,11 +84,33 @@
 
                 <div class="mb-6">
 
-                    <label class="block text-gray-700 font-semibold mb-2">
+                    <label
+                        for="monto_display"
+                        class="block text-gray-700 font-semibold mb-2"
+                    >
                         Monto solicitado
                     </label>
 
-                    {{ form.monto_solicitado }}
+                    <!-- Campo visible -->
+                    <input
+                        type="text"
+                        id="monto_display"
+                        value="{{ form.monto_solicitado.value|floatformat:0 }}"
+                        inputmode="numeric"
+                        autocomplete="off"
+                        class="w-full border border-gray-300 rounded-lg px-4 py-2
+                            focus:ring-2 focus:ring-blue-500
+                            focus:border-blue-500"
+                        placeholder="$0"
+                    >
+
+                    <!-- Campo que realmente recibe Django -->
+                    <input
+                        type="hidden"
+                        name="monto_solicitado"
+                        id="id_monto_solicitado"
+                        value="{{ form.monto_solicitado.value|floatformat:0 }}"
+                    >
 
                     {% if form.monto_solicitado.errors %}
 
@@ -99,7 +121,6 @@
                     {% endif %}
 
                 </div>
-
                 <!-- PLAZO -->
                 <div class="mb-6">
                     <label class="block text-gray-700 font-semibold mb-2">
@@ -209,14 +230,11 @@
                     </h3>
 
                     <p class="text-gray-500 mb-6">
-                        Debe adjuntar sus últimos tres extractos bancarios.
-                        Si el PDF está protegido, ingrese la contraseña
-                        correspondiente.
+                        Adjunte imágenes de sus últimos tres extractos bancarios.
+                        Se aceptan archivos JPG, JPEG y PNG.
                     </p>
 
-
                     <!-- EXTRACTO 1 -->
-
                     <div class="bg-gray-50 border rounded-xl p-5 mb-6">
 
                         <h4 class="font-bold text-gray-800 mb-4">
@@ -224,22 +242,10 @@
                         </h4>
 
                         <label class="block text-gray-700 font-semibold mb-2">
-                            Archivo PDF
+                            Imagen del extracto
                         </label>
 
                         {{ form.extracto_bancario_1 }}
-
-                        <label class="block text-gray-700 font-semibold mt-4 mb-2">
-                            Contraseña del PDF
-                        </label>
-
-                        <input
-                            type="password"
-                            id="contrasena_extracto_1"
-                            name="contrasena_extracto_1"
-                            class="w-full border rounded-lg px-4 py-2"
-                            placeholder="Ingrese la contraseña"
-                        >
 
                         <div
                             id="mensajeExtracto1"
@@ -247,18 +253,14 @@
                         ></div>
 
                         {% if form.extracto_bancario_1.errors %}
-
                             <div class="text-red-600 text-sm mt-1">
                                 {{ form.extracto_bancario_1.errors }}
                             </div>
-
                         {% endif %}
 
                     </div>
 
-
                     <!-- EXTRACTO 2 -->
-
                     <div class="bg-gray-50 border rounded-xl p-5 mb-6">
 
                         <h4 class="font-bold text-gray-800 mb-4">
@@ -266,22 +268,10 @@
                         </h4>
 
                         <label class="block text-gray-700 font-semibold mb-2">
-                            Archivo PDF
+                            Imagen del extracto
                         </label>
 
                         {{ form.extracto_bancario_2 }}
-
-                        <label class="block text-gray-700 font-semibold mt-4 mb-2">
-                            Contraseña del PDF
-                        </label>
-
-                        <input
-                            type="password"
-                            id="contrasena_extracto_2"
-                            name="contrasena_extracto_2"
-                            class="w-full border rounded-lg px-4 py-2"
-                            placeholder="Ingrese la contraseña"
-                        >
 
                         <div
                             id="mensajeExtracto2"
@@ -289,18 +279,14 @@
                         ></div>
 
                         {% if form.extracto_bancario_2.errors %}
-
                             <div class="text-red-600 text-sm mt-1">
                                 {{ form.extracto_bancario_2.errors }}
                             </div>
-
                         {% endif %}
 
                     </div>
 
-
                     <!-- EXTRACTO 3 -->
-
                     <div class="bg-gray-50 border rounded-xl p-5 mb-6">
 
                         <h4 class="font-bold text-gray-800 mb-4">
@@ -308,22 +294,10 @@
                         </h4>
 
                         <label class="block text-gray-700 font-semibold mb-2">
-                            Archivo PDF
+                            Imagen del extracto
                         </label>
 
                         {{ form.extracto_bancario_3 }}
-
-                        <label class="block text-gray-700 font-semibold mt-4 mb-2">
-                            Contraseña del PDF
-                        </label>
-
-                        <input
-                            type="password"
-                            id="contrasena_extracto_3"
-                            name="contrasena_extracto_3"
-                            class="w-full border rounded-lg px-4 py-2"
-                            placeholder="Ingrese la contraseña"
-                        >
 
                         <div
                             id="mensajeExtracto3"
@@ -331,11 +305,9 @@
                         ></div>
 
                         {% if form.extracto_bancario_3.errors %}
-
                             <div class="text-red-600 text-sm mt-1">
                                 {{ form.extracto_bancario_3.errors }}
                             </div>
-
                         {% endif %}
 
                     </div>
@@ -380,6 +352,104 @@
 
         const form = document.getElementById('formSolicitud');
 
+        const montoDisplay = document.getElementById(
+            'monto_display'
+        );
+
+        const montoOculto = document.getElementById(
+            'id_monto_solicitado'
+        );
+
+
+        function formatearPesos(valor) {
+
+            if (!valor) {
+                return '';
+            }
+
+            // Solo números
+            let limpio = valor.toString().replace(
+                /[^\d]/g,
+                ''
+            );
+
+            if (!limpio) {
+                return '';
+            }
+
+            // Separador de miles colombiano
+            limpio = limpio.replace(
+                /\B(?=(\d{3})+(?!\d))/g,
+                '.'
+            );
+
+            return '$' + limpio;
+        }
+
+
+        function obtenerMontoNumerico(valor) {
+
+            if (!valor) {
+                return '';
+            }
+
+            return valor
+                .replace(/[^\d]/g, '');
+        }
+
+
+        if (montoDisplay && montoOculto) {
+
+            // Valor inicial que viene de Django
+            if (montoDisplay.value) {
+
+                const valorInicial = obtenerMontoNumerico(
+                    montoDisplay.value
+                );
+
+                montoOculto.value = valorInicial;
+
+                montoDisplay.value = formatearPesos(
+                    valorInicial
+                );
+            }
+
+
+            // Mientras el usuario escribe
+            montoDisplay.addEventListener(
+                'input',
+                function() {
+
+                    const valor = obtenerMontoNumerico(
+                        this.value
+                    );
+
+                    montoOculto.value = valor;
+
+                }
+            );
+
+
+            // Al salir del campo
+            montoDisplay.addEventListener(
+                'blur',
+                function() {
+
+                    const valor = obtenerMontoNumerico(
+                        this.value
+                    );
+
+                    montoOculto.value = valor;
+
+                    this.value = formatearPesos(
+                        valor
+                    );
+
+                }
+            );
+
+        }
+
         const btnEnviar = document.getElementById('btnEnviar');
 
         const cedula = document.getElementById('id_cedula');
@@ -387,6 +457,7 @@
         const mensajeCedula = document.getElementById('mensajeCedula');
 
 
+        
         const extracto1 = document.getElementById(
             'id_extracto_bancario_1'
         );
@@ -398,20 +469,6 @@
         const extracto3 = document.getElementById(
             'id_extracto_bancario_3'
         );
-
-
-        const contrasena1 = document.getElementById(
-            'contrasena_extracto_1'
-        );
-
-        const contrasena2 = document.getElementById(
-            'contrasena_extracto_2'
-        );
-
-        const contrasena3 = document.getElementById(
-            'contrasena_extracto_3'
-        );
-
 
         const mensajeExtracto1 = document.getElementById(
             'mensajeExtracto1'
@@ -425,14 +482,101 @@
             'mensajeExtracto3'
         );
 
-
         let cedulaValida = false;
-
         let extracto1Valido = false;
-
         let extracto2Valido = false;
-
         let extracto3Valido = false;
+        
+        async function validarCedula() {
+            const archivo = cedula.files[0];
+
+            cedulaValida = false;
+            actualizarBoton();
+
+            if (!archivo) {
+                mensajeCedula.textContent = '';
+                return;
+            }
+
+            if (
+                archivo.type !== 'application/pdf' ||
+                !archivo.name.toLowerCase().endsWith('.pdf')
+            ) {
+                mensajeCedula.textContent =
+                    '✗ La cédula debe estar en formato PDF.';
+
+                mensajeCedula.className =
+                    'mt-3 text-sm font-medium text-red-600';
+
+                actualizarBoton();
+                return;
+            }
+
+            const datos = new FormData();
+            datos.append('cedula', archivo);
+
+            mensajeCedula.textContent =
+                'Analizando el documento...';
+
+            mensajeCedula.className =
+                'mt-3 text-sm font-medium text-blue-600';
+
+            try {
+                const respuesta = await fetch(
+                    "{% url 'validar_cedula' %}",
+                    {
+                        method: 'POST',
+                        body: datos,
+                        headers: {
+                            'X-CSRFToken':
+                                document.querySelector(
+                                    '[name=csrfmiddlewaretoken]'
+                                ).value
+                        }
+                    }
+                );
+
+                const resultado = await respuesta.json();
+
+                if (!respuesta.ok) {
+                    throw new Error(
+                        resultado.mensaje ||
+                        'No fue posible validar la cédula.'
+                    );
+                }
+
+                if (resultado.valida) {
+                    cedulaValida = true;
+
+                    mensajeCedula.textContent =
+                        '✓ ' + resultado.mensaje;
+
+                    mensajeCedula.className =
+                        'mt-3 text-sm font-medium text-green-600';
+                } else {
+                    mensajeCedula.textContent =
+                        '✗ ' + resultado.mensaje;
+
+                    mensajeCedula.className =
+                        'mt-3 text-sm font-medium text-red-600';
+                }
+
+            } catch (error) {
+                cedulaValida = false;
+
+                mensajeCedula.textContent =
+                    '✗ ' + (
+                        error.message ||
+                        'Error al analizar la cédula. Intente nuevamente.'
+                    );
+
+                mensajeCedula.className =
+                    'mt-3 text-sm font-medium text-red-600';
+
+            } finally {
+                actualizarBoton();
+            }
+        }
 
 
         function actualizarBoton() {
@@ -469,169 +613,54 @@
                     'bg-gray-400',
                     'cursor-not-allowed'
                 );
-
             }
-
         }
-
-
-        function validarCedula() {
-
-            const archivo = cedula.files[0];
-
-            cedulaValida = false;
-
-            actualizarBoton();
-
-            if (!archivo) {
-
-                mensajeCedula.textContent = '';
-
-                return;
-            }
-
-
-            const datos = new FormData();
-
-            datos.append(
-                'cedula',
-                archivo
-            );
-
-
-            mensajeCedula.textContent =
-                'Analizando cédula...';
-
-            mensajeCedula.className =
-                'mt-3 text-sm font-medium text-blue-600';
-
-
-            fetch(
-                "{% url 'validar_cedula' %}",
-                {
-                    method: 'POST',
-                    body: datos,
-                    headers: {
-                        'X-CSRFToken': '{{ csrf_token }}'
-                    }
-                }
-            )
-            .then(
-                respuesta => respuesta.json()
-            )
-            .then(
-                resultado => {
-
-                    if (resultado.valida) {
-
-                        cedulaValida = true;
-
-                        mensajeCedula.textContent =
-                            '✓ Cédula validada correctamente.';
-
-                        mensajeCedula.className =
-                            'mt-3 text-sm font-medium text-green-600';
-
-                    } else {
-
-                        cedulaValida = false;
-
-                        mensajeCedula.textContent =
-                            '✗ ' + resultado.mensaje;
-
-                        mensajeCedula.className =
-                            'mt-3 text-sm font-medium text-red-600';
-
-                    }
-
-                    actualizarBoton();
-
-                }
-            )
-            .catch(
-                () => {
-
-                    cedulaValida = false;
-
-                    mensajeCedula.textContent =
-                        '✗ Error al validar la cédula.';
-
-                    mensajeCedula.className =
-                        'mt-3 text-sm font-medium text-red-600';
-
-                    actualizarBoton();
-
-                }
-            );
-
-        }
-
 
         function validarExtracto(
             archivoInput,
-            contrasenaInput,
             mensaje,
             numero
         ) {
 
             const archivo = archivoInput.files[0];
 
-            const contrasena = contrasenaInput.value;
-
-            if (numero === 1) {
-                extracto1Valido = false;
-            }
-
-            if (numero === 2) {
-                extracto2Valido = false;
-            }
-
-            if (numero === 3) {
-                extracto3Valido = false;
-            }
+            // Reiniciar el estado del extracto correspondiente.
+            if (numero === 1) extracto1Valido = false;
+            if (numero === 2) extracto2Valido = false;
+            if (numero === 3) extracto3Valido = false;
 
             actualizarBoton();
 
-
             if (!archivo) {
-
                 mensaje.textContent = '';
-
                 return;
             }
 
+            const tiposPermitidos = [
+                'image/jpeg',
+                'image/png'
+            ];
 
-            if (!contrasena) {
+            if (!tiposPermitidos.includes(archivo.type)) {
 
                 mensaje.textContent =
-                    '✗ Debe ingresar la contraseña del PDF.';
+                    '✗ Seleccione una imagen JPG, JPEG o PNG.';
 
                 mensaje.className =
                     'mt-3 text-sm font-medium text-red-600';
 
+                actualizarBoton();
                 return;
             }
 
-
             const datos = new FormData();
 
-            datos.append(
-                'extracto',
-                archivo
-            );
+            datos.append('extracto', archivo);
 
-            datos.append(
-                'contrasena',
-                contrasena
-            );
-
-
-            mensaje.textContent =
-                'Analizando extracto...';
+            mensaje.textContent = 'Analizando imagen del extracto...';
 
             mensaje.className =
                 'mt-3 text-sm font-medium text-blue-600';
-
 
             fetch(
                 "{% url 'validar_extracto' %}",
@@ -643,158 +672,91 @@
                     }
                 }
             )
-            .then(
-                respuesta => respuesta.json()
-            )
-            .then(
-                resultado => {
+            
+            .then(async respuesta => {
+                const resultado = await respuesta.json();
 
-                    if (resultado.valida) {
-
-                        if (numero === 1) {
-                            extracto1Valido = true;
-                        }
-
-                        if (numero === 2) {
-                            extracto2Valido = true;
-                        }
-
-                        if (numero === 3) {
-                            extracto3Valido = true;
-                        }
-
-                        mensaje.textContent =
-                            '✓ Extracto validado correctamente.';
-
-                        mensaje.className =
-                            'mt-3 text-sm font-medium text-green-600';
-
-                    } else {
-
-                        mensaje.textContent =
-                            '✗ ' + resultado.mensaje;
-
-                        mensaje.className =
-                            'mt-3 text-sm font-medium text-red-600';
-
-                    }
-
-                    actualizarBoton();
-
+                if (!respuesta.ok) {
+                    throw new Error(
+                        resultado.mensaje ||
+                        'No fue posible validar el extracto.'
+                    );
                 }
-            )
-            .catch(
-                () => {
+
+                return resultado;
+            })
+            .then(resultado => {
+
+                if (resultado.valida) {
+
+                    if (numero === 1) extracto1Valido = true;
+                    if (numero === 2) extracto2Valido = true;
+                    if (numero === 3) extracto3Valido = true;
 
                     mensaje.textContent =
-                        '✗ Error al analizar el extracto.';
+                        '✓ Extracto validado correctamente.';
+
+                    mensaje.className =
+                        'mt-3 text-sm font-medium text-green-600';
+
+                } else {
+
+                    mensaje.textContent =
+                        '✗ ' + resultado.mensaje;
 
                     mensaje.className =
                         'mt-3 text-sm font-medium text-red-600';
-
-                    actualizarBoton();
-
                 }
-            );
 
+                actualizarBoton();
+            })
+            .catch(() => {
+
+                if (numero === 1) extracto1Valido = false;
+                if (numero === 2) extracto2Valido = false;
+                if (numero === 3) extracto3Valido = false;
+
+                mensaje.textContent =
+                    '✗ Error al analizar la imagen. Intente nuevamente.';
+
+                mensaje.className =
+                    'mt-3 text-sm font-medium text-red-600';
+
+                actualizarBoton();
+            });
         }
-
 
         cedula.addEventListener(
             'change',
             validarCedula
         );
 
-
         extracto1.addEventListener(
             'change',
             () => validarExtracto(
                 extracto1,
-                contrasena1,
                 mensajeExtracto1,
                 1
             )
         );
 
-
         extracto2.addEventListener(
             'change',
             () => validarExtracto(
                 extracto2,
-                contrasena2,
                 mensajeExtracto2,
                 2
             )
         );
 
-
         extracto3.addEventListener(
             'change',
             () => validarExtracto(
                 extracto3,
-                contrasena3,
                 mensajeExtracto3,
                 3
             )
         );
-
-
-        contrasena1.addEventListener(
-            'input',
-            () => {
-
-                if (extracto1.files[0]) {
-
-                    validarExtracto(
-                        extracto1,
-                        contrasena1,
-                        mensajeExtracto1,
-                        1
-                    );
-
-                }
-
-            }
-        );
-
-
-        contrasena2.addEventListener(
-            'input',
-            () => {
-
-                if (extracto2.files[0]) {
-
-                    validarExtracto(
-                        extracto2,
-                        contrasena2,
-                        mensajeExtracto2,
-                        2
-                    );
-
-                }
-
-            }
-        );
-
-
-        contrasena3.addEventListener(
-            'input',
-            () => {
-
-                if (extracto3.files[0]) {
-
-                    validarExtracto(
-                        extracto3,
-                        contrasena3,
-                        mensajeExtracto3,
-                        3
-                    );
-
-                }
-
-            }
-        );
-
 
         form.addEventListener(
             'submit',

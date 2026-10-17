@@ -1,0 +1,396 @@
+{% load formatos %}
+
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Créditos - JERD Cash</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+
+    <nav class="bg-white border-b">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">
+                    JERD<span class="text-blue-600">-Cash</span>
+                </h1>
+
+                <p class="text-xs text-gray-500">
+                    Administración de créditos
+                </p>
+            </div>
+
+            <div class="flex items-center gap-4">
+
+                <span class="text-sm text-gray-600">
+                    Hola,
+                    {{ request.user.first_name|default:request.user.username }}
+                </span>
+
+                <a
+                    href="{% url 'administrador_dashboard' %}"
+                    class="text-sm text-blue-600 hover:text-blue-800"
+                >
+                    Volver al panel
+                </a>
+
+            </div>
+
+        </div>
+    </nav>
+
+
+    <main class="max-w-7xl mx-auto px-6 py-10">
+
+        <div class="mb-8">
+
+            <h2 class="text-3xl font-bold text-gray-900">
+                Créditos aprobados
+            </h2>
+
+            <p class="text-gray-600 mt-2">
+                Consulta los créditos de los clientes y su comportamiento de pago.
+            </p>
+
+            {% if pagos_por_verificar %}
+
+                <div class="mt-6 bg-yellow-50 border border-yellow-200 rounded-xl p-5">
+
+                    <!-- ENCABEZADO -->
+
+                    <div class="flex items-start gap-3 mb-5">
+
+                        <div class="text-3xl">
+                            🔔
+                        </div>
+
+                        <div>
+
+                            <h3 class="text-lg font-bold text-yellow-800">
+                                Verificar pagos
+                            </h3>
+
+                            <p class="text-sm text-yellow-700 mt-1">
+                                Hay
+                                <strong>
+                                    {{ pagos_por_verificar|length }}
+                                </strong>
+                                pago{{ pagos_por_verificar|pluralize }}
+                                pendiente{{ pagos_por_verificar|pluralize }}
+                                de verificación.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- LISTA DE PAGOS -->
+
+                    <div class="space-y-3">
+
+                        {% for pago in pagos_por_verificar %}
+
+                            <div class="bg-white border border-yellow-200 rounded-lg p-4">
+
+                                <div class="flex items-center justify-between gap-4">
+
+                                    <!-- INFORMACIÓN DEL PAGO -->
+
+                                    <div>
+
+                                        <p class="font-semibold text-gray-900">
+
+                                            Pago #{{ pago.id }}
+
+                                        </p>
+
+
+                                        <p class="text-sm text-gray-600 mt-1">
+
+                                            Cliente:
+
+                                            <span class="font-medium text-gray-800">
+
+                                                {{ pago.cliente.first_name }}
+                                                {{ pago.cliente.last_name }}
+
+                                            </span>
+
+                                        </p>
+
+
+                                        <p class="text-sm text-gray-600">
+
+                                            Monto:
+
+                                            <span class="font-semibold text-gray-900">
+
+                                                {{ pago.monto|pesos }}
+
+                                            </span>
+
+                                        </p>
+
+
+                                        <p class="text-xs text-gray-500 mt-1">
+
+                                            Enviado:
+
+                                            {{ pago.fecha_creacion|date:"d/m/Y H:i" }}
+
+                                        </p>
+
+                                    </div>
+
+
+                                    <!-- BOTÓN -->
+
+                                    <div>
+
+                                        <a
+                                            href="{% url 'administrador_credito_detalle' pago.cuotas_pagadas.first.cuota.prestamo.id %}"
+                                            class="inline-block bg-yellow-600 text-white px-5 py-2.5 rounded-lg hover:bg-yellow-700 text-sm font-semibold"
+                                        >
+
+                                            Verificar pago
+
+                                        </a>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                </div>
+
+            {% endif %}
+        </div>
+
+
+        {% if clientes %}
+
+            <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
+
+                <div class="overflow-x-auto">
+
+                    <table class="w-full">
+
+                        <thead class="bg-gray-100 border-b">
+
+                            <tr>
+
+                                <th class="text-left px-6 py-4 text-sm font-semibold text-gray-700">
+                                    Cliente
+                                </th>
+
+                                <th class="text-center px-6 py-4 text-sm font-semibold text-gray-700">
+                                    Créditos
+                                </th>
+
+                                <th class="text-right px-6 py-4 text-sm font-semibold text-gray-700">
+                                    Total créditos
+                                </th>
+
+                                <th class="text-right px-6 py-4 text-sm font-semibold text-gray-700">
+                                    Deuda pendiente
+                                </th>
+
+                                <th class="text-center px-6 py-4 text-sm font-semibold text-gray-700">
+                                    Cuotas pagadas
+                                </th>
+
+                                <th class="text-center px-6 py-4 text-sm font-semibold text-gray-700">
+                                    Cuotas totales
+                                </th>
+
+                                <th class="text-center px-6 py-4 text-sm font-semibold text-gray-700">
+                                    Estado de pago
+                                </th>
+
+                                <th class="text-center px-6 py-4 text-sm font-semibold text-gray-700">
+                                    Acción
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody class="divide-y">
+
+                            {% for cliente in clientes %}
+
+                                <tr class="hover:bg-gray-50">
+
+                                    <td class="px-6 py-4">
+
+                                        <div class="font-semibold text-gray-900">
+                                            {{ cliente.nombre }}
+                                        </div>
+
+                                    </td>
+
+
+                                    <td class="px-6 py-4 text-center">
+
+                                        <span class="inline-flex items-center justify-center bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-semibold">
+                                            {{ cliente.cantidad_creditos }}
+                                        </span>
+
+                                    </td>
+
+
+                                    <td class="px-6 py-4 text-right">
+
+                                        <span class="font-medium text-gray-900">
+                                            {{ cliente.total_creditos|pesos }}
+                                        </span>
+
+                                    </td>
+
+
+                                    <td class="px-6 py-4 text-right">
+
+                                        <span class="font-semibold text-gray-900">
+                                            {{ cliente.deuda_pendiente|pesos }}
+                                        </span>
+
+                                    </td>
+
+
+                                    <td class="px-6 py-4 text-center">
+
+                                        <span class="text-green-600 font-semibold">
+                                            {{ cliente.cuotas_pagadas }}
+                                        </span>
+
+                                    </td>
+
+
+                                    <td class="px-6 py-4 text-center">
+
+                                        <span class="text-gray-700 font-semibold">
+                                            {{ cliente.cuotas_totales }}
+                                        </span>
+
+                                    </td>
+
+
+                                    <td class="px-6 py-4 text-center">
+
+                                        {% if cliente.estado_pago == 'mora' %}
+
+                                            <div class="flex flex-col items-center gap-1">
+
+                                                <span class="inline-flex px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs font-semibold">
+                                                    ⚠ En mora
+                                                </span>
+
+                                                <span class="text-xs text-red-600">
+                                                    {{ cliente.cuotas_vencidas }}
+                                                    cuota{{ cliente.cuotas_vencidas|pluralize }}
+                                                    vencida{{ cliente.cuotas_vencidas|pluralize }}
+                                                </span>
+
+                                            </div>
+
+                                        {% elif cliente.estado_pago == 'pago_pendiente' %}
+
+                                            <div class="flex flex-col items-center gap-1">
+
+                                                <span class="inline-flex px-3 py-1 rounded-full bg-yellow-100 text-yellow-700 text-xs font-semibold">
+                                                    🔔 Pago pendiente
+                                                </span>
+
+                                                <span class="text-xs text-yellow-600">
+                                                    Pendiente de verificación
+                                                </span>
+
+                                            </div>
+
+                                        {% elif cliente.estado_pago == 'pagado' %}
+
+                                            <span class="inline-flex px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-semibold">
+                                                ✓ Pagado
+                                            </span>
+
+                                        {% else %}
+
+                                            <span class="inline-flex px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold">
+                                                ● Al día
+                                            </span>
+
+                                        {% endif %}
+
+                                    </td>
+
+
+                                    </td>
+
+
+                                    <td class="px-6 py-4 text-center">
+
+                                        {% if cliente.prestamos %}
+
+                                            <a
+                                                href="{% url 'administrador_credito_detalle' cliente.prestamos.0.id %}"
+                                                class="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm"
+                                            >
+                                                Ver detalle
+                                            </a>
+
+                                        {% endif %}
+
+                                    </td>
+
+                                </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        {% else %}
+
+            <div class="bg-white rounded-xl shadow-sm border p-10 text-center">
+
+                <div class="text-5xl mb-4">
+                    💰
+                </div>
+
+                <h3 class="text-xl font-semibold text-gray-900">
+                    No hay créditos aprobados
+                </h3>
+
+                <p class="text-gray-600 mt-2">
+                    Actualmente no existen créditos aprobados para mostrar.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+    </main>
+
+</body>
+
+</html>

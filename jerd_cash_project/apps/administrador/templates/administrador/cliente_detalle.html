@@ -1,0 +1,204 @@
+
+{% load formatos %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle del cliente - JERD Cash</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+
+    <nav class="bg-white border-b">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">
+                    JERD<span class="text-blue-600">-Cash</span>
+                </h1>
+                <p class="text-xs text-gray-500">Información del cliente</p>
+            </div>
+
+            <a href="{% url 'administrador_clientes' %}"
+               class="text-sm text-blue-600 hover:text-blue-800">
+                Volver a clientes
+            </a>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-6 py-10">
+
+        <!-- INFORMACIÓN DEL CLIENTE -->
+        <div class="bg-white rounded-xl shadow-sm border p-6 mb-8">
+            <p class="text-sm text-gray-500">Cliente</p>
+
+            <h2 class="text-3xl font-bold text-gray-900 mt-1">
+                {{ nombre_cliente }}
+            </h2>
+
+            <p class="text-sm text-gray-600 mt-2">
+                Usuario: {{ cliente.username }}
+            </p>
+
+            <p class="text-sm text-gray-600 mt-1">
+                Correo: {{ cliente.email|default:"No registrado" }}
+            </p>
+        </div>
+
+        <!-- RESUMEN FINANCIERO -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-8">
+
+            <div class="bg-white rounded-xl border shadow-sm p-5">
+                <p class="text-sm text-gray-500">Créditos registrados</p>
+                <p class="text-3xl font-bold text-blue-700 mt-2">
+                    {{ cantidad_creditos }}
+                </p>
+            </div>
+
+            <div class="bg-white rounded-xl border shadow-sm p-5">
+                <p class="text-sm text-gray-500">Créditos pagados</p>
+                <p class="text-3xl font-bold text-green-700 mt-2">
+                    {{ creditos_pagados }}
+                </p>
+            </div>
+
+            <div class="bg-white rounded-xl border shadow-sm p-5">
+                <p class="text-sm text-gray-500">Cuotas pagadas</p>
+                <p class="text-3xl font-bold text-gray-900 mt-2">
+                    {{ cuotas_pagadas }} / {{ cuotas_totales }}
+                </p>
+            </div>
+
+            <div class="bg-white rounded-xl border shadow-sm p-5">
+                <p class="text-sm text-gray-500">Cuotas pagadas con mora</p>
+                <p class="text-3xl font-bold {% if cuotas_pagadas_con_mora > 0 %}text-red-600{% else %}text-green-700{% endif %} mt-2">
+                    {{ cuotas_pagadas_con_mora }}
+                </p>
+            </div>
+
+            <div class="bg-white rounded-xl border shadow-sm p-5">
+                <p class="text-sm text-gray-500">Total aplicado a pagos exitosos</p>
+                <p class="text-2xl font-bold text-gray-900 mt-2">
+                    {{ total_pagado|pesos }}
+                </p>
+            </div>
+
+            <div class="bg-white rounded-xl border shadow-sm p-5">
+                <p class="text-sm text-gray-500">Mora registrada en pagos</p>
+                <p class="text-2xl font-bold text-red-600 mt-2">
+                    {{ total_mora_pagada|pesos }}
+                </p>
+            </div>
+
+        </div>
+
+        <!-- HISTORIAL DE CRÉDITOS -->
+        <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
+
+            <div class="p-6 border-b">
+                <h3 class="text-2xl font-bold text-gray-900">
+                    Historial de créditos
+                </h3>
+
+                <p class="text-gray-600 mt-1">
+                    Consulta el estado de cada crédito y el comportamiento de sus cuotas.
+                </p>
+            </div>
+
+            {% if prestamos %}
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-100 border-b">
+                            <tr>
+                                <th class="px-5 py-4 text-left text-sm font-semibold text-gray-700">
+                                    Crédito
+                                </th>
+                                <th class="px-5 py-4 text-left text-sm font-semibold text-gray-700">
+                                    Fecha de solicitud
+                                </th>
+                                <th class="px-5 py-4 text-right text-sm font-semibold text-gray-700">
+                                    Monto solicitado
+                                </th>
+                                <th class="px-5 py-4 text-center text-sm font-semibold text-gray-700">
+                                    Plazo
+                                </th>
+                                <th class="px-5 py-4 text-center text-sm font-semibold text-gray-700">
+                                    Estado
+                                </th>
+                                <th class="px-5 py-4 text-center text-sm font-semibold text-gray-700">
+                                    Cuotas pagadas
+                                </th>
+                                <th class="px-5 py-4 text-center text-sm font-semibold text-gray-700">
+                                    Acción
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody class="divide-y">
+                            {% for prestamo in prestamos %}
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-5 py-4 font-semibold text-gray-900">
+                                        #{{ prestamo.id }}
+                                    </td>
+
+                                    <td class="px-5 py-4 text-sm text-gray-600">
+                                        {{ prestamo.fecha_solicitud|date:"d/m/Y" }}
+                                    </td>
+
+                                    <td class="px-5 py-4 text-right font-medium text-gray-900">
+                                        {{ prestamo.monto_solicitado|pesos }}
+                                    </td>
+
+                                    <td class="px-5 py-4 text-center text-gray-700">
+                                        {{ prestamo.plazo_meses }} meses
+                                    </td>
+
+                                    <td class="px-5 py-4 text-center">
+                                        {% if prestamo.estado == 'pagado' %}
+                                            <span class="inline-flex px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-semibold">
+                                                Pagado
+                                            </span>
+                                        {% elif prestamo.estado == 'mora' %}
+                                            <span class="inline-flex px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs font-semibold">
+                                                En mora
+                                            </span>
+                                        {% elif prestamo.estado == 'aprobado' or prestamo.estado == 'desembolsado' %}
+                                            <span class="inline-flex px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold">
+                                                {{ prestamo.get_estado_display }}
+                                            </span>
+                                        {% else %}
+                                            <span class="inline-flex px-3 py-1 rounded-full bg-gray-100 text-gray-700 text-xs font-semibold">
+                                                {{ prestamo.get_estado_display }}
+                                            </span>
+                                        {% endif %}
+                                    </td>
+
+                                    <td class="px-5 py-4 text-center text-gray-700">
+                                        {{ prestamo.cuotas_pagadas_count|default_if_none:0 }}
+                                    </td>
+
+                                    <td class="px-5 py-4 text-center">
+                                        <a href="{% url 'administrador_credito_detalle' prestamo.id %}"
+                                           class="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm font-semibold">
+                                            Ver detalle
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="p-10 text-center text-gray-500">
+                    Este cliente todavía no tiene créditos registrados.
+                </div>
+            {% endif %}
+
+        </div>
+
+    </main>
+
+</body>
+</html>

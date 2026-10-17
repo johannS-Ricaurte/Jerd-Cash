@@ -1,3 +1,5 @@
+{% load formatos %}
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -454,7 +456,7 @@
                                             class="font-semibold
                                                 formato-pesos"
                                         >
-                                            ${{ ingresos }}
+                                            {{ ingresos|pesos }}
                                         </span>
 
                                     </div>
@@ -473,7 +475,7 @@
                                             class="font-semibold
                                                 formato-pesos"
                                         >
-                                            ${{ gastos }}
+                                            {{ gastos|pesos }}
                                         </span>
 
                                     </div>
@@ -493,7 +495,7 @@
                                                 text-green-700
                                                 formato-pesos"
                                         >
-                                            ${{ saldo_disponible }}
+                                            {{ saldo_disponible|pesos }}
                                         </span>
 
                                     </div>
@@ -589,7 +591,7 @@
                                                     font-bold text-green-700
                                                     formato-cuota"
                                             >
-                                                ${{ cuota_mensual }}
+                                                {{ cuota_mensual|pesos }}
                                             </p>
 
                                         </div>
@@ -659,7 +661,7 @@
                                                 class="font-semibold
                                                     formato-pesos"
                                             >
-                                                ${{ monto }}
+                                                {{ monto|pesos }}
                                             </span>
 
                                         </div>
@@ -698,7 +700,7 @@
                                                     text-green-700
                                                     formato-cuota"
                                             >
-                                                ${{ cuota_mensual }}
+                                                {{ cuota_mensual|pesos }}
                                             </span>
 
                                         </div>
@@ -747,7 +749,7 @@
                                                             Tu saldo disponible mensual
                                                             es de
                                                             <strong class="formato-pesos">
-                                                                ${{ saldo_disponible }}
+                                                                {{ saldo_disponible|pesos }}
                                                             </strong>.
                                                         </p>
 
@@ -1181,6 +1183,61 @@
         </div>
 
     </footer>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const campos = ["ingresos", "gastos", "monto"];
+
+        campos.forEach(function (id) {
+            const campo = document.getElementById(id);
+
+            if (!campo) return;
+
+            // Formatear el valor inicial, por ejemplo, después de calcular
+            campo.value = formatearMiles(campo.value);
+
+            // Formatear mientras el usuario escribe
+            campo.addEventListener("input", function () {
+                const posicionAnterior = campo.selectionStart;
+                const longitudAnterior = campo.value.length;
+
+                campo.value = formatearMiles(campo.value);
+
+                const diferencia = campo.value.length - longitudAnterior;
+                const nuevaPosicion = Math.max(
+                    0,
+                    (posicionAnterior || 0) + diferencia
+                );
+
+                campo.setSelectionRange(nuevaPosicion, nuevaPosicion);
+            });
+        });
+
+        function formatearMiles(valor) {
+            const numeros = valor.replace(/\D/g, "");
+
+            if (!numeros) return "";
+
+            return numeros.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+
+        // Quitar puntos antes de enviar el formulario a Django
+        const formulario = document.getElementById("formulario-simulador");
+
+        if (formulario) {
+            formulario.addEventListener("submit", function () {
+                campos.forEach(function (id) {
+                    const campo = document.getElementById(id);
+
+                    if (campo) {
+                        campo.value = campo.value.replace(/\./g, "");
+                    }
+                });
+            });
+        }
+    });
+    </script>
+
 
 </body>
 </html>

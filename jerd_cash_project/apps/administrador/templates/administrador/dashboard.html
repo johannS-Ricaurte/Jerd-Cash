@@ -25,13 +25,23 @@
                 </p>
             </div>
 
-            <div>
+            
+            <div class="flex items-center gap-4">
                 <span class="text-sm text-gray-600">
                     Hola, {{ request.user.first_name|default:request.user.username }}
                 </span>
+
+                <form method="post" action="{% url 'logout' %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit">
+                        Cerrar sesión
+                    </button>
+                </form>
             </div>
 
+
         </div>
+        
     </nav>
 
 
@@ -84,10 +94,18 @@
                 </h3>
 
                 <p class="text-gray-600 mt-2">
-                    Consulta la información de los clientes.
+                    Consulta la información de los clientes, su historial de créditos y su comportamiento de pago.
                 </p>
 
+                <a
+                    href="{% url 'administrador_clientes' %}"
+                    class="block text-center w-full mt-4 bg-blue-600 text-white py-2.5 rounded-lg hover:bg-blue-700"
+                >
+                    Ver clientes
+                </a>
+
             </div>
+            
 
 
             <div class="bg-white rounded-xl shadow-sm border p-6">
@@ -101,8 +119,39 @@
                 </h3>
 
                 <p class="text-gray-600 mt-2">
-                    Administra los créditos aprobados.
+                    Administra los créditos aprobados y revisa los pagos de los clientes.
                 </p>
+
+                <a
+                    href="{% url 'administrador_creditos' %}"
+                    class="block text-center w-full mt-4 bg-blue-600 text-white py-2.5 rounded-lg hover:bg-blue-700"
+                >
+                    Ver créditos
+                </a>
+
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm border p-6">
+
+                <div class="text-3xl mb-4">
+                    💳
+                </div>
+
+                <h3 class="text-xl font-semibold">
+                    Configuración de pagos
+                </h3>
+
+                <p class="text-gray-600 mt-2">
+                    Administra los datos de pago, la llave de transferencia,
+                    el titular y el código QR que verán los clientes.
+                </p>
+
+                <a
+                    href="{% url 'administrador_configuracion_pago' %}"
+                    class="block text-center w-full mt-4 bg-blue-600 text-white py-2.5 rounded-lg hover:bg-blue-700"
+                >
+                    Configurar pagos
+                </a>
 
             </div>
 

@@ -138,3 +138,11 @@ LOGIN_URL = '/login/'
 
 SECURE_REFERRER_POLICY = 'no-referrer-when-downgrade'
 SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin-allow-popups'
+
+
+
+# ==========================================
+# CONFIGURACIÓN DE CORREO PARA DESARROLLO
+# ==========================================
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DEFAULT_FROM_EMAIL = 'JERD-Cash <no-reply@jerdcash.local>'

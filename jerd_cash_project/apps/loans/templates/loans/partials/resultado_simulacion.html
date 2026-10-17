@@ -1,4 +1,5 @@
-```html
+{% load formatos %}
+
 <div class="bg-white rounded-lg shadow-md p-6 animate-fade-in">
 
     <!-- TÍTULO -->
@@ -92,7 +93,7 @@
             </p>
 
             <p class="text-xl font-bold text-blue-900">
-                ${{ monto|floatformat:0 }}
+                {{ monto|pesos }}
             </p>
         </div>
 
@@ -116,7 +117,7 @@
             </p>
 
             <p class="text-xl font-bold text-green-800">
-                ${{ cuota_mensual|floatformat:0 }}
+                {{ cuota_mensual|pesos }}
             </p>
         </div>
 
@@ -128,7 +129,7 @@
             </p>
 
             <p class="text-xl font-bold text-purple-900">
-                ${{ total_pagar|floatformat:0 }}
+                {{ total_pagar|pesos }}
             </p>
         </div>
 
@@ -151,7 +152,7 @@
             </div>
 
             <p class="text-xl font-bold text-yellow-700">
-                ${{ total_intereses|floatformat:0 }}
+                {{ total_intereses|pesos }}
             </p>
 
         </div>
@@ -223,19 +224,19 @@
                         </td>
 
                         <td class="px-4 py-3 font-semibold">
-                            ${{ fila.valor_cuota|floatformat:0 }}
+                            {{ fila.valor_cuota|pesos }}
                         </td>
 
                         <td class="px-4 py-3">
-                            ${{ fila.interes|floatformat:0 }}
+                            {{ fila.interes|pesos }}
                         </td>
 
                         <td class="px-4 py-3">
-                            ${{ fila.abono_capital|floatformat:0 }}
+                            {{ fila.abono_capital|pesos }}
                         </td>
 
                         <td class="px-4 py-3 font-semibold">
-                            ${{ fila.saldo_pendiente|floatformat:0 }}
+                            {{ fila.saldo_pendiente|pesos }}
                         </td>
 
                     </tr>
@@ -251,4 +252,4 @@
     </div>
 
 </div>
-```
+

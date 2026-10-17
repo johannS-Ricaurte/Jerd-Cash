@@ -1,0 +1,568 @@
+{% load formatos %}
+
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Detalle del crédito - JERD Cash</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+
+    <nav class="bg-white border-b">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">
+                    JERD<span class="text-blue-600">-Cash</span>
+                </h1>
+
+                <p class="text-xs text-gray-500">
+                    Administración de créditos
+                </p>
+            </div>
+
+            <div class="flex items-center gap-4">
+
+                <span class="text-sm text-gray-600">
+                    Hola,
+                    {{ request.user.first_name|default:request.user.username }}
+                </span>
+
+                <a
+                    href="{% url 'administrador_creditos' %}"
+                    class="text-sm text-blue-600 hover:text-blue-800"
+                >
+                    Volver a créditos
+                </a>
+
+            </div>
+
+        </div>
+    </nav>
+
+
+    <main class="max-w-7xl mx-auto px-6 py-10">
+
+        <!-- ENCABEZADO DEL CLIENTE -->
+
+        <div class="bg-white rounded-xl shadow-sm border p-6 mb-8">
+
+            <p class="text-sm text-gray-500">
+                Cliente
+            </p>
+
+            <h2 class="text-3xl font-bold text-gray-900 mt-1">
+                {{ nombre_cliente }}
+            </h2>
+
+            <p class="text-gray-600 mt-2">
+                Historial de créditos y comportamiento de pagos.
+            </p>
+
+        </div>
+
+
+        <!-- CRÉDITOS DEL CLIENTE -->
+
+        <div class="mb-8">
+
+            <h3 class="text-2xl font-bold text-gray-900 mb-4">
+                Créditos
+            </h3>
+
+
+            <div class="space-y-6">
+
+                {% for prestamo_cliente in prestamos_cliente %}
+
+                    <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
+
+                        <div class="p-6 border-b bg-gray-50">
+
+                            <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+
+                                <div>
+
+                                    <h4 class="text-xl font-bold text-gray-900">
+                                        Crédito #{{ prestamo_cliente.id }}
+                                    </h4>
+
+                                    <p class="text-sm text-gray-500 mt-1">
+                                        Solicitud:
+                                        {{ prestamo_cliente.fecha_solicitud|date:"d/m/Y" }}
+                                    </p>
+
+                                </div>
+
+
+                                <div class="text-left md:text-right">
+
+                                    <p class="text-sm text-gray-500">
+                                        Monto solicitado
+                                    </p>
+
+                                    <p class="text-xl font-bold text-gray-900">
+                                        {{ prestamo_cliente.monto_solicitado|pesos }}
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- INFORMACIÓN DEL CRÉDITO -->
+
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 p-6">
+
+                            <div class="bg-blue-50 rounded-lg p-4">
+
+                                <p class="text-sm text-gray-500">
+                                    Plazo
+                                </p>
+
+                                <p class="text-lg font-bold text-gray-900">
+                                    {{ prestamo_cliente.plazo_meses }} meses
+                                </p>
+
+                            </div>
+
+
+                            <div class="bg-green-50 rounded-lg p-4">
+
+                                <p class="text-sm text-gray-500">
+                                    Cuotas pagadas
+                                </p>
+
+                                <p class="text-lg font-bold text-green-700">
+
+                                    {{ cuotas_pagadas }} / {{ cuotas_totales }}
+
+                                </p>
+
+                            </div>
+
+
+                            <div class="bg-yellow-50 rounded-lg p-4">
+
+                                <p class="text-sm text-gray-500">
+                                    Estado
+                                </p>
+
+                                <p class="text-lg font-bold text-gray-900">
+                                    {{ prestamo_cliente.get_estado_display }}
+                                </p>
+
+                            </div>
+
+
+                            <div class="bg-purple-50 rounded-lg p-4">
+
+                                <p class="text-sm text-gray-500">
+                                    Tasa mensual
+                                </p>
+
+                                <p class="text-lg font-bold text-gray-900">
+
+                                    {% if prestamo_cliente.tasa_interes_mensual %}
+                                        {{ prestamo_cliente.tasa_interes_mensual }}%
+                                    {% else %}
+                                        -
+                                    {% endif %}
+
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- TABLA DE CUOTAS -->
+
+                        <div class="px-6 pb-6">
+
+                            <h5 class="text-lg font-semibold text-gray-900 mb-4">
+                                Tabla de amortización
+                            </h5>
+
+                            {% if prestamo_cliente.id == prestamo.id and tiene_cuotas_vencidas %}
+
+                                <div class="mb-5 bg-red-50 border border-red-200 rounded-lg p-4">
+
+                                    <div class="flex items-start gap-3">
+
+                                        <div class="text-2xl">
+                                            ⚠️
+                                        </div>
+
+                                        <div>
+
+                                            <p class="font-bold text-red-800">
+                                                Este crédito presenta cuotas vencidas
+                                            </p>
+
+                                            <p class="text-sm text-red-700 mt-1">
+                                                El cliente tiene {{ cuotas_vencidas }} cuota{{ cuotas_vencidas|pluralize }}
+                                                cuyo plazo de pago ya venció.
+                                            </p>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            {% endif %}
+
+                            <div class="overflow-x-auto border rounded-lg">
+
+                                <table class="w-full">
+
+                                    <thead class="bg-gray-100 border-b">
+
+                                        <tr>
+
+                                            <th class="px-4 py-3 text-left text-sm">
+                                                Cuota
+                                            </th>
+
+                                            <th class="px-4 py-3 text-left text-sm">
+                                                Vencimiento
+                                            </th>
+
+                                            <th class="px-4 py-3 text-right text-sm">
+                                                Valor
+                                            </th>
+
+                                            <th class="px-4 py-3 text-right text-sm">
+                                                Interés
+                                            </th>
+
+                                            <th class="px-4 py-3 text-center text-sm">
+                                                Estado
+                                            </th>
+
+                                        </tr>
+
+                                    </thead>
+
+
+                                    <tbody class="divide-y">
+
+                                        {% for cuota in prestamo.cuotas.all %}
+
+                                            <tr>
+
+                                                <td class="px-4 py-3">
+                                                    {{ cuota.numero_cuota }}
+                                                </td>
+
+                                                <td class="px-4 py-3">
+                                                    {{ cuota.fecha_vencimiento|date:"d/m/Y" }}
+                                                </td>
+
+                                                <td class="px-4 py-3 text-right">
+                                                    {{ cuota.valor_cuota|pesos }}
+                                                </td>
+
+                                                <td class="px-4 py-3 text-right">
+                                                    {{ cuota.interes|pesos }}
+                                                </td>
+
+                                                <td class="px-4 py-3 text-center">
+
+                                                    {% if cuota.estado_admin == 'pagada' %}
+
+                                                        <div class="flex flex-col items-center gap-1">
+
+                                                            <span class="inline-flex px-3 py-1 rounded-full bg-green-100 text-green-700 text-sm font-semibold">
+                                                                ✓ Pagada
+                                                            </span>
+
+                                                            {% if cuota.mora_historica %}
+
+                                                                <span class="text-xs text-red-600">
+                                                                    {{ cuota.mora_historica.dias_mora }} días de mora
+                                                                </span>
+
+                                                                <span class="text-xs font-semibold text-red-600">
+                                                                    Mora: {{ cuota.mora_historica.monto_mora|pesos }}
+                                                                </span>
+
+                                                            {% endif %}
+
+                                                        </div>
+                                                    {% elif cuota.estado_admin == 'pago_pendiente' %}
+
+                                                        <span class="inline-flex px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-sm font-semibold">
+                                                            ⏳ Pago en verificación
+                                                        </span>
+
+                                                    {% elif cuota.estado_admin == 'vencida' %}
+
+                                                        <span class="inline-flex px-3 py-1 rounded-full bg-red-100 text-red-700 text-sm font-semibold">
+                                                            ⚠ Vencida
+                                                        </span>
+
+                                                    {% else %}
+
+                                                        <span class="inline-flex px-3 py-1 rounded-full bg-yellow-100 text-yellow-700 text-sm font-semibold">
+                                                            Pendiente
+                                                        </span>
+
+                                                    {% endif %}
+
+                                                </td>
+
+                                            </tr>
+
+                                        {% empty %}
+
+                                            <tr>
+
+                                                <td
+                                                    colspan="5"
+                                                    class="px-4 py-6 text-center text-gray-500"
+                                                >
+                                                    Este crédito no tiene cuotas registradas.
+                                                </td>
+
+                                            </tr>
+
+                                        {% endfor %}
+
+                                    </tbody>
+
+                                </table>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                {% empty %}
+
+                    <div class="bg-white rounded-xl border p-8 text-center">
+
+                        <p class="text-gray-500">
+                            Este cliente no tiene créditos registrados.
+                        </p>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+
+        <!-- PAGOS PENDIENTES -->
+
+        <div class="mb-8">
+
+            <h3 class="text-2xl font-bold text-gray-900 mb-4">
+                Pagos pendientes de confirmación
+            </h3>
+
+
+            {% if pagos_pendientes %}
+
+                <div class="space-y-4">
+
+                    {% for pago in pagos_pendientes %}
+
+                        <div class="bg-white rounded-xl shadow-sm border p-6">
+
+                            <div class="flex flex-col lg:flex-row lg:justify-between gap-6">
+
+                                <div>
+
+                                    <h4 class="text-lg font-bold text-gray-900">
+                                        Pago #{{ pago.id }}
+                                    </h4>
+
+                                    <p class="text-sm text-gray-500 mt-1">
+                                        Enviado:
+                                        {{ pago.fecha_creacion|date:"d/m/Y H:i" }}
+                                    </p>
+
+                                    <p class="text-lg font-semibold text-gray-900 mt-3">
+                                        {{ pago.monto|pesos }}
+                                    </p>
+
+                                </div>
+
+
+                                <div>
+
+                                    {% if pago.comprobante %}
+
+                                        <a
+                                            href="{{ pago.comprobante.url }}"
+                                            target="_blank"
+                                            class="inline-block bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-900"
+                                        >
+                                            Ver comprobante
+                                        </a>
+
+                                    {% else %}
+
+                                        <span class="text-red-600 text-sm">
+                                            No hay comprobante adjunto.
+                                        </span>
+
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- CUOTAS QUE INCLUYE EL PAGO -->
+
+                            <div class="mt-5">
+
+                                <p class="font-semibold text-gray-900 mb-2">
+                                    Cuotas asociadas:
+                                </p>
+
+                                <div class="flex flex-wrap gap-2">
+
+                                    {% for pago_cuota in pago.cuotas_pagadas.all %}
+
+                                        <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm">
+
+                                            Cuota
+                                            {{ pago_cuota.cuota.numero_cuota }}
+
+                                            -
+                                            {{ pago_cuota.monto_aplicado|pesos }}
+
+                                        </span>
+
+                                    {% endfor %}
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- ACCIONES -->
+
+                            <div class="mt-6 pt-5 border-t flex flex-col sm:flex-row gap-3">
+
+                                <form
+                                    method="POST"
+                                    action="{% url 'administrador_aprobar_pago' pago.id %}"
+                                >
+                                    {% csrf_token %}
+
+                                    <button
+                                        type="submit"
+                                        class="bg-green-600 text-white px-5 py-2.5 rounded-lg hover:bg-green-700"
+                                    >
+                                        Aprobar pago
+                                    </button>
+
+                                </form>
+
+
+                                <form
+                                    method="POST"
+                                    action="{% url 'administrador_rechazar_pago' pago.id %}"
+                                    class="w-full"
+                                >
+
+                                    {% csrf_token %}
+
+                                    <label
+                                        for="motivo_rechazo_{{ pago.id }}"
+                                        class="block text-sm font-semibold text-gray-700 mb-2"
+                                    >
+                                        Motivo del rechazo
+                                    </label>
+
+                                    <textarea
+                                        id="motivo_rechazo_{{ pago.id }}"
+                                        name="motivo_rechazo"
+                                        rows="3"
+                                        required
+                                        placeholder="Escribe el motivo por el cual se rechaza este pago..."
+                                        class="
+                                            w-full
+                                            border
+                                            border-gray-300
+                                            rounded-lg
+                                            px-4
+                                            py-3
+                                            text-sm
+                                            focus:outline-none
+                                            focus:ring-2
+                                            focus:ring-red-500
+                                        "
+                                    ></textarea>
+
+                                    <button
+                                        type="submit"
+                                        class="
+                                            mt-3
+                                            bg-red-600
+                                            text-white
+                                            px-5
+                                            py-2.5
+                                            rounded-lg
+                                            hover:bg-red-700
+                                        "
+                                    >
+                                        Rechazar pago
+                                    </button>
+
+                                </form>
+
+
+
+                            </div>
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            {% else %}
+
+                <div class="bg-white rounded-xl border p-8 text-center">
+
+                    <div class="text-4xl mb-3">
+                        ✅
+                    </div>
+
+                    <h4 class="text-lg font-semibold text-gray-900">
+                        No hay pagos pendientes
+                    </h4>
+
+                    <p class="text-gray-500 mt-1">
+                        Actualmente no hay comprobantes esperando confirmación.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </main>
+
+</body>
+
+</html>

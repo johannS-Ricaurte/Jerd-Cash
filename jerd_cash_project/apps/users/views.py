@@ -10,6 +10,7 @@ from django.urls import reverse
 from django.views.decorators.http import require_POST
 import secrets
 from decimal import Decimal
+import re
 
 from jerd_cash_project.apps.loans.services import (
     calcular_tabla_amortizacion,
@@ -179,6 +180,7 @@ def home_view(request):
 
 
 
+
 def registro_view(request):
     """
     Vista para manejar el registro de nuevos clientes.
@@ -186,18 +188,64 @@ def registro_view(request):
 
     if request.method == 'POST':
 
-        first_name = request.POST.get('first_name', '').strip()
-        primer_apellido = request.POST.get(
-            'primer_apellido',
-            ''
+        first_name = request.POST.get(
+            'first_name', ''
         ).strip()
 
-        username = request.POST.get('username', '').strip()
-        email = request.POST.get('email', '').strip()
-        password = request.POST.get('password', '')
-        cedula = request.POST.get('cedula', '').strip()
+        primer_apellido = request.POST.get(
+            'primer_apellido', ''
+        ).strip()
 
-        acepta_terminos = 'acepta_terminos' in request.POST
+        username = request.POST.get(
+            'username', ''
+        ).strip()
+
+        email = request.POST.get(
+            'email', ''
+        ).strip()
+
+        password = request.POST.get(
+            'password', ''
+        )
+
+        cedula = request.POST.get(
+            'cedula', ''
+        ).strip()
+
+        acepta_terminos = (
+            'acepta_terminos' in request.POST
+        )
+
+        # Validaciones de seguridad de la contraseña.
+        tiene_mayuscula = re.search(
+            r'[A-Z]',
+            password
+        )
+
+        tiene_punto = '.' in password
+
+        caracteres_especiales = (
+            "!@#$%^&*_-+=/?¿¡:;,(){}[]<>|\\'\""
+        )
+
+        tiene_especial = any(
+            caracter in caracteres_especiales
+            for caracter in password
+        )
+
+        if not tiene_mayuscula or not tiene_punto or not tiene_especial:
+
+            messages.error(
+                request,
+                "La contraseña debe contener al menos una "
+                "letra mayúscula, un punto (.) y un carácter "
+                "especial, por ejemplo !, @, # o $."
+            )
+
+            return render(
+                request,
+                'users/register.html'
+            )
 
         x_forwarded_for = request.META.get(
             'HTTP_X_FORWARDED_FOR'
@@ -267,7 +315,6 @@ def login_view(request):
         )
 
         if usuario is not None:
-
             login(request, usuario)
 
             messages.success(
@@ -275,7 +322,22 @@ def login_view(request):
                 f"Bienvenido, {usuario.username}."
             )
 
-            return redirect('simulador')
+            # Redirección según el tipo de usuario
+            if usuario.role == 'administrador':
+                return redirect('administrador_dashboard')
+
+            elif usuario.role == 'empleado':
+                return redirect('empleado_dashboard')
+
+            elif usuario.role == 'cliente':
+                return redirect('cliente_dashboard')
+
+            # Por seguridad, si el usuario no tiene un rol válido
+            messages.error(
+                request,
+                "El usuario no tiene un rol válido configurado."
+            )
+            return redirect('login')
 
         messages.error(
             request,

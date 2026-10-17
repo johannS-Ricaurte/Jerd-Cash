@@ -1,3 +1,5 @@
+{% load formatos %}
+
 <!DOCTYPE html>
 <html lang="es">
 
@@ -22,9 +24,9 @@
 
             <a
                 href="{% url 'cliente_dashboard' %}"
-                class="bg-white text-blue-700 px-4 py-2 rounded-lg"
+                class="text-sm text-white-600 hover:text-blue-800"
             >
-                Volver
+                Volver al inicio
             </a>
 
         </div>
@@ -63,7 +65,7 @@
 
                                     <p class="text-gray-600">
                                         Monto solicitado:
-                                        ${{ solicitud.monto_solicitado }}
+                                        {{ solicitud.monto_solicitado|pesos }}
                                     </p>
 
                                     <p class="text-sm text-gray-500">
