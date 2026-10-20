@@ -11,6 +11,7 @@ from django.views.decorators.http import require_POST
 import secrets
 from decimal import Decimal
 import re
+from jerd_cash_project.apps.users.email_service import enviar_notificacion
 
 from jerd_cash_project.apps.loans.services import (
     calcular_tabla_amortizacion,
@@ -268,6 +269,19 @@ def registro_view(request):
                 cedula=cedula,
                 ip_address=ip_address,
                 acepta_terminos=acepta_terminos
+            )
+
+            enviar_notificacion(
+                destinatario=email,
+                asunto="¡Bienvenido a JERD-Cash!",
+                mensaje=(
+                    f"Hola {first_name},\n\n"
+                    "Tu cuenta de JERD-Cash ha sido creada correctamente.\n\n"
+                    "Ya puedes iniciar sesión y consultar los servicios "
+                    "disponibles en la plataforma.\n\n"
+                    "Gracias por registrarte.\n"
+                    "Equipo JERD-Cash"
+                ),
             )
 
             messages.success(

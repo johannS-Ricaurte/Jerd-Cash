@@ -5,6 +5,7 @@ from django.utils import timezone
 from django.db import transaction
 
 from jerd_cash_project.apps.cliente.models import SolicitudCredito
+from jerd_cash_project.apps.users.email_service import enviar_notificacion
 
 from jerd_cash_project.apps.loans.models import (
     Prestamo,
@@ -183,6 +184,24 @@ def aprobar_solicitud_view(request, solicitud_id):
     solicitud.estado = 'APROBADA'
     solicitud.save()
 
+    enviar_notificacion(
+        destinatario=usuario.email,
+        asunto=f"Tu crédito #{prestamo.id} ha sido aprobado",
+        mensaje=(
+            f"Hola {usuario.first_name or usuario.username},\n\n"
+            f"¡Buenas noticias! Tu solicitud de crédito "
+            f"#{solicitud.id} ha sido aprobada.\n\n"
+            f"Crédito: #{prestamo.id}\n"
+            f"Monto aprobado: ${prestamo.monto_solicitado:,.2f}\n"
+            f"Plazo: {prestamo.plazo_meses} meses\n"
+            f"Tasa de interés mensual: "
+            f"{prestamo.tasa_interes_mensual}%\n\n"
+            "Puedes ingresar a JERD-Cash para consultar "
+            "el detalle de tu crédito y sus cuotas.\n\n"
+            "Equipo JERD-Cash"
+        ),
+    )
+
     messages.success(
         request,
         f'La solicitud #{solicitud.id} fue aprobada, se creó el préstamo #{prestamo.id} y se generaron {len(tabla)} cuotas.'
@@ -223,6 +242,23 @@ def rechazar_solicitud_view(request, solicitud_id):
 
     solicitud.estado = 'RECHAZADA'
     solicitud.save()
+
+    usuario = solicitud.usuario
+
+    enviar_notificacion(
+        destinatario=usuario.email,
+        asunto=f"Actualización de tu solicitud #{solicitud.id}",
+        mensaje=(
+            f"Hola {usuario.first_name or usuario.username},\n\n"
+            f"Te informamos que tu solicitud de crédito "
+            f"#{solicitud.id} ha sido rechazada.\n\n"
+            "Puedes ingresar a JERD-Cash para consultar "
+            "el estado de tu solicitud o contactar al equipo "
+            "responsable si necesitas más información.\n\n"
+            "Gracias por tu interés.\n"
+            "Equipo JERD-Cash"
+        ),
+    )
 
     messages.success(
         request,
@@ -641,6 +677,23 @@ def aprobar_pago_view(request, pago_id):
 
     pago_cuota = pago.cuotas_pagadas.first()
 
+    if pago_cuota:
+        usuario = pago_cuota.cuota.prestamo.cliente
+
+        enviar_notificacion(
+            destinatario=usuario.email,
+            asunto=f"Tu pago #{pago.id} ha sido aprobado",
+            mensaje=(
+                f"Hola {usuario.first_name or usuario.username},\n\n"
+                f"Tu pago #{pago.id} ha sido aprobado correctamente.\n\n"
+                f"Valor del pago: ${pago.monto:,.2f}\n\n"
+                "El sistema ha actualizado el estado de las cuotas "
+                "asociadas a este pago. Puedes ingresar a JERD-Cash "
+                "para consultar el detalle de tu crédito.\n\n"
+                "Equipo JERD-Cash"
+            ),
+        )
+
     messages.success(
         request,
         f'El pago #{pago.id} fue aprobado correctamente.'
@@ -722,6 +775,23 @@ def rechazar_pago_view(request, pago_id):
     )
 
     pago_cuota = pago.cuotas_pagadas.first()
+
+    if pago_cuota:
+        usuario = pago_cuota.cuota.prestamo.cliente
+
+        enviar_notificacion(
+            destinatario=usuario.email,
+            asunto=f"Tu pago #{pago.id} ha sido rechazado",
+            mensaje=(
+                f"Hola {usuario.first_name or usuario.username},\n\n"
+                f"Tu pago #{pago.id} ha sido rechazado.\n\n"
+                f"Motivo informado: {pago.motivo_rechazo}\n\n"
+                "Por favor, revisa el motivo indicado y las "
+                "instrucciones de pago en JERD-Cash. Si necesitas "
+                "ayuda, contacta al equipo responsable.\n\n"
+                "Equipo JERD-Cash"
+            ),
+        )
 
     if pago_cuota:
         return redirect(
