@@ -3,7 +3,9 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.utils import timezone
 from django.db import transaction
-
+from .decorators import administrador_required
+from django.contrib.auth import get_user_model
+from django.db.models import Q
 from jerd_cash_project.apps.cliente.models import SolicitudCredito
 from jerd_cash_project.apps.users.email_service import enviar_notificacion
 
@@ -23,7 +25,7 @@ from jerd_cash_project.apps.loans.services import (
 from jerd_cash_project.apps.administrador.models import ConfiguracionPago
 
 
-@login_required
+@administrador_required
 def dashboard_view(request):
 
     return render(
@@ -32,7 +34,7 @@ def dashboard_view(request):
     )
 
 
-@login_required
+@administrador_required
 def solicitudes_view(request):
 
     solicitudes = SolicitudCredito.objects.select_related(
@@ -50,7 +52,7 @@ def solicitudes_view(request):
     )
 
 
-@login_required
+@administrador_required
 def solicitud_detalle_view(request, solicitud_id):
 
     solicitud = get_object_or_404(
@@ -101,8 +103,7 @@ def solicitud_detalle_view(request, solicitud_id):
         context
     )
 
-
-@login_required
+@administrador_required
 def aprobar_solicitud_view(request, solicitud_id):
 
     if request.method != 'POST':
@@ -112,108 +113,175 @@ def aprobar_solicitud_view(request, solicitud_id):
             solicitud_id=solicitud_id
         )
 
-    solicitud = get_object_or_404(
-        SolicitudCredito,
-        id=solicitud_id
-    )
+    with transaction.atomic():
 
-    if solicitud.estado != 'PENDIENTE':
-
-        messages.warning(
-            request,
-            'Esta solicitud ya fue procesada anteriormente.'
+        solicitud = get_object_or_404(
+            SolicitudCredito.objects.select_for_update(),
+            id=solicitud_id
         )
 
-        return redirect(
-            'administrador_solicitud_detalle',
-            solicitud_id=solicitud.id
+        if solicitud.estado != 'PENDIENTE':
+
+            messages.warning(
+                request,
+                'Esta solicitud ya fue procesada anteriormente.'
+            )
+
+            return redirect(
+                'administrador_solicitud_detalle',
+                solicitud_id=solicitud.id
+            )
+
+        usuario = solicitud.usuario
+
+        # Bloquear aprobaciones simultáneas del mismo cliente.
+        Usuario = get_user_model()
+
+        Usuario.objects.select_for_update().get(
+            pk=usuario.pk
         )
 
-    usuario = solicitud.usuario
+        # ==========================================
+        # VERIFICAR CRÉDITOS ACTIVOS
+        # ==========================================
 
-    score, nivel_riesgo, tasa_interes = (
-        calcular_score_deterministico(
-            usuario,
-            solicitud
+        credito_activo = Prestamo.objects.filter(
+            cliente=usuario
+        ).filter(
+            Q(
+                estado__in=[
+                    'aprobado',
+                    'desembolsado',
+                    'mora'
+                ],
+                cuotas__pagada=False
+            )
+            |
+            Q(
+                estado__in=[
+                    'aprobado',
+                    'desembolsado',
+                    'mora'
+                ],
+                cuotas__isnull=True
+            )
+        ).exists()
+
+        if credito_activo:
+
+            messages.error(
+                request,
+                'No se puede aprobar esta solicitud porque '
+                'el cliente ya tiene un crédito activo. '
+                'Debe terminar de pagar todas sus cuotas.'
+            )
+
+            return redirect(
+                'administrador_solicitud_detalle',
+                solicitud_id=solicitud.id
+            )
+
+        # ==========================================
+        # CALCULAR SCORE
+        # ==========================================
+
+        score, nivel_riesgo, tasa_interes = (
+            calcular_score_deterministico(
+                usuario,
+                solicitud
+            )
         )
-    )
 
-    if tasa_interes is None:
+        if tasa_interes is None:
 
-        messages.error(
-            request,
-            'No se puede aprobar la solicitud porque no existe una tasa de interés válida para este nivel de riesgo.'
+            messages.error(
+                request,
+                'No se puede aprobar la solicitud porque '
+                'no existe una tasa de interés válida '
+                'para este nivel de riesgo.'
+            )
+
+            return redirect(
+                'administrador_solicitud_detalle',
+                solicitud_id=solicitud.id
+            )
+
+        plazo_meses = solicitud.plazo_meses
+
+        # ==========================================
+        # CREAR PRÉSTAMO
+        # ==========================================
+
+        prestamo = Prestamo.objects.create(
+            cliente=usuario,
+            monto_solicitado=solicitud.monto_solicitado,
+            plazo_meses=plazo_meses,
+            tasa_interes_mensual=tasa_interes,
+            score_calculado=score,
+            nivel_riesgo=nivel_riesgo,
+            estado='aprobado'
         )
 
-        return redirect(
-            'administrador_solicitud_detalle',
-            solicitud_id=solicitud.id
+        tabla = calcular_tabla_amortizacion(
+            monto=prestamo.monto_solicitado,
+            tasa_mensual=prestamo.tasa_interes_mensual,
+            plazo_meses=prestamo.plazo_meses
         )
 
-    plazo_meses = solicitud.plazo_meses
+        for fila in tabla:
 
-    prestamo = Prestamo.objects.create(
-        cliente=usuario,
-        monto_solicitado=solicitud.monto_solicitado,
-        plazo_meses=plazo_meses,
-        tasa_interes_mensual=tasa_interes,
-        score_calculado=score,
-        nivel_riesgo=nivel_riesgo,
-        estado='aprobado'
-    )
+            Cuota.objects.create(
+                prestamo=prestamo,
+                numero_cuota=fila['numero_cuota'],
+                fecha_vencimiento=fila['fecha_vencimiento'],
+                valor_cuota=fila['valor_cuota'],
+                interes=fila['interes'],
+                abono_capital=fila['abono_capital'],
+                saldo_pendiente=fila['saldo_pendiente'],
+                pagada=False
+            )
 
-    tabla = calcular_tabla_amortizacion(
-        monto=prestamo.monto_solicitado,
-        tasa_mensual=prestamo.tasa_interes_mensual,
-        plazo_meses=prestamo.plazo_meses
-    )
+        solicitud.estado = 'APROBADA'
+        solicitud.save()
 
-    for fila in tabla:
+        prestamo_id = prestamo.id
+        cantidad_cuotas = len(tabla)
+        solicitud_id_aprobada = solicitud.id
 
-        Cuota.objects.create(
-            prestamo=prestamo,
-            numero_cuota=fila['numero_cuota'],
-            fecha_vencimiento=fila['fecha_vencimiento'],
-            valor_cuota=fila['valor_cuota'],
-            interes=fila['interes'],
-            abono_capital=fila['abono_capital'],
-            saldo_pendiente=fila['saldo_pendiente'],
-            pagada=False
+        # Enviar correo después de confirmar los cambios.
+        transaction.on_commit(
+            lambda: enviar_notificacion(
+                destinatario=usuario.email,
+                asunto=f"Tu crédito #{prestamo_id} ha sido aprobado",
+                mensaje=(
+                    f"Hola {usuario.first_name or usuario.username},\n\n"
+                    f"¡Buenas noticias! Tu solicitud de crédito "
+                    f"#{solicitud_id_aprobada} ha sido aprobada.\n\n"
+                    f"Crédito: #{prestamo_id}\n"
+                    f"Monto aprobado: ${prestamo.monto_solicitado:,.2f}\n"
+                    f"Plazo: {prestamo.plazo_meses} meses\n"
+                    f"Tasa de interés mensual: "
+                    f"{prestamo.tasa_interes_mensual}%\n\n"
+                    "Puedes ingresar a JERD-Cash para consultar "
+                    "el detalle de tu crédito y sus cuotas.\n\n"
+                    "Equipo JERD-Cash"
+                )
+            )
         )
-
-    solicitud.estado = 'APROBADA'
-    solicitud.save()
-
-    enviar_notificacion(
-        destinatario=usuario.email,
-        asunto=f"Tu crédito #{prestamo.id} ha sido aprobado",
-        mensaje=(
-            f"Hola {usuario.first_name or usuario.username},\n\n"
-            f"¡Buenas noticias! Tu solicitud de crédito "
-            f"#{solicitud.id} ha sido aprobada.\n\n"
-            f"Crédito: #{prestamo.id}\n"
-            f"Monto aprobado: ${prestamo.monto_solicitado:,.2f}\n"
-            f"Plazo: {prestamo.plazo_meses} meses\n"
-            f"Tasa de interés mensual: "
-            f"{prestamo.tasa_interes_mensual}%\n\n"
-            "Puedes ingresar a JERD-Cash para consultar "
-            "el detalle de tu crédito y sus cuotas.\n\n"
-            "Equipo JERD-Cash"
-        ),
-    )
 
     messages.success(
         request,
-        f'La solicitud #{solicitud.id} fue aprobada, se creó el préstamo #{prestamo.id} y se generaron {len(tabla)} cuotas.'
+        f'La solicitud #{solicitud_id_aprobada} fue aprobada, '
+        f'se creó el préstamo #{prestamo_id} '
+        f'y se generaron {cantidad_cuotas} cuotas.'
     )
 
     return redirect(
         'administrador_solicitud_detalle',
-        solicitud_id=solicitud.id
+        solicitud_id=solicitud_id_aprobada
     )
 
-
-@login_required
+@administrador_required
 def rechazar_solicitud_view(request, solicitud_id):
 
     if request.method != 'POST':
@@ -270,7 +338,7 @@ def rechazar_solicitud_view(request, solicitud_id):
         solicitud_id=solicitud.id
     )
 
-@login_required
+@administrador_required
 def creditos_view(request):
 
     prestamos = Prestamo.objects.filter(
@@ -482,7 +550,7 @@ def creditos_view(request):
         }
     )
 
-@login_required
+@administrador_required
 def credito_detalle_view(request, prestamo_id):
 
     prestamo = get_object_or_404(
@@ -630,7 +698,7 @@ def credito_detalle_view(request, prestamo_id):
         }
     )
 
-@login_required
+@administrador_required
 def aprobar_pago_view(request, pago_id):
 
     if request.method != 'POST':
@@ -675,6 +743,28 @@ def aprobar_pago_view(request, pago_id):
             cuota.pagada = True
             cuota.save(update_fields=['pagada'])
 
+        # ==========================================
+        # VERIFICAR SI EL CRÉDITO ESTÁ PAGADO
+        # ==========================================
+
+        prestamos = {
+            pago_cuota.cuota.prestamo
+            for pago_cuota in pago.cuotas_pagadas.all()
+        }
+
+        for prestamo in prestamos:
+
+            tiene_cuotas = prestamo.cuotas.exists()
+
+            cuotas_pendientes = prestamo.cuotas.filter(
+                pagada=False
+            ).exists()
+
+            if tiene_cuotas and not cuotas_pendientes:
+
+                prestamo.estado = 'pagado'
+                prestamo.save(update_fields=['estado'])
+
     pago_cuota = pago.cuotas_pagadas.first()
 
     if pago_cuota:
@@ -705,7 +795,7 @@ def aprobar_pago_view(request, pago_id):
     )
 
 
-@login_required
+@administrador_required
 def rechazar_pago_view(request, pago_id):
 
     if request.method != 'POST':
@@ -803,11 +893,10 @@ def rechazar_pago_view(request, pago_id):
 
 
 
-@login_required
+@administrador_required
 def clientes_view(request):
 
-    from django.contrib.auth import get_user_model
-    from django.db.models import Q
+
 
     Usuario = get_user_model()
 
@@ -916,7 +1005,7 @@ def clientes_view(request):
     )
 
 
-@login_required
+@administrador_required
 def cliente_detalle_view(request, cliente_id):
 
     from django.contrib.auth import get_user_model
@@ -1007,7 +1096,7 @@ def cliente_detalle_view(request, cliente_id):
 
 
 
-@login_required
+@administrador_required
 def configuracion_pago_view(request):
     from jerd_cash_project.apps.administrador.models import ConfiguracionPago
 

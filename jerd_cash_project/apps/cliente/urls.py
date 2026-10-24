@@ -41,27 +41,33 @@ urlpatterns = [
     ),
 
     path(
-    'mis-creditos/',
-    views.mis_creditos_view,
-    name='mis_creditos'
+        'mis-creditos/',
+        views.mis_creditos_view,
+        name='mis_creditos'
     ),
 
     path(
-    'pagar/', 
-    views.pagar_view, 
-    name='pagar'
+        'pagar/',
+        views.pagar_view,
+        name='pagar'
     ),
 
     path(
-    'estado-financiero/',
-    views.estado_financiero_view,
-    name='estado_financiero'
+        'estado-financiero/',
+        views.estado_financiero_view,
+        name='estado_financiero'
     ),
 
     path(
-    'estado-financiero/<int:prestamo_id>/',
-    views.detalle_estado_financiero_view,
-    name='detalle_estado_financiero'
+        'estado-financiero/<int:prestamo_id>/',
+        views.detalle_estado_financiero_view,
+        name='detalle_estado_financiero'
+    ),
+
+    path(
+        'solicitudes/<int:solicitud_id>/documentos/<str:tipo>/',
+        views.documento_solicitud_view,
+        name='documento_solicitud'
     ),
 
 ]

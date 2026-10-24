@@ -72,9 +72,6 @@
                             JERD-Cash
                         </h1>
 
-                        <p style="color: red; font-weight: bold;">
-                            PRUEBA DE PLANTILLA JERD-CASH
-                        </p>
 
                         <p
                             class="text-xs
@@ -352,12 +349,8 @@
                         >
 
 
-                        <p
-                            class="text-xs
-                                   text-gray-500
-                                   mt-2"
-                        >
-                            Monto mínimo: $100.000
+                        <p class="text-xs text-gray-500 mt-2">
+                            Monto permitido: $100.000 a $1.000.000
                         </p>
 
                     </div>
@@ -386,41 +379,13 @@
                             name="plazo"
                             id="plazo"
                             required
-                            class="w-full
-                                   px-4 py-3
-                                   border
-                                   border-gray-300
-                                   rounded-lg
-                                   focus:outline-none
-                                   focus:ring-2
-                                   focus:ring-blue-500"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg
+                                focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
-
-                            <option value="">
-                                Selecciona un plazo
-                            </option>
-
-                            <option value="3">
-                                3 meses
-                            </option>
-
-                            <option value="6">
-                                6 meses
-                            </option>
-
-                            <option value="12">
-                                12 meses
-                            </option>
-
-                            <option value="24">
-                                24 meses
-                            </option>
-
-                            <option value="36">
-                                36 meses
-                            </option>
-
+                            <option value="">Seleccione las cuotas</option>
                         </select>
+
+                        <p id="mensajePlazo" class="text-xs text-gray-500 mt-2"></p>
 
                     </div>
 
@@ -620,7 +585,7 @@
                                    mt-2"
                         >
 
-                            PRUEBA: {{ 2000000|pesos }}
+                            {{ saldo_disponible|pesos }}
 
                         </p>
 
@@ -1118,10 +1083,8 @@
          * 5.000.000
          */
 
-        
-        
         function formatearCampo(input) {
-            const valor = input.value.replace(/\D/g, '');
+            const valor = input.value.replace(/[^0-9]/g, '');
 
             if (!valor) {
                 input.value = '';
@@ -1130,10 +1093,6 @@
 
             input.value = valor.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
         }
-
-
-
-
 
         /*
          * Campos de entrada
@@ -1148,6 +1107,75 @@
             document.getElementById('monto')
 
         ];
+
+        const montoInput = document.getElementById('monto');
+        const plazoSelect = document.getElementById('plazo');
+        const mensajePlazo = document.getElementById('mensajePlazo');
+
+        function obtenerMaximoCuotas(monto) {
+
+            if (monto < 100000 || monto > 1000000) return 0;
+
+            if (monto < 200000) return 1;
+            if (monto < 300000) return 2;
+            if (monto < 400000) return 3;
+            if (monto < 500000) return 4;
+            if (monto < 600000) return 5;
+            if (monto < 700000) return 6;
+            if (monto < 800000) return 7;
+            if (monto < 900000) return 8;
+            if (monto < 1000000) return 10;
+
+            return 12;
+        }
+
+        function actualizarPlazos() {
+
+            const monto = Number(
+                montoInput.value.replace(/\D/g, '')
+            );
+
+            const maximo = obtenerMaximoCuotas(monto);
+            const plazoAnterior = plazoSelect.value;
+
+            plazoSelect.innerHTML = '';
+
+            if (maximo === 0) {
+
+                plazoSelect.add(
+                    new Option('Ingrese un monto válido', '')
+                );
+
+                mensajePlazo.textContent =
+                    'Ingrese un monto entre $100.000 y $1.000.000.';
+
+                return;
+            }
+
+            plazoSelect.add(
+                new Option('Seleccione las cuotas', '')
+            );
+
+            for (let i = 1; i <= maximo; i++) {
+
+                plazoSelect.add(
+                    new Option(
+                        `${i} ${i === 1 ? 'cuota' : 'cuotas'}`,
+                        i
+                    )
+                );
+            }
+
+            if (
+                Number(plazoAnterior) >= 1 &&
+                Number(plazoAnterior) <= maximo
+            ) {
+                plazoSelect.value = plazoAnterior;
+            }
+
+            mensajePlazo.textContent =
+                `Para este monto puedes seleccionar entre 1 y ${maximo} cuotas.`;
+        }
 
 
 
@@ -1171,6 +1199,25 @@
             }
 
         });
+
+        montoInput.addEventListener('input', function() {
+            actualizarPlazos();
+        });
+
+        const plazoGuardado = "{{ request.POST.plazo|default:''|escapejs }}";
+
+        actualizarPlazos();
+
+        if (plazoGuardado) {
+
+            const opcionExiste = Array.from(
+                plazoSelect.options
+            ).some(opcion => opcion.value === plazoGuardado);
+
+            if (opcionExiste) {
+                plazoSelect.value = plazoGuardado;
+            }
+        }
 
 
 

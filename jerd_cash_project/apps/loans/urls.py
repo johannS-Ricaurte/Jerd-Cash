@@ -20,5 +20,11 @@ urlpatterns = [
         name='simulador_publico'
     ),
 
+    path(
+        'comprobantes/<int:pago_id>/',
+        views.documento_pago_view,
+        name='documento_pago'
+    ),
+
 ]
 

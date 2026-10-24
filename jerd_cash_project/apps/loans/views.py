@@ -4,9 +4,41 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from decimal import Decimal
 from .services import calcular_tabla_amortizacion, calcular_score_deterministico, calcular_score_simulador
-from types import SimpleNamespace 
+from types import SimpleNamespace
+from jerd_cash_project.apps.cliente.decorators import cliente_required
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404
+from django.http import FileResponse, Http404
 
-@login_required
+from .models import Pago
+
+def obtener_maximo_cuotas(monto):
+
+    if monto < 100000 or monto > 1000000:
+        return 0
+
+    if monto < 200000:
+        return 1
+    if monto < 300000:
+        return 2
+    if monto < 400000:
+        return 3
+    if monto < 500000:
+        return 4
+    if monto < 600000:
+        return 5
+    if monto < 700000:
+        return 6
+    if monto < 800000:
+        return 7
+    if monto < 900000:
+        return 8
+    if monto < 1000000:
+        return 10
+
+    return 12
+
+@cliente_required
 def simulador_view(request):
     return render(request, 'loans/simulador.html', {'titulo': 'Simulador de Crédito'})
 
@@ -26,24 +58,15 @@ def simulador_publico_view(request):
         try:
 
             ingresos = Decimal(
-                request.POST.get(
-                    'ingresos',
-                    '0'
-                )
+                request.POST.get('ingresos', '0').replace('.', '').replace(',', '')
             )
 
             gastos = Decimal(
-                request.POST.get(
-                    'gastos',
-                    '0'
-                )
+                request.POST.get('gastos', '0').replace('.', '').replace(',', '')
             )
 
             monto = Decimal(
-                request.POST.get(
-                    'monto',
-                    '0'
-                )
+                request.POST.get('monto', '0').replace('.', '').replace(',', '')
             )
 
             plazo = int(
@@ -71,18 +94,20 @@ def simulador_publico_view(request):
                     'ser negativos.'
                 )
 
-            elif monto < 100000:
+            elif monto < 100000 or monto > 1000000:
 
                 context['error'] = (
-                    'El monto mínimo del crédito es '
-                    '$100.000.'
+                    'El monto del crédito debe estar '
+                    'entre $100.000 y $1.000.000.'
                 )
 
-            elif plazo not in [3, 6, 12, 24, 36]:
+            elif plazo < 1 or plazo > obtener_maximo_cuotas(monto):
+
+                maximo = obtener_maximo_cuotas(monto)
 
                 context['error'] = (
-                    'Selecciona un plazo válido entre '
-                    '3 y 36 meses.'
+                    f'Para este monto puedes seleccionar '
+                    f'entre 1 y {maximo} cuotas.'
                 )
 
             else:
@@ -179,29 +204,67 @@ def simulador_publico_view(request):
 
 
 @require_POST
-@login_required
+@cliente_required
 def calcular_simulacion_ajax(request):
 
     """Endpoint HTMX para cálculo en tiempo real."""
 
     try:
 
-        monto = Decimal(request.POST.get('monto', '0'))
-        plazo = int(request.POST.get('plazo', '0'))
+        monto_texto = request.POST.get('monto', '').strip()
 
-        if monto < 100000 or plazo < 1 or plazo > 36:
+        if not monto_texto.isascii() or not monto_texto.isdigit():
+            return render(
+                request,
+                'loans/partials/error_simulacion.html',
+                {
+                    'mensaje': 'Ingresa un monto válido utilizando solo números.'
+                }
+            )
+
+        monto = Decimal(monto_texto)
+
+        plazo_texto = request.POST.get('plazo', '').strip()
+
+        if not plazo_texto.isascii() or not plazo_texto.isdigit():
+
+            return render(
+                request,
+                'loans/partials/error_simulacion.html',
+                {
+                    'mensaje': 'Selecciona un número de cuotas válido.'
+                }
+            )
+
+        plazo = int(plazo_texto)
+
+        maximo_cuotas = obtener_maximo_cuotas(monto)
+
+        if maximo_cuotas == 0:
 
             return render(
                 request,
                 'loans/partials/error_simulacion.html',
                 {
                     'mensaje': (
-                        'Monto mínimo: $100.000 | '
-                        'Plazo: 1 a 36 meses'
+                        'El monto del crédito debe estar '
+                        'entre $100.000 y $1.000.000.'
                     )
                 }
             )
 
+        if plazo < 1 or plazo > maximo_cuotas:
+
+            return render(
+                request,
+                'loans/partials/error_simulacion.html',
+                {
+                    'mensaje': (
+                        f'Para un crédito de este monto puedes '
+                        f'seleccionar entre 1 y {maximo_cuotas} cuotas.'
+                    )
+                }
+            )
         # ======================================================
         # SOLICITUD TEMPORAL PARA CALCULAR EL SCORE REAL
         # ======================================================
@@ -287,12 +350,49 @@ def calcular_simulacion_ajax(request):
             context
         )
 
-    except Exception as e:
+    except Exception:
 
         return render(
             request,
             'loans/partials/error_simulacion.html',
             {
-                'mensaje': f'Error: {str(e)}'
-            }
+                'mensaje': (
+                    'Ocurrió un error al calcular la simulación. '
+                    'Inténtalo nuevamente.'
+                )
+            },
+            status=500
         )
+
+@login_required
+def documento_pago_view(request, pago_id):
+
+    pago = get_object_or_404(
+        Pago,
+        id=pago_id
+    )
+
+    # Solo el propietario o un administrador.
+    if (
+        pago.cliente_id != request.user.id
+        and request.user.role != 'administrador'
+    ):
+        raise Http404("Comprobante no encontrado.")
+
+    if not pago.comprobante:
+        raise Http404("Comprobante no disponible.")
+
+    try:
+        pago.comprobante.open('rb')
+    except (OSError, ValueError):
+        raise Http404("Comprobante no disponible.")
+
+    respuesta = FileResponse(
+        pago.comprobante,
+        as_attachment=False
+    )
+
+    respuesta['X-Content-Type-Options'] = 'nosniff'
+    respuesta['Cache-Control'] = 'private, no-store'
+
+    return respuesta

@@ -1,6 +1,7 @@
 from django import forms
 from .models import PerfilCliente
 from .models import SolicitudCredito
+from .validadores_archivos import validar_documento
 
 
 # ==========================================
@@ -551,13 +552,6 @@ class SolicitudCreditoForm(forms.ModelForm):
             }),
 
             'plazo_meses': forms.Select(
-                choices=[
-                    (6, '6 meses'),
-                    (12, '12 meses'),
-                    (18, '18 meses'),
-                    (24, '24 meses'),
-                    (36, '36 meses'),
-                ],
                 attrs={
                     'class': 'w-full border rounded-lg px-4 py-2',
                 }
@@ -597,53 +591,80 @@ class SolicitudCreditoForm(forms.ModelForm):
             }),
         }
 
+        def __init__(self, *args, **kwargs):
+
+            super().__init__(*args, **kwargs)
+
+            self.fields['plazo_meses'].widget.choices = [
+                ('', 'Seleccione las cuotas')
+            ] + [
+                (i, f'{i} {"cuota" if i == 1 else "cuotas"}')
+                for i in range(1, 13)
+            ]
+
+
+        def clean(self):
+
+            cleaned_data = super().clean()
+
+            monto = cleaned_data.get('monto_solicitado')
+            plazo = cleaned_data.get('plazo_meses')
+
+            if monto is None or plazo is None:
+                return cleaned_data
+
+            if monto < 100000 or monto > 1000000:
+
+                self.add_error(
+                    'monto_solicitado',
+                    'El monto debe estar entre $100.000 y $1.000.000.'
+                )
+
+                return cleaned_data
+
+            if monto < 200000:
+                maximo = 1
+            elif monto < 300000:
+                maximo = 2
+            elif monto < 400000:
+                maximo = 3
+            elif monto < 500000:
+                maximo = 4
+            elif monto < 600000:
+                maximo = 5
+            elif monto < 700000:
+                maximo = 6
+            elif monto < 800000:
+                maximo = 7
+            elif monto < 900000:
+                maximo = 8
+            elif monto < 1000000:
+                maximo = 10
+            else:
+                maximo = 12
+
+            if plazo < 1 or plazo > maximo:
+
+                self.add_error(
+                    'plazo_meses',
+                    f'Para este monto puede seleccionar entre 1 y {maximo} cuotas.'
+                )
+
+            return cleaned_data
+
     def clean_cedula(self):
         archivo = self.cleaned_data.get('cedula')
+        return validar_documento(archivo, 'pdf')
 
-        if archivo:
-            if not archivo.name.lower().endswith('.pdf'):
-                raise forms.ValidationError(
-                    'La cédula debe estar en formato PDF.'
-                )
-
-            if archivo.content_type != 'application/pdf':
-                raise forms.ValidationError(
-                    'El archivo de la cédula debe ser un PDF válido.'
-                )
-
-        return archivo
 
     def clean_recibo(self):
         archivo = self.cleaned_data.get('recibo')
+        return validar_documento(archivo, 'pdf')
 
-        if archivo:
-            if not archivo.name.lower().endswith('.pdf'):
-                raise forms.ValidationError(
-                    'El recibo debe estar en formato PDF.'
-                )
-
-            if archivo.content_type != 'application/pdf':
-                raise forms.ValidationError(
-                    'El archivo del recibo debe ser un PDF válido.'
-                )
-
-        return archivo
 
     def clean_certificacion_bancaria(self):
         archivo = self.cleaned_data.get('certificacion_bancaria')
-
-        if archivo:
-            if not archivo.name.lower().endswith('.pdf'):
-                raise forms.ValidationError(
-                    'La certificación bancaria debe estar en formato PDF.'
-                )
-
-            if archivo.content_type != 'application/pdf':
-                raise forms.ValidationError(
-                    'El archivo de la certificación bancaria debe ser un PDF válido.'
-                )
-
-        return archivo
+        return validar_documento(archivo, 'pdf')
 
     def clean_extracto_bancario_1(self):
         return self.validar_extracto(
@@ -661,23 +682,10 @@ class SolicitudCreditoForm(forms.ModelForm):
         )
 
     def validar_extracto(self, archivo):
+
         if not archivo:
             raise forms.ValidationError(
                 'Debe adjuntar la fotografía de este extracto bancario.'
             )
 
-        extensiones_validas = ('.jpg', '.jpeg', '.png')
-
-        if not archivo.name.lower().endswith(extensiones_validas):
-            raise forms.ValidationError(
-                'El extracto debe ser una imagen JPG, JPEG o PNG.'
-            )
-
-        tipos_validos = ('image/jpeg', 'image/png')
-
-        if archivo.content_type not in tipos_validos:
-            raise forms.ValidationError(
-                'El archivo debe ser una imagen JPG o PNG válida.'
-            )
-
-        return archivo
+        return validar_documento(archivo, 'imagen')

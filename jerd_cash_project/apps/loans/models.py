@@ -2,6 +2,9 @@ from django.db import models
 from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
 from decimal import Decimal
+from jerd_cash_project.private_storage import PrivateMediaStorage
+
+private_storage = PrivateMediaStorage()
 
 
 class Prestamo(models.Model):
@@ -140,6 +143,7 @@ class Pago(models.Model):
 
     comprobante = models.FileField(
         upload_to='pagos/comprobantes/',
+        storage=private_storage,
         null=True,
         blank=True,
         verbose_name='Comprobante de pago'
@@ -217,4 +221,41 @@ class PagoCuota(models.Model):
             f'Pago #{self.pago.id} → '
             f'Cuota #{self.cuota.numero_cuota}'
         )
-    
+
+
+
+class RecordatorioCuota(models.Model):
+    TIPOS = [
+        ('vencimiento', 'Recordatorio de vencimiento'),
+        ('mora', 'Recordatorio de mora'),
+    ]
+
+    cuota = models.ForeignKey(
+        Cuota,
+        on_delete=models.CASCADE,
+        related_name='recordatorios'
+    )
+
+    tipo = models.CharField(
+        max_length=20,
+        choices=TIPOS
+    )
+
+    fecha_envio = models.DateField()
+
+    class Meta:
+        verbose_name = 'Recordatorio de cuota'
+        verbose_name_plural = 'Recordatorios de cuotas'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['cuota', 'tipo', 'fecha_envio'],
+                name='unique_recordatorio_cuota_tipo_fecha'
+            )
+        ]
+
+    def __str__(self):
+        return (
+            f'{self.get_tipo_display()} - '
+            f'Cuota #{self.cuota.numero_cuota} - '
+            f'{self.fecha_envio}'
+        )

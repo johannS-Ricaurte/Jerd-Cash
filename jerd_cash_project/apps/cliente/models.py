@@ -1,5 +1,8 @@
 from django.db import models
 from django.conf import settings
+from jerd_cash_project.private_storage import PrivateMediaStorage
+
+private_storage = PrivateMediaStorage()
 
 
 class PerfilCliente(models.Model):
@@ -97,31 +100,37 @@ class SolicitudCredito(models.Model):
 )
 
     cedula = models.FileField(
-        upload_to='solicitudes/cedulas/'
+        upload_to='solicitudes/cedulas/',
+        storage=private_storage
     )
 
     recibo = models.FileField(
-        upload_to='solicitudes/recibos/'
+        upload_to='solicitudes/recibos/',
+        storage=private_storage
     )
 
     certificacion_bancaria = models.FileField(
-        upload_to='solicitudes/certificaciones_bancarias/'
+        upload_to='solicitudes/certificaciones_bancarias/',
+        storage=private_storage
     )
 
     extracto_bancario_1 = models.FileField(
         upload_to='solicitudes/extractos/',
+        storage=private_storage,
         blank=True,
         null=True
     )
 
     extracto_bancario_2 = models.FileField(
         upload_to='solicitudes/extractos/',
+        storage=private_storage,
         blank=True,
         null=True
     )
 
     extracto_bancario_3 = models.FileField(
         upload_to='solicitudes/extractos/',
+        storage=private_storage,
         blank=True,
         null=True
     )

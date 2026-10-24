@@ -185,7 +185,7 @@
                             <p>
 
                                 <strong>
-                                    Pago #:
+                                    Pago :
                                 </strong>
 
                                 {{ pago_pendiente.id }}
@@ -725,7 +725,7 @@
                                     <div>
 
                                         <p class="font-semibold text-gray-800">
-                                            Pago #{{ pago.id }}
+                                            Pago {{ pago.id }}
                                         </p>
 
                                         <p class="text-sm text-gray-500">
@@ -853,9 +853,6 @@
                                     </p>
 
                                 {% endif %}
-
-
-
                                 <!-- COMPROBANTE -->
 
                                 {% if pago.comprobante %}
@@ -863,8 +860,9 @@
                                     <div class="mt-4">
 
                                         <a
-                                            href="{{ pago.comprobante.url }}"
+                                            href="{% url 'documento_pago' pago.id %}"
                                             target="_blank"
+                                            rel="noopener noreferrer"
                                             class="
                                                 inline-block
                                                 bg-blue-600

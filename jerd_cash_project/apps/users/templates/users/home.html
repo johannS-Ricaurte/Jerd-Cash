@@ -320,7 +320,7 @@
                                         inputmode="numeric"
                                         autocomplete="off"
                                         value="{% if request.method == 'POST' %}{{ request.POST.monto }}{% endif %}"
-                                        placeholder="Ej: 2.000.000"
+                                        placeholder="Ej: 500.000"
                                         class="w-full border border-gray-300
                                             rounded-lg px-4 py-3 pl-9
                                             focus:outline-none
@@ -349,47 +349,15 @@
                                 <select
                                     id="plazo"
                                     name="plazo"
-                                    class="w-full border border-gray-300
-                                        rounded-lg px-4 py-3
-                                        bg-white
-                                        focus:outline-none
-                                        focus:ring-2
-                                        focus:ring-blue-500
-                                        focus:border-blue-500"
                                     required
+                                    class="w-full border border-gray-300 rounded-lg px-4 py-3
+                                        bg-white focus:outline-none focus:ring-2
+                                        focus:ring-blue-500 focus:border-blue-500"
                                 >
-
-                                    <option value="">
-                                        Selecciona un plazo
-                                    </option>
-
-                                    <option value="3"
-                                        {% if request.POST.plazo == '3' %}selected{% endif %}>
-                                        3 meses
-                                    </option>
-
-                                    <option value="6"
-                                        {% if request.POST.plazo == '6' %}selected{% endif %}>
-                                        6 meses
-                                    </option>
-
-                                    <option value="12"
-                                        {% if request.POST.plazo == '12' %}selected{% endif %}>
-                                        12 meses
-                                    </option>
-
-                                    <option value="24"
-                                        {% if request.POST.plazo == '24' %}selected{% endif %}>
-                                        24 meses
-                                    </option>
-
-                                    <option value="36"
-                                        {% if request.POST.plazo == '36' %}selected{% endif %}>
-                                        36 meses
-                                    </option>
-
+                                    <option value="">Seleccione las cuotas</option>
                                 </select>
-                            </div>
+
+                                <p id="mensajePlazo" class="text-xs text-gray-500 mt-2"></p>                            </div>
 
 
                             <!-- ERROR -->
@@ -1188,6 +1156,88 @@
     document.addEventListener("DOMContentLoaded", function () {
         const campos = ["ingresos", "gastos", "monto"];
 
+        const montoInput = document.getElementById("monto");
+        const plazoSelect = document.getElementById("plazo");
+        const mensajePlazo = document.getElementById("mensajePlazo");
+
+        function obtenerMaximoCuotas(monto) {
+
+            if (monto < 100000 || monto > 1000000) return 0;
+
+            if (monto < 200000) return 1;
+            if (monto < 300000) return 2;
+            if (monto < 400000) return 3;
+            if (monto < 500000) return 4;
+            if (monto < 600000) return 5;
+            if (monto < 700000) return 6;
+            if (monto < 800000) return 7;
+            if (monto < 900000) return 8;
+            if (monto < 1000000) return 10;
+
+            return 12;
+        }
+
+        function actualizarPlazos() {
+
+            const monto = Number(montoInput.value.replace(/\D/g, ""));
+            const maximo = obtenerMaximoCuotas(monto);
+            const plazoAnterior = plazoSelect.value;
+
+            plazoSelect.innerHTML = "";
+
+            if (maximo === 0) {
+
+                plazoSelect.add(
+                    new Option("Ingrese un monto válido", "")
+                );
+
+                mensajePlazo.textContent =
+                    "Monto permitido: $100.000 a $1.000.000.";
+
+                return;
+            }
+
+            plazoSelect.add(
+                new Option("Seleccione las cuotas", "")
+            );
+
+            for (let i = 1; i <= maximo; i++) {
+
+                plazoSelect.add(
+                    new Option(
+                        `${i} ${i === 1 ? "cuota" : "cuotas"}`,
+                        i
+                    )
+                );
+            }
+
+            if (
+                Number(plazoAnterior) >= 1 &&
+                Number(plazoAnterior) <= maximo
+            ) {
+                plazoSelect.value = plazoAnterior;
+            }
+
+            mensajePlazo.textContent =
+                `Puedes seleccionar entre 1 y ${maximo} cuotas.`;
+        }
+
+        montoInput.addEventListener("input", actualizarPlazos);
+
+        const plazoGuardado = "{{ request.POST.plazo|default:''|escapejs }}";
+
+        actualizarPlazos();
+
+        if (plazoGuardado) {
+            const existe = Array.from(plazoSelect.options).some(
+                opcion => opcion.value === plazoGuardado
+            );
+
+            if (existe) {
+                plazoSelect.value = plazoGuardado;
+            }
+        }
+
         campos.forEach(function (id) {
             const campo = document.getElementById(id);
 
@@ -1222,7 +1272,7 @@
         }
 
         // Quitar puntos antes de enviar el formulario a Django
-        const formulario = document.getElementById("formulario-simulador");
+        const formulario = document.getElementById("simulador-form");
 
         if (formulario) {
             formulario.addEventListener("submit", function () {
@@ -1230,7 +1280,7 @@
                     const campo = document.getElementById(id);
 
                     if (campo) {
-                        campo.value = campo.value.replace(/\./g, "");
+                        campo.value = campo.value.replace(/\D/g, "");
                     }
                 });
             });

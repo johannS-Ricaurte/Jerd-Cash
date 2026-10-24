@@ -75,8 +75,7 @@
                             class="w-full px-4 py-3 border border-gray-300 rounded-lg
                                 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             placeholder="$0"
-                            hx-post="/prestamos/calcular-simulacion/"
-                            hx-trigger="input changed delay:500ms"
+                            hx-post="{% url 'calcular_simulacion' %}"
                             hx-target="#resultado-simulacion"
                             hx-include="#monto, #plazo, [name=csrfmiddlewaretoken]"
                         >
@@ -92,7 +91,7 @@
 
 
                         <p class="text-xs text-gray-500 mt-2">
-                            Monto mínimo: $100.000
+                            Monto permitido: $100.000 a $1.000.000
                         </p>
 
                     </div>
@@ -112,34 +111,16 @@
                             id="plazo"
                             required
                             class="w-full px-4 py-3 border border-gray-300 rounded-lg
-                                   focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            hx-post="/prestamos/calcular-simulacion/"
+                                focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            hx-post="{% url 'calcular_simulacion' %}"
                             hx-trigger="change"
                             hx-target="#resultado-simulacion"
                             hx-include="#monto, [name=csrfmiddlewaretoken]"
                         >
-
-                            <option value="3">
-                                3 meses
-                            </option>
-
-                            <option value="6">
-                                6 meses
-                            </option>
-
-                            <option value="12" selected>
-                                12 meses
-                            </option>
-
-                            <option value="24">
-                                24 meses
-                            </option>
-
-                            <option value="36">
-                                36 meses
-                            </option>
-
+                            <option value="">Seleccione las cuotas</option>
                         </select>
+
+                        <p id="mensajePlazo" class="text-xs text-gray-500 mt-2"></p>
 
                     </div>
 
@@ -152,7 +133,7 @@
                     class="w-full bg-blue-800 text-white font-semibold
                            py-3 px-4 rounded-lg
                            hover:bg-blue-900 transition"
-                    hx-post="/prestamos/calcular-simulacion/"
+                    hx-post="{% url 'calcular_simulacion' %}"
                     hx-include="#monto, #plazo, [name=csrfmiddlewaretoken]"
                     hx-target="#resultado-simulacion"
                 >
@@ -200,15 +181,9 @@
             return '$' + limpio;
         }
 
-
         function obtenerMontoNumerico(valor) {
-
-            if (!valor) {
-                return '';
-            }
-
-            return valor
-                .replace(/[^\d]/g, '');
+            if (!valor) return '';
+            return valor.replace(/[^0-9]/g, '');
         }
 
 
@@ -219,6 +194,74 @@
         const monto = document.getElementById(
             'monto'
         );
+
+        const plazoSelect = document.getElementById('plazo');
+
+        const mensajePlazo = document.getElementById('mensajePlazo');
+
+        function obtenerMaximoCuotas(monto) {
+
+            if (monto < 100000 || monto > 1000000) return 0;
+
+            if (monto < 200000) return 1;
+            if (monto < 300000) return 2;
+            if (monto < 400000) return 3;
+            if (monto < 500000) return 4;
+            if (monto < 600000) return 5;
+            if (monto < 700000) return 6;
+            if (monto < 800000) return 7;
+            if (monto < 900000) return 8;
+            if (monto < 1000000) return 10;
+
+            return 12;
+        }
+
+        function actualizarPlazos() {
+
+            const valorMonto = Number(monto.value);
+
+            const maximo = obtenerMaximoCuotas(valorMonto);
+
+            const plazoAnterior = plazoSelect.value;
+
+            plazoSelect.innerHTML = '';
+
+            if (maximo === 0) {
+
+                plazoSelect.add(
+                    new Option('Ingrese un monto válido', '')
+                );
+
+                mensajePlazo.textContent =
+                    'Ingrese un monto entre $100.000 y $1.000.000.';
+
+                return;
+            }
+
+            plazoSelect.add(
+                new Option('Seleccione las cuotas', '')
+            );
+
+            for (let i = 1; i <= maximo; i++) {
+
+                plazoSelect.add(
+                    new Option(
+                        `${i} ${i === 1 ? 'cuota' : 'cuotas'}`,
+                        i
+                    )
+                );
+            }
+
+            if (
+                Number(plazoAnterior) >= 1 &&
+                Number(plazoAnterior) <= maximo
+            ) {
+                plazoSelect.value = plazoAnterior;
+            }
+
+            mensajePlazo.textContent =
+                `Para este monto puedes seleccionar entre 1 y ${maximo} cuotas.`;
+        }
 
 
         if (montoDisplay && monto) {
@@ -233,16 +276,22 @@
             }
 
 
-            // Mientras escribe
+            // Mientras escribe: bloquear letras
             montoDisplay.addEventListener(
                 'input',
                 function() {
+
+                    this.value = this.value.replace(/[^0-9.]/g, '');
 
                     const valor = obtenerMontoNumerico(
                         this.value
                     );
 
                     monto.value = valor;
+
+                    actualizarPlazos();
+
+                    document.getElementById('resultado-simulacion').innerHTML = '';
 
                 }
             );
@@ -267,6 +316,29 @@
             );
 
         }
+
+        actualizarPlazos();
+
+        document.body.addEventListener('htmx:configRequest', function(event) {
+
+            if (
+                !event.detail.path.includes("{% url 'calcular_simulacion' %}")
+            ) {
+                return;
+            }
+
+            const valorMonto = Number(monto.value);
+            const valorPlazo = Number(plazoSelect.value);
+            const maximo = obtenerMaximoCuotas(valorMonto);
+
+            if (
+                maximo === 0 ||
+                valorPlazo < 1 ||
+                valorPlazo > maximo
+            ) {
+                event.preventDefault();
+            }
+        });
 
     </script>
 

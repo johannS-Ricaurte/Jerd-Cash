@@ -91,7 +91,7 @@
                                 <div>
 
                                     <h4 class="text-xl font-bold text-gray-900">
-                                        Crédito #{{ prestamo_cliente.id }}
+                                        Crédito {{ prestamo_cliente.id }}
                                     </h4>
 
                                     <p class="text-sm text-gray-500 mt-1">
@@ -388,7 +388,7 @@
                                 <div>
 
                                     <h4 class="text-lg font-bold text-gray-900">
-                                        Pago #{{ pago.id }}
+                                        Comprobante {{ pago.id }}
                                     </h4>
 
                                     <p class="text-sm text-gray-500 mt-1">
@@ -408,7 +408,7 @@
                                     {% if pago.comprobante %}
 
                                         <a
-                                            href="{{ pago.comprobante.url }}"
+                                            href="{% url 'documento_pago' pago.id %}"
                                             target="_blank"
                                             class="inline-block bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-900"
                                         >

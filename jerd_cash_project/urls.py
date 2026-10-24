@@ -1,5 +1,5 @@
 """
-URL configuration for jerdCash project.
+URL configuration for JERD-Cash.
 """
 
 from django.contrib import admin
@@ -12,32 +12,40 @@ from jerd_cash_project.apps.users.views import home_view
 
 urlpatterns = [
 
-    # Panel de administración
-    path('admin/', admin.site.urls),
+    # Administración interna de Django
+    path(
+        'gestion-interna/',
+        admin.site.urls
+    ),
 
     # Página principal
-    path('', home_view, name='home'),
+    path(
+        '',
+        home_view,
+        name='home'
+    ),
 
-    # URLs de usuarios
+    # Usuarios
     path(
         '',
         include('jerd_cash_project.apps.users.urls')
     ),
 
-    # URLs de préstamos
+    # Préstamos
     path(
-        'prestamos/',
+        'servicios/',
         include('jerd_cash_project.apps.loans.urls')
     ),
 
-    # URLs de clientes
+    # Clientes
     path(
-        'cliente/',
+        'cuenta/',
         include('jerd_cash_project.apps.cliente.urls')
     ),
 
+    # Administración de JERD-Cash
     path(
-        'administrador/',
+        'panel/',
         include('jerd_cash_project.apps.administrador.urls')
     ),
 ]
@@ -45,6 +53,7 @@ urlpatterns = [
 
 # Archivos subidos por los usuarios
 if settings.DEBUG:
+
     urlpatterns += static(
         settings.MEDIA_URL,
         document_root=settings.MEDIA_ROOT

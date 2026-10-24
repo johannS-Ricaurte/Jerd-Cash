@@ -746,7 +746,34 @@ function prepararCampoPesos(displayId, hiddenId) {
 
     });
 
+
+    // Bloquear letras en ingresos y gastos
+    document.querySelectorAll(
+        '#ingresos_display, #gastos_display'
+    ).forEach(function(campo) {
+
+        campo.addEventListener('input', function() {
+            this.value = this.value.replace(/[^0-9.]/g, '');
+        });
+
+    });
+
+    // Bloquear letras en teléfono de respaldo
+    const telefonoRespaldo = document.querySelector(
+        '[name="contacto_respaldo_telefono"]'
+    );
+
+    if (telefonoRespaldo) {
+
+        telefonoRespaldo.addEventListener('input', function() {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+
+    }
+
 </script>
+
+
 
 </body>
 </html>

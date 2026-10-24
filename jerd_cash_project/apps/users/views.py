@@ -93,10 +93,28 @@ def home_view(request):
                     '$100.000.'
                 )
 
-            elif plazo not in [3, 6, 12, 24, 36]:
+            elif monto > 1000000:
 
                 context['error'] = (
-                    'Selecciona un plazo válido.'
+                    'El monto máximo del crédito es $1.000.000.'
+                )
+
+            elif plazo < 1 or plazo > (
+                1 if monto < 200000 else
+                2 if monto < 300000 else
+                3 if monto < 400000 else
+                4 if monto < 500000 else
+                5 if monto < 600000 else
+                6 if monto < 700000 else
+                7 if monto < 800000 else
+                8 if monto < 900000 else
+                10 if monto < 1000000 else
+                12
+            ):
+
+                context['error'] = (
+                    'El plazo seleccionado no es válido '
+                    'para el monto solicitado.'
                 )
 
             else:
@@ -213,9 +231,23 @@ def registro_view(request):
             'cedula', ''
         ).strip()
 
+        # Validar que la cédula contenga únicamente números.
+        if not cedula.isdigit():
+            messages.error(
+                request,
+                "La cédula debe contener únicamente números, "
+                "sin letras, espacios ni caracteres especiales."
+            )
+
+            return render(
+                request,
+                'users/register.html'
+            )
+
         acepta_terminos = (
             'acepta_terminos' in request.POST
         )
+
 
         # Validaciones de seguridad de la contraseña.
         tiene_mayuscula = re.search(
@@ -445,13 +477,23 @@ def login_google_view(request):
 
     if usuario:
 
+        if usuario.role != 'cliente':
+
+            return JsonResponse(
+                {
+                    'error': (
+                        'Esta cuenta no tiene permisos '
+                        'para iniciar sesión como cliente.'
+                    )
+                },
+                status=403
+            )
+
         login(request, usuario)
 
         return JsonResponse(
             {
-                'redirect_url': reverse(
-                    'cliente_dashboard'
-                )
+                'redirect_url': reverse('cliente_dashboard')
             }
         )
 
@@ -540,6 +582,23 @@ def completar_registro_google_view(request):
             'cedula',
             ''
         ).strip()
+
+        # Validar que la cédula contenga únicamente números.
+        if not cedula.isascii() or not cedula.isdigit():
+
+            messages.error(
+                request,
+                "La cédula debe contener únicamente números, "
+                "sin letras, espacios ni caracteres especiales."
+            )
+
+            return render(
+                request,
+                'users/completar_registro_google.html',
+                {
+                    'datos_google': datos_google
+                }
+            )
 
         acepta_terminos = (
             'acepta_terminos'

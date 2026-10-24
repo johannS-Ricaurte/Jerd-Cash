@@ -4,6 +4,18 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.utils import timezone
 from django.contrib import messages
+from django.shortcuts import redirect
+from jerd_cash_project.apps.cliente.models import SolicitudCredito
+from jerd_cash_project.apps.loans.models import Prestamo
+from .decorators import cliente_required
+from django.http import FileResponse, Http404
+from django.shortcuts import get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ValidationError
+from .validadores_archivos import validar_documento
+
+from .models import SolicitudCredito
+
 
 from datetime import timedelta
 from decimal import Decimal
@@ -37,7 +49,7 @@ from .ocr import (
 )
 
 
-@login_required
+@cliente_required
 def dashboard_view(request):
     return render(
         request,
@@ -45,7 +57,7 @@ def dashboard_view(request):
     )
 
 
-@login_required
+@cliente_required
 def perfil_view(request):
 
     perfil, creado = PerfilCliente.objects.get_or_create(
@@ -87,8 +99,64 @@ def perfil_view(request):
     )
 
 
-@login_required
+@cliente_required
 def solicitar_credito_view(request):
+
+    # ==========================================
+    # VERIFICAR SOLICITUDES PENDIENTES
+    # ==========================================
+
+    solicitud_pendiente = SolicitudCredito.objects.filter(
+        usuario=request.user,
+        estado='PENDIENTE'
+    ).exists()
+
+    if solicitud_pendiente:
+
+        messages.warning(
+            request,
+            'Ya tienes una solicitud de crédito pendiente. '
+            'Debes esperar a que sea evaluada antes de solicitar otro crédito.'
+        )
+
+        return redirect('cliente_dashboard')
+
+    # ==========================================
+    # VERIFICAR CRÉDITOS ACTIVOS
+    # ==========================================
+
+    prestamos_activos = Prestamo.objects.filter(
+        cliente=request.user,
+        estado__in=[
+            'aprobado',
+            'desembolsado',
+            'mora'
+        ]
+    )
+
+    credito_activo = prestamos_activos.filter(
+        cuotas__pagada=False
+    ).exists()
+
+    # También bloquear préstamos aprobados sin cuotas generadas.
+    credito_sin_cuotas = prestamos_activos.filter(
+        cuotas__isnull=True
+    ).exists()
+
+    if credito_activo or credito_sin_cuotas:
+
+        messages.warning(
+            request,
+            'Actualmente tienes un crédito activo. '
+            'Debes terminar de pagar todas tus cuotas '
+            'antes de solicitar un nuevo crédito.'
+        )
+
+        return redirect('cliente_dashboard')
+
+    # ==========================================
+    # PROCESAR SOLICITUD
+    # ==========================================
 
     if request.method == 'POST':
 
@@ -239,8 +307,7 @@ def solicitar_credito_view(request):
             'form': form
         }
     )
-
-@login_required
+@cliente_required
 def validar_cedula_ajax(request):
 
     if request.method != 'POST':
@@ -322,7 +389,7 @@ def validar_cedula_ajax(request):
 
 
 
-@login_required
+@cliente_required
 def validar_extracto_ajax(request):
 
     if request.method != 'POST':
@@ -415,7 +482,7 @@ def validar_extracto_ajax(request):
         )
 
 
-@login_required
+@cliente_required
 def mis_solicitudes_view(request):
 
     solicitudes = SolicitudCredito.objects.filter(
@@ -433,7 +500,7 @@ def mis_solicitudes_view(request):
     )
 
 
-@login_required
+@cliente_required
 def mis_creditos_view(request):
 
     # Fecha simulada para las pruebas.
@@ -633,7 +700,7 @@ def mis_creditos_view(request):
     )
 
 
-@login_required
+@cliente_required
 def pagar_view(request):
 
     from jerd_cash_project.apps.administrador.models import (
@@ -732,6 +799,43 @@ def pagar_view(request):
 
             return redirect('pagar')
 
+                # ==========================================
+        # VALIDAR COMPROBANTE DE PAGO
+        # ==========================================
+
+        try:
+
+            extension = comprobante.name.lower()
+
+            if extension.endswith('.pdf'):
+
+                validar_documento(
+                    comprobante,
+                    'pdf'
+                )
+
+            elif extension.endswith(('.jpg', '.jpeg', '.png')):
+
+                validar_documento(
+                    comprobante,
+                    'imagen'
+                )
+
+            else:
+
+                raise ValidationError(
+                    'El comprobante debe ser un archivo PDF, JPG o PNG.'
+                )
+
+        except ValidationError as error:
+
+            messages.error(
+                request,
+                ' '.join(error.messages)
+            )
+
+            return redirect('pagar')
+
         if not cuotas_para_pagar:
 
             messages.error(
@@ -804,7 +908,7 @@ def pagar_view(request):
     )
 
 
-@login_required
+@cliente_required
 def estado_financiero_view(request):
 
     prestamos = Prestamo.objects.filter(
@@ -939,7 +1043,7 @@ def estado_financiero_view(request):
     )
 
 
-@login_required
+@cliente_required
 def detalle_estado_financiero_view(request, prestamo_id):
 
     prestamo = get_object_or_404(
@@ -1041,3 +1145,54 @@ def detalle_estado_financiero_view(request, prestamo_id):
             'cuotas_con_mora': cuotas_con_mora,
         }
     )
+
+@login_required
+def documento_solicitud_view(request, solicitud_id, tipo):
+
+    solicitud = get_object_or_404(
+        SolicitudCredito,
+        id=solicitud_id
+    )
+
+    # Verificar que sea el propietario o un administrador.
+    if (
+        solicitud.usuario_id != request.user.id
+        and request.user.role != 'administrador'
+    ):
+        raise Http404("Documento no encontrado.")
+
+    # Campos permitidos.
+    documentos = {
+        'cedula': 'cedula',
+        'recibo': 'recibo',
+        'certificacion': 'certificacion_bancaria',
+        'extracto_1': 'extracto_bancario_1',
+        'extracto_2': 'extracto_bancario_2',
+        'extracto_3': 'extracto_bancario_3',
+    }
+
+    if tipo not in documentos:
+        raise Http404("Documento no encontrado.")
+
+    archivo = getattr(
+        solicitud,
+        documentos[tipo]
+    )
+
+    if not archivo:
+        raise Http404("Documento no disponible.")
+
+    try:
+        archivo.open('rb')
+    except (OSError, ValueError):
+        raise Http404("Documento no disponible.")
+
+    respuesta = FileResponse(
+        archivo,
+        as_attachment=False
+    )
+
+    respuesta['X-Content-Type-Options'] = 'nosniff'
+    respuesta['Cache-Control'] = 'private, no-store'
+
+    return respuesta

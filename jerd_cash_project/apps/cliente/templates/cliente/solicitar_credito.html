@@ -97,6 +97,7 @@
                         id="monto_display"
                         value="{{ form.monto_solicitado.value|floatformat:0 }}"
                         inputmode="numeric"
+                        oninput="this.value = this.value.replace(/[^0-9.]/g, '')"
                         autocomplete="off"
                         class="w-full border border-gray-300 rounded-lg px-4 py-2
                             focus:ring-2 focus:ring-blue-500
@@ -360,6 +361,58 @@
             'id_monto_solicitado'
         );
 
+        const plazoSelect = document.getElementById('id_plazo_meses');
+
+        function obtenerMaximoCuotas(monto) {
+
+            if (monto < 100000 || monto > 1000000) return 0;
+
+            if (monto < 200000) return 1;
+            if (monto < 300000) return 2;
+            if (monto < 400000) return 3;
+            if (monto < 500000) return 4;
+            if (monto < 600000) return 5;
+            if (monto < 700000) return 6;
+            if (monto < 800000) return 7;
+            if (monto < 900000) return 8;
+            if (monto < 1000000) return 10;
+
+            return 12;
+        }
+
+        function actualizarPlazos() {
+
+            const monto = Number(montoOculto.value);
+            const maximo = obtenerMaximoCuotas(monto);
+
+            const plazoAnterior = plazoSelect.value;
+
+            plazoSelect.innerHTML = '';
+
+            if (maximo === 0) {
+                plazoSelect.add(new Option(
+                    'Ingrese un monto entre $100.000 y $1.000.000',
+                    ''
+                ));
+                plazoSelect.value = '';
+                return;
+            }
+
+            plazoSelect.add(new Option('Seleccione las cuotas', ''));
+
+            for (let i = 1; i <= maximo; i++) {
+                plazoSelect.add(new Option(
+                    `${i} ${i === 1 ? 'cuota' : 'cuotas'}`,
+                    i
+                ));
+            }
+
+            if (Number(plazoAnterior) >= 1 &&
+                Number(plazoAnterior) <= maximo) {
+                plazoSelect.value = plazoAnterior;
+            }
+        }
+
 
         function formatearPesos(valor) {
 
@@ -415,7 +468,6 @@
             }
 
 
-            // Mientras el usuario escribe
             montoDisplay.addEventListener(
                 'input',
                 function() {
@@ -425,6 +477,8 @@
                     );
 
                     montoOculto.value = valor;
+
+                    actualizarPlazos();
 
                 }
             );
@@ -449,6 +503,8 @@
             );
 
         }
+
+        actualizarPlazos();
 
         const btnEnviar = document.getElementById('btnEnviar');
 

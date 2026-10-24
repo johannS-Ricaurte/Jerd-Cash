@@ -1,18 +1,56 @@
-# Entorno virtual
+# ==========================================
+# JERD-CASH - ARCHIVOS EXCLUIDOS DE GIT
+# ==========================================
+
+# Entornos virtuales
 venv/
 .venv/
 env/
 
 # Python
 __pycache__/
-*.pyc
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
 
 # Django
 db.sqlite3
+db.sqlite3-journal
+db.sqlite3-shm
+db.sqlite3-wal
 *.log
 
-# Variables de entorno
+# Variables de entorno y credenciales
 .env
+.env.*
+!.env.example
+
+# Documentos privados de clientes
+private_media/
+
+# Archivos públicos subidos por usuarios
+media/
+
+# Copias de seguridad
+respaldo_documentos/
+backups/
+*.sqlite3.bak
 
 # Visual Studio Code
 .vscode/
+
+# Archivos temporales del sistema
+.DS_Store
+Thumbs.db
+
+# Script local de recordatorios
+/ejecutar_recordatorios.bat
+
+# Scripts locales de migración de documentos
+/copiar_comprobantes_privados.py
+
+/copiar_documentos_privados.py
+
+# Scripts locales de mantenimiento y migración
+/retirar_documentos_publicos.py
+/verificar_documentos_privados.py
