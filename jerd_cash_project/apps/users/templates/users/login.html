@@ -1,218 +1,318 @@
-<!DOCTYPE html>
 
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iniciar sesión - JERD-Cash</title>
+{% extends 'base.html' %}
 
+{% block title %}Iniciar sesión - JERD-Cash{% endblock %}
 
-<script src="https://cdn.tailwindcss.com"></script>
-
-<!-- Google Identity Services -->
+{% block extra_head %}
 <script src="https://accounts.google.com/gsi/client" async defer></script>
+{% endblock %}
 
 
-</head>
+{% block content %}
 
-<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+<div class="min-h-[calc(100vh-80px)] flex items-center justify-center px-4 py-12 bg-gray-50">
 
+    <div class="w-full max-w-md">
 
-<div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+        <!-- ENCABEZADO -->
+        <div class="text-center mb-8">
 
-    <h1 class="text-2xl font-bold text-center text-blue-800 mb-6">
-        JERD-Cash
-    </h1>
-
-    <h2 class="text-xl font-semibold text-center mb-4">
-        Iniciar Sesión
-    </h2>
-
-    <!-- Mensajes de Django -->
-    {% if messages %}
-        {% for message in messages %}
-            <div class="mb-4 p-3 rounded
-                {% if message.tags == 'error' %}
-                    bg-red-100 text-red-700
-                {% else %}
-                    bg-green-100 text-green-700
-                {% endif %}">
-                {{ message }}
+            <div class="w-16 h-16 bg-blue-900 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm">
+                <span class="text-white text-3xl font-bold">
+                    J
+                </span>
             </div>
-        {% endfor %}
-    {% endif %}
 
-    <!-- LOGIN NORMAL -->
-    <form method="post" action="{% url 'login' %}">
+            <h1 class="text-3xl font-bold text-blue-950">
+                JERD-Cash
+            </h1>
 
-        {% csrf_token %}
-
-        <div class="mb-4">
-
-            <label
-                for="id_username"
-                class="block text-sm font-medium text-gray-700 mb-1">
-                Usuario
-            </label>
-
-            <input
-                type="text"
-                name="username"
-                id="id_username"
-                required
-                class="w-full px-3 py-2 border border-gray-300 rounded-md
-                       focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <p class="text-gray-500 text-sm mt-2">
+                Plataforma de microcréditos
+            </p>
 
         </div>
 
-        <div class="mb-6">
 
-            <label
-                for="id_password"
-                class="block text-sm font-medium text-gray-700 mb-1">
-                Contraseña
-            </label>
+        <!-- TARJETA DE LOGIN -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
 
-            <input
-                type="password"
-                name="password"
-                id="id_password"
-                required
-                class="w-full px-3 py-2 border border-gray-300 rounded-md
-                       focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <div class="text-center mb-7">
+
+                <h2 class="text-2xl font-bold text-blue-950">
+                    Iniciar sesión
+                </h2>
+
+                <p class="text-sm text-gray-500 mt-2">
+                    Ingresa tus credenciales para acceder a tu cuenta.
+                </p>
+
+            </div>
+
+
+            <!-- MENSAJES DJANGO -->
+            {% if messages %}
+
+                <div class="mb-6 space-y-3">
+
+                    {% for message in messages %}
+
+                        <div class="rounded-lg border px-4 py-3 text-sm
+                            {% if 'error' in message.tags %}
+                                border-red-200 bg-red-50 text-red-700
+                            {% elif 'warning' in message.tags %}
+                                border-yellow-200 bg-yellow-50 text-yellow-800
+                            {% elif 'success' in message.tags %}
+                                border-green-200 bg-green-50 text-green-700
+                            {% else %}
+                                border-blue-200 bg-blue-50 text-blue-800
+                            {% endif %}">
+
+                            {{ message }}
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            {% endif %}
+
+
+            <!-- LOGIN TRADICIONAL -->
+            <form method="POST" action="{% url 'login' %}">
+
+                {% csrf_token %}
+
+                <!-- USUARIO -->
+                <div class="mb-5">
+
+                    <label for="id_username"
+                           class="block text-sm font-semibold text-gray-700 mb-2">
+                        Usuario
+                    </label>
+
+                    <input type="text"
+                           name="username"
+                           id="id_username"
+                           required
+                           autocomplete="username"
+                           placeholder="Ingresa tu usuario"
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-blue-900 focus:ring-2 focus:ring-blue-100 transition">
+
+                </div>
+
+
+                <!-- CONTRASEÑA -->
+                <div class="mb-4">
+
+                    <label for="id_password"
+                           class="block text-sm font-semibold text-gray-700 mb-2">
+                        Contraseña
+                    </label>
+
+                    <input type="password"
+                           name="password"
+                           id="id_password"
+                           required
+                           autocomplete="current-password"
+                           placeholder="Ingresa tu contraseña"
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-blue-900 focus:ring-2 focus:ring-blue-100 transition">
+
+                </div>
+
+
+                <!-- RECUPERAR CONTRASEÑA -->
+                <div class="text-right mb-6">
+
+                    <a href="{% url 'password_reset' %}"
+                       class="text-sm font-medium text-blue-900 hover:text-blue-700 hover:underline transition">
+                        ¿Olvidaste tu contraseña?
+                    </a>
+
+                </div>
+
+
+                <!-- BOTÓN INGRESAR -->
+                <button type="submit"
+                        class="w-full bg-blue-900 text-white py-3 px-4 rounded-lg font-semibold hover:bg-blue-800 transition">
+                    Ingresar
+                </button>
+
+            </form>
+
+
+            <!-- SEPARADOR -->
+            <div class="flex items-center gap-4 my-7">
+
+                <div class="flex-1 border-t border-gray-200"></div>
+
+                <span class="text-sm text-gray-400">
+                    O continúa con
+                </span>
+
+                <div class="flex-1 border-t border-gray-200"></div>
+
+            </div>
+
+
+            <!-- LOGIN CON GOOGLE -->
+            <div class="flex flex-col items-center">
+
+                <div id="g_id_onload"
+                     data-client_id="{{ GOOGLE_CLIENT_ID }}"
+                     data-callback="manejarRespuestaGoogle"
+                     data-auto_prompt="false">
+                </div>
+
+                <div class="w-full flex justify-center">
+
+                    <div class="g_id_signin"
+                         data-type="standard"
+                         data-size="large"
+                         data-theme="outline"
+                         data-text="continue_with"
+                         data-shape="rectangular"
+                         data-logo_alignment="left"
+                         data-ux_mode="popup">
+                    </div>
+
+                </div>
+
+                <p id="google-error"
+                   role="alert"
+                   aria-live="polite"
+                   class="hidden mt-4 text-center text-sm text-red-600">
+                </p>
+
+            </div>
+
+
+            <!-- REGISTRO -->
+            <div class="mt-8 pt-6 border-t border-gray-100">
+
+                <p class="text-center text-sm text-gray-600">
+
+                    ¿No tienes una cuenta?
+
+                    <a href="{% url 'registro' %}"
+                       class="font-semibold text-blue-900 hover:text-blue-700 hover:underline transition">
+                        Regístrate aquí
+                    </a>
+
+                </p>
+
+            </div>
 
         </div>
 
-        
-        <div class="text-right mb-4">
-            <a
-                href="{% url 'password_reset' %}"
-                class="text-sm text-blue-700 hover:text-blue-900 hover:underline"
-            >
-                ¿Olvidaste tu contraseña?
-            </a>
-        </div>
 
-
-        <button
-            type="submit"
-            class="w-full bg-blue-800 text-white py-2 px-4 rounded-md
-                   hover:bg-blue-900 transition">
-            Ingresar
-        </button>
-
-    </form>
-
-    <!-- SEPARADOR -->
-
-    <div class="flex items-center my-6">
-
-        <div class="flex-1 border-t border-gray-300"></div>
-
-        <span class="px-3 text-sm text-gray-500">
-            O
-        </span>
-
-        <div class="flex-1 border-t border-gray-300"></div>
+        <!-- TEXTO INFERIOR -->
+        <p class="text-center text-xs text-gray-400 mt-6">
+            JERD-Cash · Plataforma de gestión de microcréditos
+        </p>
 
     </div>
-
-    <!-- LOGIN CON GOOGLE -->
-
-    <div
-        id="g_id_onload"
-        data-client_id="{{ GOOGLE_CLIENT_ID }}"
-        data-callback="manejarRespuestaGoogle"
-        data-auto_prompt="false">
-    </div>
-
-    <div
-        class="g_id_signin"
-        data-type="standard"
-        data-size="large"
-        data-theme="outline"
-        data-text="continue_with"
-        data-shape="rectangular"
-        data-logo_alignment="left"
-        data-ux_mode="popup">
-    </div>
-
-    <script>
-        function manejarRespuestaGoogle(response) {
-
-            console.log("GOOGLE CALLBACK EJECUTADO");
-            console.log("Respuesta de Google:", response);
-
-            alert("Google devolvió correctamente la credencial.");
-
-            const datos = new URLSearchParams();
-
-            datos.append(
-                'credential',
-                response.credential
-            );
-
-            fetch("{% url 'login_google' %}", {
-
-                method: "POST",
-
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded",
-                    "X-CSRFToken": "{{ csrf_token }}"
-                },
-
-                body: datos.toString()
-
-            })
-            .then(response => response.json())
-
-            .then(data => {
-
-                console.log("Respuesta Django:", data);
-
-                if (data.redirect_url) {
-
-                    window.location.href = data.redirect_url;
-
-                    return;
-                }
-
-                alert(
-                    data.error ||
-                    "No fue posible iniciar sesión con Google."
-                );
-
-            })
-
-            .catch(error => {
-
-                console.error(
-                    "Error comunicándose con Django:",
-                    error
-                );
-
-                alert(
-                    "Ocurrió un error al comunicarse con JERD-Cash."
-                );
-
-            });
-        }
-    </script>
-    <!-- REGISTRO -->
-
-    <p class="text-center text-sm text-gray-600 mt-6">
-
-        ¿No tienes cuenta?
-
-        <a
-            href="{% url 'registro' %}"
-            class="text-blue-800 hover:underline">
-            Regístrate aquí
-        </a>
-
-    </p>
 
 </div>
 
-</body>
-</html>
+{% endblock %}
+
+
+{% block extra_js %}
+
+<script>
+
+    function mostrarErrorGoogle(mensaje) {
+
+        const contenedor = document.getElementById("google-error");
+
+        contenedor.textContent = mensaje;
+
+        contenedor.classList.remove("hidden");
+
+    }
+
+
+    function manejarRespuestaGoogle(response) {
+
+        const contenedorError = document.getElementById("google-error");
+
+        contenedorError.classList.add("hidden");
+        contenedorError.textContent = "";
+
+        if (!response || !response.credential) {
+
+            mostrarErrorGoogle(
+                "No se recibió una credencial válida de Google."
+            );
+
+            return;
+        }
+
+        const datos = new URLSearchParams();
+
+        datos.append(
+            "credential",
+            response.credential
+        );
+
+        fetch("{% url 'login_google' %}", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "X-CSRFToken": "{{ csrf_token }}"
+            },
+
+            credentials: "same-origin",
+
+            body: datos.toString()
+
+        })
+
+        .then(respuesta => {
+
+            if (!respuesta.ok) {
+                throw new Error("No fue posible procesar el inicio de sesión.");
+            }
+
+            return respuesta.json();
+
+        })
+
+        .then(data => {
+
+            if (data.redirect_url) {
+
+                window.location.href = data.redirect_url;
+
+                return;
+            }
+
+            mostrarErrorGoogle(
+                data.error ||
+                "No fue posible iniciar sesión con Google."
+            );
+
+        })
+
+        .catch(error => {
+
+            console.error(
+                "Error al iniciar sesión con Google:",
+                error
+            );
+
+            mostrarErrorGoogle(
+                "Ocurrió un error al comunicarse con JERD-Cash."
+            );
+
+        });
+
+    }
+
+</script>
+
+{% endblock %}

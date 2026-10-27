@@ -1,4 +1,4 @@
-{% load formatos %}
+{% load formatos static %}
 
 <!DOCTYPE html>
 <html lang="es">
@@ -9,7 +9,7 @@
     <title>JERD-Cash | Microcréditos</title>
 
     <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{% static 'css/tailwind-home.css' %}">
 </head>
 
 <body class="bg-white text-gray-800">
@@ -392,13 +392,24 @@
 
                         </form>
 
+                        <!-- RESULTADOS DEL SIMULADOR SIN CONEXIÓN -->
+                        <div
+                            id="resultado-simulador-offline"
+                            class="hidden mt-8 border-t pt-7"
+                            aria-live="polite"
+                        >
+                        </div>
+
 
                         <!-- =========================
                             RESULTADO
                         ========================== -->
                         {% if score is not None %}
 
-                            <div class="mt-8 border-t pt-7">
+                            <div
+                                id="resultado-simulador-django"
+                                class="mt-8 border-t pt-7"
+                            >
 
                                 <h4
                                     class="text-xl font-bold
@@ -1271,23 +1282,29 @@
             return numeros.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
         }
 
-        // Quitar puntos antes de enviar el formulario a Django
-        const formulario = document.getElementById("simulador-form");
-
-        if (formulario) {
-            formulario.addEventListener("submit", function () {
-                campos.forEach(function (id) {
-                    const campo = document.getElementById(id);
-
-                    if (campo) {
-                        campo.value = campo.value.replace(/\D/g, "");
-                    }
-                });
-            });
-        }
+        
     });
     </script>
 
+    {% load static %}
+
+    <script src="{% static 'js/simulador-home.js' %}"></script>
+
+
+    <script>
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", function () {
+                navigator.serviceWorker.register("/service-worker.js")
+                    .then(function () {
+                        console.log("Service Worker registrado correctamente");
+                    })
+                    .catch(function (error) {
+                        console.error("Error registrando Service Worker:", error);
+                    });
+            });
+        }
+    </script>
+    
 
 </body>
 </html>

@@ -1,173 +1,297 @@
 
+{% extends 'base.html' %}
 {% load formatos %}
-<!DOCTYPE html>
-<html lang="es">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clientes - JERD Cash</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
+{% block title %}Clientes - JERD-Cash{% endblock %}
 
-<body class="bg-gray-50 min-h-screen">
+{% block navbar %}
+<nav class="bg-white border-b border-gray-200">
+    <div class="max-w-7xl mx-auto px-6 py-4">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
 
-    <nav class="bg-white border-b">
-        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-            <div>
-                <h1 class="text-2xl font-bold text-gray-900">
-                    JERD<span class="text-blue-600">-Cash</span>
-                </h1>
-                <p class="text-xs text-gray-500">Administración de clientes</p>
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-blue-900 rounded-xl flex items-center justify-center">
+                    <span class="text-white text-xl font-bold">J</span>
+                </div>
+
+                <div>
+                    <h1 class="text-xl font-bold text-blue-950">
+                        JERD-Cash
+                    </h1>
+                    <p class="text-xs text-gray-500">
+                        Panel administrativo
+                    </p>
+                </div>
             </div>
 
-            <a href="{% url 'administrador_dashboard' %}"
-               class="text-sm text-blue-600 hover:text-blue-800">
-                Volver al panel
-            </a>
+            <div class="flex flex-wrap items-center gap-4">
+
+                <span class="text-sm text-gray-600">
+                    Hola,
+                    <span class="font-semibold text-gray-900">
+                        {{ request.user.first_name|default:request.user.username }}
+                    </span>
+                </span>
+
+                <a href="{% url 'administrador_dashboard' %}"
+                   class="text-blue-900 hover:text-blue-700 font-semibold transition">
+                    Volver al panel
+                </a>
+
+                <form method="POST" action="{% url 'logout' %}">
+                    {% csrf_token %}
+
+                    <button type="submit"
+                            class="px-4 py-2 bg-blue-900 text-white text-sm font-semibold rounded-lg hover:bg-blue-800 transition">
+                        Cerrar sesión
+                    </button>
+                </form>
+
+            </div>
         </div>
-    </nav>
+    </div>
+</nav>
+{% endblock %}
 
-    <main class="max-w-7xl mx-auto px-6 py-10">
 
-        <div class="mb-8">
-            <h2 class="text-3xl font-bold text-gray-900">Clientes</h2>
-            <p class="text-gray-600 mt-2">
-                Consulta la información y el comportamiento de pago de tus clientes.
+{% block content %}
+<main class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+
+    <!-- ENCABEZADO -->
+    <div class="mb-8">
+        <h2 class="text-3xl font-bold text-blue-950">
+            Clientes
+        </h2>
+
+        <p class="text-gray-600 mt-2">
+            Consulta la información y el comportamiento de pago de tus clientes.
+        </p>
+    </div>
+
+
+    <!-- BUSCADOR -->
+    <section class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 md:p-6 mb-8">
+
+        <div class="mb-5">
+            <h3 class="text-lg font-bold text-blue-950">
+                Buscar clientes
+            </h3>
+
+            <p class="text-sm text-gray-600 mt-1">
+                Busca por nombre, apellido o nombre de usuario.
             </p>
         </div>
 
-        <!-- BUSCADOR -->
-        <div class="bg-white rounded-xl shadow-sm border p-6 mb-8">
-            <form method="GET" action="{% url 'administrador_clientes' %}"
-                  class="flex flex-col sm:flex-row gap-3">
+        <form method="GET"
+              action="{% url 'administrador_clientes' %}"
+              class="flex flex-col sm:flex-row gap-3">
 
-                <input
-                    type="text"
-                    name="buscar"
-                    value="{{ busqueda }}"
-                    placeholder="Buscar por nombre, apellido o usuario..."
-                    class="flex-1 border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
+            <input
+                type="text"
+                name="buscar"
+                value="{{ busqueda }}"
+                placeholder="Buscar por nombre, apellido o usuario..."
+                class="flex-1 min-w-0 border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            >
 
-                <button type="submit"
-                        class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-semibold">
-                    Buscar cliente
-                </button>
+            <button type="submit"
+                    class="px-6 py-3 bg-blue-900 text-white text-sm font-semibold rounded-lg hover:bg-blue-800 transition">
+                Buscar cliente
+            </button>
 
-                {% if busqueda %}
-                    <a href="{% url 'administrador_clientes' %}"
-                       class="border border-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-50 text-center">
-                        Limpiar
-                    </a>
-                {% endif %}
-            </form>
+            {% if busqueda %}
+                <a href="{% url 'administrador_clientes' %}"
+                   class="px-6 py-3 border border-gray-300 text-gray-700 text-sm font-semibold rounded-lg hover:bg-gray-50 transition text-center">
+                    Limpiar
+                </a>
+            {% endif %}
+
+        </form>
+    </section>
+
+
+    <!-- LISTADO DE CLIENTES -->
+    {% if clientes %}
+
+    <section class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+
+        <div class="overflow-x-auto">
+
+            <table class="w-full min-w-[950px] text-sm">
+
+                <thead class="bg-gray-50 border-b border-gray-100">
+
+                    <tr class="text-gray-600">
+
+                        <th scope="col"
+                            class="text-left px-5 py-4 font-semibold">
+                            Cliente
+                        </th>
+
+                        <th scope="col"
+                            class="text-center px-5 py-4 font-semibold">
+                            Créditos
+                        </th>
+
+                        <th scope="col"
+                            class="text-center px-5 py-4 font-semibold">
+                            Créditos pagados
+                        </th>
+
+                        <th scope="col"
+                            class="text-center px-5 py-4 font-semibold">
+                            Cuotas pagadas
+                        </th>
+
+                        <th scope="col"
+                            class="text-center px-5 py-4 font-semibold">
+                            Cuotas con mora
+                        </th>
+
+                        <th scope="col"
+                            class="text-center px-5 py-4 font-semibold">
+                            Acción
+                        </th>
+
+                    </tr>
+                </thead>
+
+
+                <tbody class="divide-y divide-gray-100">
+
+                    {% for item in clientes %}
+
+                    <tr class="hover:bg-blue-50/40 transition-colors">
+
+                        <!-- CLIENTE -->
+                        <td class="px-5 py-4">
+
+                            <p class="font-semibold text-gray-900">
+                                {{ item.nombre }}
+                            </p>
+
+                            <p class="text-xs text-gray-500 mt-1">
+                                Usuario: {{ item.cliente.username }}
+                            </p>
+
+                        </td>
+
+
+                        <!-- CANTIDAD DE CRÉDITOS -->
+                        <td class="px-5 py-4 text-center">
+
+                            <span class="inline-flex items-center justify-center bg-blue-100 text-blue-900 px-3 py-1 rounded-full font-semibold">
+                                {{ item.cantidad_creditos }}
+                            </span>
+
+                        </td>
+
+
+                        <!-- CRÉDITOS PAGADOS -->
+                        <td class="px-5 py-4 text-center">
+
+                            <span class="font-semibold text-green-700">
+                                {{ item.creditos_pagados }}
+                            </span>
+
+                        </td>
+
+
+                        <!-- CUOTAS PAGADAS -->
+                        <td class="px-5 py-4 text-center">
+
+                            <span class="font-semibold text-gray-800">
+                                {{ item.cuotas_pagadas }}
+                            </span>
+
+                            <span class="text-gray-500">
+                                / {{ item.cuotas_totales }}
+                            </span>
+
+                        </td>
+
+
+                        <!-- CUOTAS CON MORA -->
+                        <td class="px-5 py-4 text-center">
+
+                            {% if item.cuotas_pagadas_con_mora > 0 %}
+
+                                <span class="inline-flex items-center justify-center bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-semibold">
+                                    ⚠ {{ item.cuotas_pagadas_con_mora }}
+                                </span>
+
+                            {% else %}
+
+                                <span class="inline-flex items-center justify-center bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-semibold">
+                                    ✓ 0
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- ACCIÓN -->
+                        <td class="px-5 py-4 text-center">
+
+                            <a href="{% url 'administrador_cliente_detalle' item.cliente.id %}"
+                               class="inline-flex items-center justify-center px-4 py-2 bg-blue-900 text-white rounded-lg font-semibold hover:bg-blue-800 transition whitespace-nowrap">
+                                Ver cliente
+                            </a>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
         </div>
 
-        <!-- LISTADO -->
-        {% if clientes %}
-            <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
-                <div class="overflow-x-auto">
-                    <table class="w-full">
-                        <thead class="bg-gray-100 border-b">
-                            <tr>
-                                <th class="text-left px-6 py-4 text-sm font-semibold text-gray-700">
-                                    Cliente
-                                </th>
-                                <th class="text-center px-6 py-4 text-sm font-semibold text-gray-700">
-                                    Créditos
-                                </th>
-                                <th class="text-center px-6 py-4 text-sm font-semibold text-gray-700">
-                                    Créditos pagados
-                                </th>
-                                <th class="text-center px-6 py-4 text-sm font-semibold text-gray-700">
-                                    Cuotas pagadas
-                                </th>
-                                <th class="text-center px-6 py-4 text-sm font-semibold text-gray-700">
-                                    Cuotas con mora
-                                </th>
-                                <th class="text-center px-6 py-4 text-sm font-semibold text-gray-700">
-                                    Acción
-                                </th>
-                            </tr>
-                        </thead>
+    </section>
 
-                        <tbody class="divide-y">
-                            {% for item in clientes %}
-                                <tr class="hover:bg-gray-50">
-                                    <td class="px-6 py-4">
-                                        <p class="font-semibold text-gray-900">
-                                            {{ item.nombre }}
-                                        </p>
-                                        <p class="text-xs text-gray-500 mt-1">
-                                            Usuario: {{ item.cliente.username }}
-                                        </p>
-                                    </td>
+    {% else %}
 
-                                    <td class="px-6 py-4 text-center">
-                                        <span class="inline-flex bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-semibold">
-                                            {{ item.cantidad_creditos }}
-                                        </span>
-                                    </td>
+    <!-- SIN CLIENTES -->
+    <section class="bg-white rounded-xl shadow-sm border border-gray-100 p-10 text-center">
 
-                                    <td class="px-6 py-4 text-center">
-                                        <span class="font-semibold text-green-700">
-                                            {{ item.creditos_pagados }}
-                                        </span>
-                                    </td>
+        <div class="text-4xl mb-4" aria-hidden="true">
+            👥
+        </div>
 
-                                    <td class="px-6 py-4 text-center">
-                                        <span class="font-semibold text-gray-800">
-                                            {{ item.cuotas_pagadas }} / {{ item.cuotas_totales }}
-                                        </span>
-                                    </td>
+        {% if busqueda %}
 
-                                    <td class="px-6 py-4 text-center">
-                                        {% if item.cuotas_pagadas_con_mora > 0 %}
-                                            <span class="inline-flex bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm font-semibold">
-                                                {{ item.cuotas_pagadas_con_mora }}
-                                            </span>
-                                        {% else %}
-                                            <span class="text-green-700 font-semibold">0</span>
-                                        {% endif %}
-                                    </td>
+            <h3 class="text-xl font-bold text-blue-950">
+                No se encontraron clientes
+            </h3>
 
-                                    <td class="px-6 py-4 text-center">
-                                        <a
-                                            href="{% url 'administrador_cliente_detalle' item.cliente.id %}"
-                                            class="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm font-semibold">
-                                            Ver cliente
-                                        </a>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+            <p class="text-gray-600 mt-2">
+                Prueba con otro nombre, apellido o usuario.
+            </p>
+
+            <a href="{% url 'administrador_clientes' %}"
+               class="inline-flex items-center justify-center mt-5 px-5 py-2.5 bg-blue-900 text-white text-sm font-semibold rounded-lg hover:bg-blue-800 transition">
+                Ver todos los clientes
+            </a>
+
         {% else %}
-            <div class="bg-white rounded-xl shadow-sm border p-10 text-center">
-                <div class="text-5xl mb-4">👥</div>
 
-                {% if busqueda %}
-                    <h3 class="text-xl font-semibold text-gray-900">
-                        No se encontraron clientes
-                    </h3>
-                    <p class="text-gray-600 mt-2">
-                        Prueba con otro nombre o nombre de usuario.
-                    </p>
-                {% else %}
-                    <h3 class="text-xl font-semibold text-gray-900">
-                        No hay clientes con créditos
-                    </h3>
-                    <p class="text-gray-600 mt-2">
-                        Los clientes aparecerán aquí cuando tengan créditos registrados.
-                    </p>
-                {% endif %}
-            </div>
+            <h3 class="text-xl font-bold text-blue-950">
+                No hay clientes con créditos
+            </h3>
+
+            <p class="text-gray-600 mt-2">
+                Los clientes aparecerán aquí cuando tengan créditos registrados.
+            </p>
+
         {% endif %}
 
-    </main>
+    </section>
 
-</body>
-</html>
+    {% endif %}
+
+</main>
+{% endblock %}

@@ -1,274 +1,206 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro - JERD-Cash</title>
+{% extends 'base.html' %}
 
-    <!-- Tailwind CSS (CDN para desarrollo) -->
-    <script src="https://cdn.tailwindcss.com"></script>
+{% block title %}Registro - JERD-Cash{% endblock %}
 
-    <!-- HTMX -->
-    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
-</head>
+{% block extra_head %}
+<script src="https://unpkg.com/htmx.org@1.9.10"></script>
+{% endblock %}
 
-<body class="bg-gray-50 flex items-center justify-center min-h-screen">
+{% block content %}
+<div class="min-h-[calc(100vh-80px)] bg-gray-50 px-4 py-10 sm:py-12">
+    <div class="mx-auto w-full max-w-xl">
+        <header class="mb-8 text-center">
+            <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-900 shadow-sm">
+                <span class="text-3xl font-bold text-white">J</span>
+            </div>
+            <h1 class="text-3xl font-bold text-blue-950">JERD-Cash</h1>
+            <p class="mt-2 text-sm text-gray-500">Plataforma de microcréditos</p>
+        </header>
 
-    <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+        <div class="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm sm:p-8">
+            <div class="mb-7 text-center">
+                <h2 class="text-2xl font-bold text-blue-950">Crear cuenta</h2>
+                <p class="mt-2 text-sm text-gray-500">Completa tus datos para registrarte como cliente.</p>
+            </div>
 
-        <h2 class="text-2xl font-bold text-center text-blue-800 mb-6">
-            Crear Cuenta JERD-Cash
-        </h2>
-
-        <!-- Mensajes de Django (Éxito/Error) -->
-        {% if messages %}
-            {% for message in messages %}
-                <div
-                    class="mb-4 p-3 rounded
-                    {% if message.tags == 'error' %}
-                        bg-red-100 text-red-700 border border-red-200
-                    {% elif message.tags == 'success' %}
-                        bg-green-100 text-green-700 border border-green-200
-                    {% else %}
-                        bg-blue-100 text-blue-700 border border-blue-200
-                    {% endif %}"
-                    role="alert"
-                >
-                    {{ message }}
+            {% if messages %}
+                <div class="mb-6 space-y-3">
+                    {% for message in messages %}
+                        <div role="alert" class="rounded-lg border px-4 py-3 text-sm {% if 'error' in message.tags %}border-red-200 bg-red-50 text-red-700{% elif 'success' in message.tags %}border-green-200 bg-green-50 text-green-700{% elif 'warning' in message.tags %}border-yellow-200 bg-yellow-50 text-yellow-800{% else %}border-blue-200 bg-blue-50 text-blue-800{% endif %}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
                 </div>
-            {% endfor %}
-        {% endif %}
+            {% endif %}
 
-        <form method="POST" action="{% url 'registro' %}" class="space-y-4">
-            {% csrf_token %}
+            <form method="POST" action="{% url 'registro' %}" class="space-y-5">
+                {% csrf_token %}
 
-            <!-- Nombre -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700">
-                    Nombre
-                </label>
+                <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                    <div>
+                        <label for="first_name" class="mb-2 block text-sm font-semibold text-gray-700">Nombre *</label>
+                        <input type="text" id="first_name" name="first_name" required autocomplete="given-name" value="{{ request.POST.first_name|default:'' }}" placeholder="Tu nombre" class="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm focus:border-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-100">
+                    </div>
+                    <div>
+                        <label for="primer_apellido" class="mb-2 block text-sm font-semibold text-gray-700">Apellido *</label>
+                        <input type="text" id="primer_apellido" name="primer_apellido" required autocomplete="family-name" value="{{ request.POST.primer_apellido|default:'' }}" placeholder="Tu apellido" class="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm focus:border-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-100">
+                    </div>
+                </div>
 
-                <input
-                    type="text"
-                    name="first_name"
-                    required
-                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                >
-            </div>
+                <div>
+                    <label for="username" class="mb-2 block text-sm font-semibold text-gray-700">Nombre de usuario *</label>
+                    <input type="text" id="username" name="username" required autocomplete="username" value="{{ request.POST.username|default:'' }}" placeholder="Elige un nombre de usuario" class="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm focus:border-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-100">
+                </div>
 
-            <!-- Apellido -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700">
-                    Apellido
-                </label>
+                <div>
+                    <label for="email" class="mb-2 block text-sm font-semibold text-gray-700">Correo electrónico *</label>
+                    <input type="email" id="email" name="email" required autocomplete="email" value="{{ request.POST.email|default:'' }}" placeholder="correo@ejemplo.com" class="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm focus:border-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-100">
+                </div>
 
-                <input
-                    type="text"
-                    name="primer_apellido"
-                    required
-                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                >
-            </div>
+                <div>
+                    <label for="cedula" class="mb-2 block text-sm font-semibold text-gray-700">Cédula / NIT *</label>
+                    <input type="text" id="cedula" name="cedula" required inputmode="numeric" pattern="[0-9]+" title="Ingrese únicamente números, sin espacios ni caracteres especiales." value="{{ request.POST.cedula|default:'' }}" oninput="this.value = this.value.replace(/[^0-9]/g, '')" placeholder="Solo números" class="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm focus:border-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-100">
+                    <p class="mt-2 text-xs text-gray-500">Ingresa únicamente números, sin puntos ni espacios.</p>
+                </div>
 
-            <!-- Nombre de usuario -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700">
-                    Nombre de Usuario
-                </label>
+                <div>
+                    <label for="password" class="mb-2 block text-sm font-semibold text-gray-700">Contraseña *</label>
+                    <input type="password" id="password" name="password" required minlength="8" autocomplete="new-password" aria-describedby="password-requisitos" placeholder="Crea una contraseña segura" class="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm focus:border-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-100">
+                    <div id="password-requisitos" class="mt-3 rounded-xl border border-gray-200 bg-gray-50 p-4">
+                        <p class="mb-3 text-sm font-semibold text-gray-700">La contraseña debe contener:</p>
+                        <ul class="space-y-2 text-sm text-gray-600">
+                            <li id="req-longitud"><span aria-hidden="true">○</span> Al menos 8 caracteres.</li>
+                            <li id="req-mayuscula"><span aria-hidden="true">○</span> Una letra mayúscula (A-Z).</li>
+                            <li id="req-punto"><span aria-hidden="true">○</span> Un punto (.).</li>
+                            <li id="req-especial"><span aria-hidden="true">○</span> Un carácter especial, como !, @, # o $.</li>
+                        </ul>
+                    </div>
+                </div>
 
-                <input
-                    type="text"
-                    name="username"
-                    required
-                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                >
-            </div>
+                
+                <!-- ACEPTACIONES LEGALES -->
+                <div class="rounded-xl border border-gray-200 bg-gray-50 p-4">
 
-            <!-- Correo electrónico -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700">
-                    Correo Electrónico
-                </label>
+                    <h3 class="mb-4 text-sm font-semibold text-blue-950">
+                        Documentos legales y autorizaciones
+                    </h3>
 
-                <input
-                    type="email"
-                    name="email"
-                    required
-                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                >
-            </div>
+                    <div class="space-y-4">
 
-            <!-- Cédula -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700">
-                    Cédula / NIT
-                </label>
+                        <!-- TÉRMINOS Y CONDICIONES -->
+                        <div class="flex items-start gap-3">
 
-                <input
-                    type="text"
-                    name="cedula"
-                    id="cedula"
-                    required
-                    inputmode="numeric"
-                    pattern="[0-9]+"
-                    title="Ingrese únicamente números, sin espacios ni caracteres especiales."
-                    oninput="this.value = this.value.replace(/[^0-9]/g, '')"
-                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                >
+                            <input
+                                type="checkbox"
+                                id="acepta_terminos"
+                                name="acepta_terminos"
+                                required
+                                {% if request.POST.acepta_terminos %}checked{% endif %}
+                                class="mt-1 h-4 w-4 shrink-0 rounded border-gray-300 text-blue-900 focus:ring-blue-900"
+                            >
 
-                <p class="mt-1 text-xs text-gray-500">
-                    Ingrese únicamente números.
-                </p>
-            </div>
+                            <label for="acepta_terminos"
+                                class="text-sm leading-6 text-gray-700">
+
+                                He leído y acepto los
+
+                                <a href="{% url 'terminos' %}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="font-semibold text-blue-900 underline hover:text-blue-700">
+
+                                    Términos y Condiciones
+
+                                </a>
+
+                                de JERD-Cash.
+
+                            </label>
+
+                        </div>
 
 
-            <!-- Contraseña -->
-            <div>
-                <label
-                    for="password"
-                    class="block text-sm font-medium text-gray-700"
-                >
-                    Contraseña
-                </label>
+                        <!-- POLÍTICA DE DATOS -->
+                        <div class="flex items-start gap-3">
 
-                <input
-                    type="password"
-                    id="password"
-                    name="password"
-                    required
-                    minlength="8"
-                    autocomplete="new-password"
-                    aria-describedby="password-requisitos"
-                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                >
+                            <input
+                                type="checkbox"
+                                id="acepta_politica_datos"
+                                name="acepta_politica_datos"
+                                required
+                                {% if request.POST.acepta_politica_datos %}checked{% endif %}
+                                class="mt-1 h-4 w-4 shrink-0 rounded border-gray-300 text-blue-900 focus:ring-blue-900"
+                            >
 
-                <div
-                    id="password-requisitos"
-                    class="mt-2 rounded-md bg-gray-50 border border-gray-200 p-3"
-                >
-                    <p class="text-sm font-medium text-gray-700 mb-2">
-                        La contraseña debe contener:
+                            <label for="acepta_politica_datos"
+                                class="text-sm leading-6 text-gray-700">
+
+                                He leído la
+
+                                <a href="{% url 'politica_datos' %}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="font-semibold text-blue-900 underline hover:text-blue-700">
+
+                                    Política de Tratamiento de Datos Personales
+
+                                </a>
+
+                                y autorizo el tratamiento de mis datos personales
+                                para las finalidades informadas.
+
+                            </label>
+
+                        </div>
+
+                    </div>
+
+                    <p class="mt-4 border-t border-gray-200 pt-3 text-xs leading-5 text-gray-500">
+                        Puedes consultar ambos documentos antes de continuar.
+                        Las dos aceptaciones son necesarias para completar el registro.
                     </p>
 
-                    <ul class="space-y-1 text-sm text-gray-600">
-                        <li id="req-longitud">
-                            <span>○</span> Al menos 8 caracteres.
-                        </li>
-                        <li id="req-mayuscula">
-                            <span>○</span> Una letra mayúscula (A-Z).
-                        </li>
-                        <li id="req-punto">
-                            <span>○</span> Un punto (.).
-                        </li>
-                        <li id="req-especial">
-                            <span>○</span> Un carácter especial, como !, @, # o $.
-                        </li>
-                    </ul>
                 </div>
+
+
+                <button type="submit" class="w-full rounded-lg bg-blue-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">Crear mi cuenta</button>
+            </form>
+
+            <div class="mt-7 border-t border-gray-100 pt-6 text-center">
+                <p class="text-sm text-gray-600">¿Ya tienes cuenta?
+                    <a href="{% url 'login' %}" class="font-semibold text-blue-900 hover:text-blue-700 hover:underline">Inicia sesión aquí</a>
+                </p>
             </div>
-
-            <!-- Checkbox obligatorio de términos y condiciones -->
-            <div class="flex items-start">
-                <div class="flex items-center h-5">
-                    <input
-                        id="acepta_terminos"
-                        name="acepta_terminos"
-                        type="checkbox"
-                        required
-                        class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                    >
-                </div>
-
-                <div class="ml-3 text-sm">
-                    <label for="acepta_terminos" class="font-medium text-gray-700">
-                        He leído y acepto los
-
-                        <a
-                            href="{% url 'terminos' %}"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            class="text-blue-600 hover:text-blue-500 underline"
-                        >
-                            Términos y Condiciones
-                        </a>
-
-                        y la Política de Tratamiento de Datos Personales
-                        (Ley 1581 de 2012).
-                    </label>
-                </div>
-            </div>
-
-            <!-- Botón de registro -->
-            <button
-                type="submit"
-                class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-800 hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-                Registrarme
-            </button>
-        </form>
-
-        <p class="mt-4 text-center text-sm text-gray-600">
-            ¿Ya tienes cuenta?
-
-            <a
-                href="{% url 'login' %}"
-                class="font-medium text-blue-600 hover:text-blue-500"
-            >
-                Inicia sesión aquí
-            </a>
-        </p>
-
+        </div>
+        <p class="mt-6 text-center text-xs text-gray-400">JERD-Cash · Plataforma de gestión de microcréditos</p>
     </div>
+</div>
+{% endblock %}
 
-    <!-- Validación visual de la contraseña -->
-    <script>
-        const passwordInput = document.getElementById('password');
+{% block extra_js %}
+<script>
+    const passwordInput = document.getElementById('password');
+    const requisitos = {
+        longitud: { elemento: document.getElementById('req-longitud'), validar: password => password.length >= 8 },
+        mayuscula: { elemento: document.getElementById('req-mayuscula'), validar: password => /[A-Z]/.test(password) },
+        punto: { elemento: document.getElementById('req-punto'), validar: password => password.includes('.') },
+        especial: { elemento: document.getElementById('req-especial'), validar: password => /[!@#$%^&*_\-+=/?¿¡:;,(){}\[\]<>|\\'\"]/.test(password) }
+    };
 
-        const requisitos = {
-            longitud: {
-                elemento: document.getElementById('req-longitud'),
-                validar: password => password.length >= 8
-            },
-            mayuscula: {
-                elemento: document.getElementById('req-mayuscula'),
-                validar: password => /[A-Z]/.test(password)
-            },
-            punto: {
-                elemento: document.getElementById('req-punto'),
-                validar: password => password.includes('.')
-            },
-            especial: {
-                elemento: document.getElementById('req-especial'),
-                validar: password => /[!@#$%^&*_\-+=/?¿¡:;,(){}\[\]<>|\\'"]/.test(password)
-            }
-        };
-
-        function actualizarRequisitos() {
-            const password = passwordInput.value;
-
-            for (const requisito of Object.values(requisitos)) {
-                const cumple = requisito.validar(password);
-                const textoOriginal = requisito.elemento.textContent.trim().replace(/^[○✓]\s*/, '');
-
-                requisito.elemento.innerHTML = '';
-
-                const indicador = document.createElement('span');
-                indicador.textContent = cumple ? '✓ ' : '○ ';
-
-                const texto = document.createTextNode(textoOriginal);
-
-                requisito.elemento.appendChild(indicador);
-                requisito.elemento.appendChild(texto);
-
-                requisito.elemento.classList.toggle('text-green-700', cumple);
-                requisito.elemento.classList.toggle('text-gray-600', !cumple);
-            }
+    function actualizarRequisitos() {
+        const password = passwordInput.value;
+        for (const requisito of Object.values(requisitos)) {
+            const cumple = requisito.validar(password);
+            const indicador = requisito.elemento.querySelector('span');
+            indicador.textContent = cumple ? '✓' : '○';
+            requisito.elemento.classList.toggle('text-green-700', cumple);
+            requisito.elemento.classList.toggle('text-gray-600', !cumple);
         }
+    }
 
+    if (passwordInput) {
         passwordInput.addEventListener('input', actualizarRequisitos);
-
         actualizarRequisitos();
-    </script>
-
-</body>
-</html>
+    }
+</script>
+{% endblock %}

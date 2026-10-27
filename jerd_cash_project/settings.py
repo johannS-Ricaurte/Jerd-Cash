@@ -13,9 +13,12 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 
 import os
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+load_dotenv(BASE_DIR / '.env')
 
 
 # Quick-start development settings - unsuitable for production
@@ -67,7 +70,7 @@ ROOT_URLCONF = 'jerd_cash_project.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -130,6 +133,9 @@ USE_TZ = True
 STATIC_URL = 'static/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
 
 # Almacenamiento de documentos financieros privados.
 PRIVATE_MEDIA_ROOT = BASE_DIR / 'private_media'

@@ -451,14 +451,16 @@ class PerfilClienteForm(forms.ModelForm):
             for ciudad in ciudades_residencia
         ]
 
+        
         # ==========================================
         # ESTILOS
         # ==========================================
 
         clases = (
             'w-full px-4 py-2.5 border border-gray-300 rounded-lg '
-            'focus:ring-2 focus:ring-blue-500 '
-            'focus:border-blue-500 '
+            'bg-white text-gray-800 '
+            'focus:ring-2 focus:ring-blue-900 '
+            'focus:border-blue-900 '
             'outline-none transition'
         )
 
@@ -467,6 +469,7 @@ class PerfilClienteForm(forms.ModelForm):
             campo.widget.attrs.update({
                 'class': clases
             })
+
 
         # ==========================================
         # DATOS DEL USUARIO
@@ -528,6 +531,7 @@ class PerfilClienteForm(forms.ModelForm):
         return perfil
 
 
+
 class SolicitudCreditoForm(forms.ModelForm):
 
     class Meta:
@@ -546,146 +550,245 @@ class SolicitudCreditoForm(forms.ModelForm):
 
         widgets = {
             'monto_solicitado': forms.NumberInput(attrs={
-                'class': 'w-full border rounded-lg px-4 py-2',
+                'class': (
+                    'w-full px-4 py-2.5 border border-gray-300 '
+                    'rounded-lg bg-white text-gray-800 '
+                    'focus:ring-2 focus:ring-blue-900 '
+                    'focus:border-blue-900 outline-none transition'
+                ),
                 'placeholder': 'Ingrese el monto solicitado',
                 'min': '1',
             }),
 
-            'plazo_meses': forms.Select(
-                attrs={
-                    'class': 'w-full border rounded-lg px-4 py-2',
-                }
-            ),
+            'plazo_meses': forms.Select(attrs={
+                'class': (
+                    'w-full px-4 py-2.5 border border-gray-300 '
+                    'rounded-lg bg-white text-gray-800 '
+                    'focus:ring-2 focus:ring-blue-900 '
+                    'focus:border-blue-900 outline-none transition'
+                ),
+            }),
 
             'cedula': forms.ClearableFileInput(attrs={
-                'class': 'w-full border rounded-lg px-4 py-2',
+                'class': (
+                    'w-full px-4 py-2.5 border border-gray-300 '
+                    'rounded-lg bg-white text-gray-800 '
+                    'focus:ring-2 focus:ring-blue-900 '
+                    'focus:border-blue-900 outline-none transition'
+                ),
                 'accept': '.pdf',
             }),
 
             'recibo': forms.ClearableFileInput(attrs={
-                'class': 'w-full border rounded-lg px-4 py-2',
+                'class': (
+                    'w-full px-4 py-2.5 border border-gray-300 '
+                    'rounded-lg bg-white text-gray-800 '
+                    'focus:ring-2 focus:ring-blue-900 '
+                    'focus:border-blue-900 outline-none transition'
+                ),
                 'accept': '.pdf',
             }),
 
             'certificacion_bancaria': forms.ClearableFileInput(attrs={
-                'class': 'w-full border rounded-lg px-4 py-2',
+                'class': (
+                    'w-full px-4 py-2.5 border border-gray-300 '
+                    'rounded-lg bg-white text-gray-800 '
+                    'focus:ring-2 focus:ring-blue-900 '
+                    'focus:border-blue-900 outline-none transition'
+                ),
                 'accept': '.pdf',
             }),
 
             'extracto_bancario_1': forms.ClearableFileInput(attrs={
-                'class': 'w-full border rounded-lg px-4 py-2',
+                'class': (
+                    'w-full px-4 py-2.5 border border-gray-300 '
+                    'rounded-lg bg-white text-gray-800 '
+                    'focus:ring-2 focus:ring-blue-900 '
+                    'focus:border-blue-900 outline-none transition'
+                ),
                 'accept': 'image/jpeg,image/png',
                 'required': True,
             }),
 
             'extracto_bancario_2': forms.ClearableFileInput(attrs={
-                'class': 'w-full border rounded-lg px-4 py-2',
+                'class': (
+                    'w-full px-4 py-2.5 border border-gray-300 '
+                    'rounded-lg bg-white text-gray-800 '
+                    'focus:ring-2 focus:ring-blue-900 '
+                    'focus:border-blue-900 outline-none transition'
+                ),
                 'accept': 'image/jpeg,image/png',
                 'required': True,
             }),
 
             'extracto_bancario_3': forms.ClearableFileInput(attrs={
-                'class': 'w-full border rounded-lg px-4 py-2',
+                'class': (
+                    'w-full px-4 py-2.5 border border-gray-300 '
+                    'rounded-lg bg-white text-gray-800 '
+                    'focus:ring-2 focus:ring-blue-900 '
+                    'focus:border-blue-900 outline-none transition'
+                ),
                 'accept': 'image/jpeg,image/png',
                 'required': True,
             }),
         }
 
-        def __init__(self, *args, **kwargs):
+    # ==========================================================
+    # INICIALIZACIÓN DEL FORMULARIO
+    # ==========================================================
 
-            super().__init__(*args, **kwargs)
+    def __init__(self, *args, **kwargs):
 
-            self.fields['plazo_meses'].widget.choices = [
-                ('', 'Seleccione las cuotas')
-            ] + [
-                (i, f'{i} {"cuota" if i == 1 else "cuotas"}')
-                for i in range(1, 13)
-            ]
+        super().__init__(*args, **kwargs)
 
+        self.fields['plazo_meses'].widget.choices = [
+            ('', 'Seleccione las cuotas')
+        ] + [
+            (i, f'{i} {"cuota" if i == 1 else "cuotas"}')
+            for i in range(1, 13)
+        ]
 
-        def clean(self):
+    # ==========================================================
+    # VALIDACIÓN DE MONTO Y PLAZO
+    # ==========================================================
 
-            cleaned_data = super().clean()
+    def clean(self):
 
-            monto = cleaned_data.get('monto_solicitado')
-            plazo = cleaned_data.get('plazo_meses')
+        cleaned_data = super().clean()
 
-            if monto is None or plazo is None:
-                return cleaned_data
+        monto = cleaned_data.get('monto_solicitado')
+        plazo = cleaned_data.get('plazo_meses')
 
-            if monto < 100000 or monto > 1000000:
+        if monto is None or plazo is None:
+            return cleaned_data
 
-                self.add_error(
-                    'monto_solicitado',
-                    'El monto debe estar entre $100.000 y $1.000.000.'
-                )
+        # Validar monto permitido
+        if monto < 100000 or monto > 1000000:
 
-                return cleaned_data
-
-            if monto < 200000:
-                maximo = 1
-            elif monto < 300000:
-                maximo = 2
-            elif monto < 400000:
-                maximo = 3
-            elif monto < 500000:
-                maximo = 4
-            elif monto < 600000:
-                maximo = 5
-            elif monto < 700000:
-                maximo = 6
-            elif monto < 800000:
-                maximo = 7
-            elif monto < 900000:
-                maximo = 8
-            elif monto < 1000000:
-                maximo = 10
-            else:
-                maximo = 12
-
-            if plazo < 1 or plazo > maximo:
-
-                self.add_error(
-                    'plazo_meses',
-                    f'Para este monto puede seleccionar entre 1 y {maximo} cuotas.'
-                )
+            self.add_error(
+                'monto_solicitado',
+                'El monto debe estar entre $100.000 y $1.000.000.'
+            )
 
             return cleaned_data
 
-    def clean_cedula(self):
-        archivo = self.cleaned_data.get('cedula')
-        return validar_documento(archivo, 'pdf')
+        # Determinar máximo de cuotas según el monto
+        if monto < 200000:
+            maximo = 1
 
+        elif monto < 300000:
+            maximo = 2
+
+        elif monto < 400000:
+            maximo = 3
+
+        elif monto < 500000:
+            maximo = 4
+
+        elif monto < 600000:
+            maximo = 5
+
+        elif monto < 700000:
+            maximo = 6
+
+        elif monto < 800000:
+            maximo = 7
+
+        elif monto < 900000:
+            maximo = 8
+
+        elif monto < 1000000:
+            maximo = 10
+
+        else:
+            maximo = 12
+
+        # Validar plazo seleccionado
+        if plazo < 1 or plazo > maximo:
+
+            self.add_error(
+                'plazo_meses',
+                f'Para este monto puede seleccionar entre 1 y {maximo} cuotas.'
+            )
+
+        return cleaned_data
+
+    # ==========================================================
+    # VALIDACIÓN DE CÉDULA
+    # ==========================================================
+
+    def clean_cedula(self):
+
+        archivo = self.cleaned_data.get('cedula')
+
+        return validar_documento(
+            archivo,
+            'pdf'
+        )
+
+    # ==========================================================
+    # VALIDACIÓN DE RECIBO DE SERVICIO PÚBLICO
+    # ==========================================================
 
     def clean_recibo(self):
-        archivo = self.cleaned_data.get('recibo')
-        return validar_documento(archivo, 'pdf')
 
+        archivo = self.cleaned_data.get('recibo')
+
+        return validar_documento(
+            archivo,
+            'pdf'
+        )
+
+    # ==========================================================
+    # VALIDACIÓN DE CERTIFICACIÓN BANCARIA
+    # ==========================================================
 
     def clean_certificacion_bancaria(self):
-        archivo = self.cleaned_data.get('certificacion_bancaria')
-        return validar_documento(archivo, 'pdf')
+
+        archivo = self.cleaned_data.get(
+            'certificacion_bancaria'
+        )
+
+        return validar_documento(
+            archivo,
+            'pdf'
+        )
+
+    # ==========================================================
+    # VALIDACIÓN DE EXTRACTOS BANCARIOS
+    # ==========================================================
 
     def clean_extracto_bancario_1(self):
+
         return self.validar_extracto(
             self.cleaned_data.get('extracto_bancario_1')
         )
 
     def clean_extracto_bancario_2(self):
+
         return self.validar_extracto(
             self.cleaned_data.get('extracto_bancario_2')
         )
 
     def clean_extracto_bancario_3(self):
+
         return self.validar_extracto(
             self.cleaned_data.get('extracto_bancario_3')
         )
 
+    # ==========================================================
+    # VALIDACIÓN GENERAL DE IMÁGENES
+    # ==========================================================
+
     def validar_extracto(self, archivo):
 
         if not archivo:
+
             raise forms.ValidationError(
                 'Debe adjuntar la fotografía de este extracto bancario.'
             )
 
-        return validar_documento(archivo, 'imagen')
+        return validar_documento(
+            archivo,
+            'imagen'
+        )

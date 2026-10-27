@@ -1,45 +1,79 @@
+
+{% extends 'base.html' %}
 {% load formatos %}
 
-<!DOCTYPE html>
-<html lang="es">
+{% block title %}Solicitudes de crédito - JERD-Cash{% endblock %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% block navbar %}
 
-    <title>Solicitudes - JERD Cash</title>
+<nav class="bg-white border-b border-gray-200">
 
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
+    <div class="max-w-7xl mx-auto px-6 py-4">
 
-<body class="bg-gray-50 min-h-screen">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
 
-    <nav class="bg-white border-b">
-        <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+            <!-- LOGO Y NOMBRE -->
+            <div class="flex items-center gap-3">
 
-            <div>
-                <h1 class="text-2xl font-bold text-gray-900">
-                    JERD<span class="text-blue-600">-Cash</span>
-                </h1>
+                <div class="w-10 h-10 bg-blue-900 rounded-xl flex items-center justify-center">
+                    <span class="text-white text-xl font-bold">J</span>
+                </div>
 
-                <p class="text-xs text-gray-500">
-                    Panel administrativo
-                </p>
+                <div>
+                    <h1 class="text-xl font-bold text-blue-950">
+                        JERD-Cash
+                    </h1>
+
+                    <p class="text-xs text-gray-500">
+                        Panel administrativo
+                    </p>
+                </div>
+
             </div>
 
-            <a
-                href="{% url 'administrador_dashboard' %}"
-                class="text-sm text-blue-600 hover:text-blue-800"
-            >
-                Volver al panel
-            </a>
+            <!-- ADMINISTRADOR Y NAVEGACIÓN -->
+            <div class="flex flex-wrap items-center gap-4">
+
+                <span class="text-sm text-gray-600">
+                    Hola,
+                    <span class="font-semibold text-gray-900">
+                        {{ request.user.first_name|default:request.user.username }}
+                    </span>
+                </span>
+
+                <a href="{% url 'administrador_dashboard' %}"
+                   class="text-blue-900 hover:text-blue-700 font-semibold transition">
+                    Volver al panel
+                </a>
+
+                <form method="POST" action="{% url 'logout' %}">
+                    {% csrf_token %}
+
+                    <button type="submit"
+                            class="px-4 py-2 bg-blue-900 text-white text-sm font-semibold rounded-lg hover:bg-blue-800 transition">
+                        Cerrar sesión
+                    </button>
+                </form>
+
+            </div>
 
         </div>
-    </nav>
 
-    <main class="max-w-6xl mx-auto px-6 py-10">
+    </div>
 
-        <h2 class="text-3xl font-bold text-gray-900">
+</nav>
+
+{% endblock %}
+
+
+{% block content %}
+
+<main class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+
+    <!-- ENCABEZADO -->
+    <div class="mb-8">
+
+        <h2 class="text-3xl font-bold text-blue-950">
             Solicitudes de crédito
         </h2>
 
@@ -47,39 +81,44 @@
             Aquí puedes consultar todas las solicitudes realizadas por los clientes.
         </p>
 
-        <div class="bg-white rounded-xl shadow-sm border mt-8 overflow-hidden">
+    </div>
 
-            {% if solicitudes %}
+
+    <!-- CONTENEDOR PRINCIPAL -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+
+        {% if solicitudes %}
 
             <div class="overflow-x-auto">
 
-                <table class="w-full">
+                <table class="w-full min-w-[950px] text-sm">
 
-                    <thead class="bg-gray-100 border-b">
+                    <!-- ENCABEZADO DE TABLA -->
+                    <thead class="bg-gray-50 border-b border-gray-100">
 
-                        <tr>
+                        <tr class="text-left text-gray-600">
 
-                            <th class="text-left px-6 py-4 text-sm font-semibold">
+                            <th class="px-6 py-4 font-semibold">
                                 ID
                             </th>
 
-                            <th class="text-left px-6 py-4 text-sm font-semibold">
+                            <th class="px-6 py-4 font-semibold">
                                 Cliente
                             </th>
 
-                            <th class="text-left px-6 py-4 text-sm font-semibold">
+                            <th class="px-6 py-4 font-semibold">
                                 Monto
                             </th>
 
-                            <th class="text-left px-6 py-4 text-sm font-semibold">
+                            <th class="px-6 py-4 font-semibold">
                                 Estado
                             </th>
 
-                            <th class="text-left px-6 py-4 text-sm font-semibold">
+                            <th class="px-6 py-4 font-semibold">
                                 Fecha
                             </th>
 
-                            <th class="text-left px-6 py-4 text-sm font-semibold">
+                            <th class="px-6 py-4 font-semibold">
                                 Acción
                             </th>
 
@@ -87,72 +126,96 @@
 
                     </thead>
 
-                    <tbody>
+
+                    <!-- CUERPO DE TABLA -->
+                    <tbody class="divide-y divide-gray-100">
 
                         {% for solicitud in solicitudes %}
 
-                        <tr class="border-b hover:bg-gray-50">
+                            <tr class="hover:bg-blue-50/40 transition-colors">
 
-                            <td class="px-6 py-4">
-                                {{ solicitud.id }}
-                            </td>
+                                <!-- ID -->
+                                <td class="px-6 py-4">
 
-                            <td class="px-6 py-4">
-
-                                <p class="font-medium text-gray-900">
-                                    {{ solicitud.usuario.first_name }}
-                                    {{ solicitud.usuario.primer_apellido }}
-                                </p>
-
-                                <p class="text-sm text-gray-500">
-                                    {{ solicitud.usuario.email }}
-                                </p>
-
-                            </td>
-                            <td class="px-6 py-4 font-medium">
-                                {{ solicitud.monto_solicitado|pesos }}
-                            </td>
-
-                            <td class="px-6 py-4">
-
-                                {% if solicitud.estado == 'PENDIENTE' %}
-
-                                    <span class="px-3 py-1 rounded-full text-sm bg-yellow-100 text-yellow-800">
-                                        Pendiente
+                                    <span class="font-semibold text-blue-950">
+                                        #{{ solicitud.id }}
                                     </span>
 
-                                {% elif solicitud.estado == 'APROBADA' %}
+                                </td>
 
-                                    <span class="px-3 py-1 rounded-full text-sm bg-green-100 text-green-800">
-                                        Aprobada
+
+                                <!-- CLIENTE -->
+                                <td class="px-6 py-4">
+
+                                    <p class="font-semibold text-gray-900">
+                                        {{ solicitud.usuario.first_name }}
+                                        {{ solicitud.usuario.primer_apellido }}
+                                    </p>
+
+                                    <p class="text-xs text-gray-500 mt-1">
+                                        {{ solicitud.usuario.email }}
+                                    </p>
+
+                                </td>
+
+
+                                <!-- MONTO -->
+                                <td class="px-6 py-4">
+
+                                    <span class="font-semibold text-blue-900">
+                                        {{ solicitud.monto_solicitado|pesos }}
                                     </span>
 
-                                {% elif solicitud.estado == 'RECHAZADA' %}
+                                </td>
 
-                                    <span class="px-3 py-1 rounded-full text-sm bg-red-100 text-red-800">
-                                        Rechazada
-                                    </span>
 
-                                {% endif %}
+                                <!-- ESTADO -->
+                                <td class="px-6 py-4">
 
-                            </td>
+                                    {% if solicitud.estado == 'PENDIENTE' %}
 
-                            <td class="px-6 py-4 text-sm text-gray-600">
-                                {{ solicitud.fecha_solicitud|date:"d/m/Y H:i" }}
-                            </td>
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">
+                                            Pendiente
+                                        </span>
 
-                            <td class="px-6 py-4">
+                                    {% elif solicitud.estado == 'APROBADA' %}
 
-                                <a
-                                    href="{% url 'administrador_solicitud_detalle' solicitud.id %}"
-                                    class="text-blue-600 hover:text-blue-800 font-medium"
-                                >
-                                    Ver detalles
-                                </a>
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">
+                                            Aprobada
+                                        </span>
 
-                            </td>
+                                    {% elif solicitud.estado == 'RECHAZADA' %}
 
-                        </tr>
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800">
+                                            Rechazada
+                                        </span>
+
+                                    {% endif %}
+
+                                </td>
+
+
+                                <!-- FECHA -->
+                                <td class="px-6 py-4 text-gray-600 whitespace-nowrap">
+
+                                    {{ solicitud.fecha_solicitud|date:"d/m/Y H:i" }}
+
+                                </td>
+
+
+                                <!-- ACCIÓN -->
+                                <td class="px-6 py-4">
+
+                                    <a href="{% url 'administrador_solicitud_detalle' solicitud.id %}"
+                                       class="inline-flex items-center justify-center px-4 py-2 bg-blue-900 text-white rounded-lg text-xs font-semibold hover:bg-blue-800 transition whitespace-nowrap">
+
+                                        Ver detalles
+
+                                    </a>
+
+                                </td>
+
+                            </tr>
 
                         {% endfor %}
 
@@ -162,22 +225,29 @@
 
             </div>
 
-            {% else %}
+        {% else %}
 
-                <div class="p-10 text-center">
+            <!-- SIN SOLICITUDES -->
+            <div class="p-10 text-center">
 
-                    <p class="text-gray-500">
-                        No hay solicitudes de crédito registradas.
-                    </p>
-
+                <div class="text-4xl mb-4">
+                    📄
                 </div>
 
-            {% endif %}
+                <h3 class="text-lg font-bold text-blue-950 mb-2">
+                    No hay solicitudes registradas
+                </h3>
 
-        </div>
+                <p class="text-gray-500">
+                    Todavía no se han registrado solicitudes de crédito.
+                </p>
 
-    </main>
+            </div>
 
-</body>
+        {% endif %}
 
-</html>
+    </div>
+
+</main>
+
+{% endblock %}

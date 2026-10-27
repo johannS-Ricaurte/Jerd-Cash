@@ -21,6 +21,13 @@ urlpatterns = [
         name='terminos'
     ),
 
+    # Política de Tratamiento de Datos Personales
+    path(
+        'politica-de-datos/',
+        views.PoliticaDatosView.as_view(),
+        name='politica_datos'
+    ),
+
     # Inicio de sesión
     path(
         'login/',
@@ -94,5 +101,6 @@ urlpatterns = [
         ),
         name='password_reset_complete'
     ),
+
 
 ]

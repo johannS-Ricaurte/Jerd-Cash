@@ -1,165 +1,179 @@
-<!DOCTYPE html>
-<html lang="es">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% extends 'base.html' %}
 
-    <title>Panel administrativo - JERD Cash</title>
+{% block title %}Panel administrativo - JERD-Cash{% endblock %}
 
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
+{% block navbar %}
+<header class="bg-white border-b border-gray-200">
+    <div class="max-w-7xl mx-auto px-6 py-4">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
 
-<body class="bg-gray-50 min-h-screen">
+            <!-- LOGO -->
+            <a href="{% url 'administrador_dashboard' %}"
+               class="flex items-center gap-2">
 
-    <nav class="bg-white border-b">
-        <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+                <div class="w-10 h-10 bg-blue-900 rounded-lg
+                            flex items-center justify-center">
+                    <span class="text-white font-bold text-xl">J</span>
+                </div>
 
-            <div>
-                <h1 class="text-2xl font-bold text-gray-900">
-                    JERD<span class="text-blue-600">-Cash</span>
-                </h1>
+                <div>
+                    <h1 class="text-xl font-bold text-blue-900">
+                        JERD-Cash
+                    </h1>
+                    <p class="text-xs text-gray-500">
+                        Panel administrativo
+                    </p>
+                </div>
+            </a>
 
-                <p class="text-xs text-gray-500">
-                    Panel administrativo
-                </p>
-            </div>
-
-            
-            <div class="flex items-center gap-4">
+            <!-- USUARIO Y CIERRE DE SESIÓN -->
+            <div class="flex flex-wrap items-center gap-4">
                 <span class="text-sm text-gray-600">
                     Hola, {{ request.user.first_name|default:request.user.username }}
                 </span>
 
-                <form method="post" action="{% url 'logout' %}" style="display: inline;">
+                <form method="post" action="{% url 'logout' %}">
                     {% csrf_token %}
-                    <button type="submit">
+                    <button type="submit"
+                            class="px-4 py-2 border border-blue-900
+                                   text-blue-900 font-semibold rounded-lg
+                                   hover:bg-blue-50 transition">
                         Cerrar sesión
                     </button>
                 </form>
             </div>
 
-
         </div>
-        
-    </nav>
+    </div>
+</header>
+{% endblock %}
 
 
-    <main class="max-w-6xl mx-auto px-6 py-10">
+{% block content %}
+<div class="max-w-7xl mx-auto px-6 py-10">
 
-        <h2 class="text-3xl font-bold text-gray-900">
+    <!-- ENCABEZADO -->
+    <div class="mb-10">
+        <h2 class="text-3xl font-bold text-blue-950">
             Panel administrativo
         </h2>
 
         <p class="text-gray-600 mt-2">
-            Desde aquí podrás administrar los clientes y créditos de JERD Cash.
+            Administra los clientes, las solicitudes y los créditos de JERD-Cash.
         </p>
+    </div>
 
+    <!-- TARJETAS ADMINISTRATIVAS -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+        <!-- SOLICITUDES -->
+        <div class="bg-white rounded-xl border border-gray-100
+                    shadow-sm p-7 flex flex-col h-full
+                    hover:shadow-md transition">
 
-
-            <div class="bg-white rounded-xl shadow-sm border p-6">
-
-                <div class="text-3xl mb-4">
-                    📋
-                </div>
-
-                <h3 class="text-xl font-semibold">
-                    Solicitudes
-                </h3>
-
-                <p class="text-gray-600 mt-2">
-                    Consulta y gestiona las solicitudes de crédito.
-                </p>
-
-                <a
-                    href="{% url 'administrador_solicitudes' %}"
-                    class="block text-center w-full mt-4 bg-blue-600 text-white py-2.5 rounded-lg hover:bg-blue-700"
-                >
-                    Ver solicitudes
-                </a>
-
+            <div class="w-12 h-12 bg-blue-100 rounded-lg
+                        flex items-center justify-center text-2xl mb-5">
+                📋
             </div>
 
+            <h3 class="text-xl font-bold text-gray-900">
+                Solicitudes
+            </h3>
 
-            <div class="bg-white rounded-xl shadow-sm border p-6">
+            <p class="text-gray-600 mt-3 mb-6 flex-1">
+                Consulta y gestiona las solicitudes de crédito.
+            </p>
 
-                <div class="text-3xl mb-4">
-                    👥
-                </div>
-
-                <h3 class="text-xl font-semibold">
-                    Clientes
-                </h3>
-
-                <p class="text-gray-600 mt-2">
-                    Consulta la información de los clientes, su historial de créditos y su comportamiento de pago.
-                </p>
-
-                <a
-                    href="{% url 'administrador_clientes' %}"
-                    class="block text-center w-full mt-4 bg-blue-600 text-white py-2.5 rounded-lg hover:bg-blue-700"
-                >
-                    Ver clientes
-                </a>
-
-            </div>
-            
-
-
-            <div class="bg-white rounded-xl shadow-sm border p-6">
-
-                <div class="text-3xl mb-4">
-                    💰
-                </div>
-
-                <h3 class="text-xl font-semibold">
-                    Créditos
-                </h3>
-
-                <p class="text-gray-600 mt-2">
-                    Administra los créditos aprobados y revisa los pagos de los clientes.
-                </p>
-
-                <a
-                    href="{% url 'administrador_creditos' %}"
-                    class="block text-center w-full mt-4 bg-blue-600 text-white py-2.5 rounded-lg hover:bg-blue-700"
-                >
-                    Ver créditos
-                </a>
-
-            </div>
-
-            <div class="bg-white rounded-xl shadow-sm border p-6">
-
-                <div class="text-3xl mb-4">
-                    💳
-                </div>
-
-                <h3 class="text-xl font-semibold">
-                    Configuración de pagos
-                </h3>
-
-                <p class="text-gray-600 mt-2">
-                    Administra los datos de pago, la llave de transferencia,
-                    el titular y el código QR que verán los clientes.
-                </p>
-
-                <a
-                    href="{% url 'administrador_configuracion_pago' %}"
-                    class="block text-center w-full mt-4 bg-blue-600 text-white py-2.5 rounded-lg hover:bg-blue-700"
-                >
-                    Configurar pagos
-                </a>
-
-            </div>
-
-
+            <a href="{% url 'administrador_solicitudes' %}"
+               class="block w-full bg-blue-900 text-white text-center
+                      font-semibold py-3 rounded-lg
+                      hover:bg-blue-800 transition">
+                Ver solicitudes
+            </a>
         </div>
 
-    </main>
+        <!-- CLIENTES -->
+        <div class="bg-white rounded-xl border border-gray-100
+                    shadow-sm p-7 flex flex-col h-full
+                    hover:shadow-md transition">
 
-</body>
+            <div class="w-12 h-12 bg-blue-100 rounded-lg
+                        flex items-center justify-center text-2xl mb-5">
+                👥
+            </div>
 
-</html>
+            <h3 class="text-xl font-bold text-gray-900">
+                Clientes
+            </h3>
+
+            <p class="text-gray-600 mt-3 mb-6 flex-1">
+                Consulta la información de los clientes, su historial
+                de créditos y su comportamiento de pago.
+            </p>
+
+            <a href="{% url 'administrador_clientes' %}"
+               class="block w-full bg-blue-900 text-white text-center
+                      font-semibold py-3 rounded-lg
+                      hover:bg-blue-800 transition">
+                Ver clientes
+            </a>
+        </div>
+
+        <!-- CRÉDITOS -->
+        <div class="bg-white rounded-xl border border-gray-100
+                    shadow-sm p-7 flex flex-col h-full
+                    hover:shadow-md transition">
+
+            <div class="w-12 h-12 bg-blue-100 rounded-lg
+                        flex items-center justify-center text-2xl mb-5">
+                💰
+            </div>
+
+            <h3 class="text-xl font-bold text-gray-900">
+                Créditos
+            </h3>
+
+            <p class="text-gray-600 mt-3 mb-6 flex-1">
+                Administra los créditos aprobados y revisa
+                los pagos de los clientes.
+            </p>
+
+            <a href="{% url 'administrador_creditos' %}"
+               class="block w-full bg-blue-900 text-white text-center
+                      font-semibold py-3 rounded-lg
+                      hover:bg-blue-800 transition">
+                Ver créditos
+            </a>
+        </div>
+
+        <!-- CONFIGURACIÓN DE PAGOS -->
+        <div class="bg-white rounded-xl border border-gray-100
+                    shadow-sm p-7 flex flex-col h-full
+                    hover:shadow-md transition">
+
+            <div class="w-12 h-12 bg-blue-100 rounded-lg
+                        flex items-center justify-center text-2xl mb-5">
+                💳
+            </div>
+
+            <h3 class="text-xl font-bold text-gray-900">
+                Configuración de pagos
+            </h3>
+
+            <p class="text-gray-600 mt-3 mb-6 flex-1">
+                Administra los datos de pago, la llave de transferencia,
+                el titular y el código QR que verán los clientes.
+            </p>
+
+            <a href="{% url 'administrador_configuracion_pago' %}"
+               class="block w-full bg-blue-900 text-white text-center
+                      font-semibold py-3 rounded-lg
+                      hover:bg-blue-800 transition">
+                Configurar pagos
+            </a>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

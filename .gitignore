@@ -54,3 +54,11 @@ Thumbs.db
 # Scripts locales de mantenimiento y migración
 /retirar_documentos_publicos.py
 /verificar_documentos_privados.py
+
+# Variables de entorno y credenciales
+.env
+.env.*
+!.env.example 
+
+# Dependencias de Node.js y Tailwind CSS
+node_modules/

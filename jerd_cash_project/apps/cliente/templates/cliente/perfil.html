@@ -1,56 +1,85 @@
-<!DOCTYPE html>
 
+{% extends 'base.html' %}
 {% load formatos %}
 
-<html lang="es">
+{% block title %}Mi perfil - JERD-Cash{% endblock %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Perfil - JERD-Cash</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
+{% block navbar %}
 
-<body class="bg-gray-50 min-h-screen">
+
 
 <!-- NAVBAR -->
-<nav class="bg-white border-b border-gray-200 shadow-sm">
-    <div class="w-full px-8 py-4">
-        <div class="flex items-center justify-between">
+<header class="bg-white border-b border-gray-200">
+    <div class="max-w-7xl mx-auto px-6 py-4">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
 
             <!-- LOGO -->
             <a href="{% url 'cliente_dashboard' %}"
-               class="text-2xl font-bold text-blue-600">
-                JERD-Cash
+               class="flex items-center gap-2">
+
+                <div class="w-10 h-10 bg-blue-900 rounded-lg
+                            flex items-center justify-center">
+                    <span class="text-white font-bold text-xl">J</span>
+                </div>
+
+                <div>
+                    <h1 class="text-xl font-bold text-blue-900">
+                        JERD-Cash
+                    </h1>
+                    <p class="text-xs text-gray-500">
+                        Portal del cliente
+                    </p>
+                </div>
             </a>
 
-            <!-- DERECHA -->
-            <div class="flex items-center gap-6">
-                <span class="text-gray-600">
-                    Hola, {{ user.first_name|default:user.username }}
+            
+            <!-- USUARIO Y NAVEGACIÓN -->
+            <div class="flex flex-wrap items-center gap-4">
+
+                <span class="text-sm text-gray-600">
+                    Hola,
+                    <span class="font-semibold text-gray-900">
+                        {{ request.user.first_name|default:request.user.username }}
+                    </span>
                 </span>
 
-                <form method="post" action="{% url 'logout' %}" style="display: inline;">
+                <a href="{% url 'cliente_dashboard' %}"
+                class="text-blue-900 hover:text-blue-700
+                        font-semibold transition">
+                    Volver al inicio
+                </a>
+
+                <form method="POST" action="{% url 'logout' %}">
                     {% csrf_token %}
-                    <button type="submit">
+
+                    <button type="submit"
+                            class="px-4 py-2 bg-blue-900 text-white
+                                text-sm font-semibold rounded-lg
+                                hover:bg-blue-800 transition">
                         Cerrar sesión
                     </button>
                 </form>
+
             </div>
+
 
         </div>
     </div>
-</nav>
+</header>
+
+{% endblock %}
+
+{% block content %}
 
 
 <!-- CONTENIDO -->
-<main class="w-full px-8 py-10">
+<div class="max-w-7xl mx-auto px-6 py-10">
 
     <!-- ENCABEZADO -->
-    <div class="mb-8 flex items-start justify-between">
+    <div class="mb-8">
 
         <div>
-            <h1 class="text-3xl font-bold text-gray-800">
+            <h1 class="text-3xl font-bold text-blue-950">
                 Mi perfil
             </h1>
 
@@ -58,11 +87,6 @@
                 Completa y actualiza tu información personal.
             </p>
         </div>
-
-        <a href="{% url 'cliente_dashboard' %}"
-            class="text-blue-600 hover:text-blue-800 font-medium">
-            Volver al inicio
-        </a>
 
     </div>
 
@@ -85,11 +109,11 @@
         <!-- INFORMACIÓN PERSONAL -->
         <!-- ============================== -->
 
-        <section class="bg-white rounded-2xl shadow-sm
-                        border border-gray-200 p-8">
+        <section class="bg-white rounded-xl border border-gray-100
+                        shadow-sm p-6 md:p-8">
 
             <div class="mb-6">
-                <h2 class="text-xl font-bold text-gray-800">
+                <h2 class="text-xl font-bold text-blue-950">
                     Información personal
                 </h2>
 
@@ -233,11 +257,11 @@
         <!-- RESIDENCIA -->
         <!-- ============================== -->
 
-        <section class="bg-white rounded-2xl shadow-sm
-                        border border-gray-200 p-8">
+        <section class="bg-white rounded-xl border border-gray-100
+                        shadow-sm p-6 md:p-8">
 
             <div class="mb-6">
-                <h2 class="text-xl font-bold text-gray-800">
+                <h2 class="text-xl font-bold text-blue-950">
                     Información de residencia
                 </h2>
 
@@ -329,11 +353,11 @@
         <!-- INFORMACIÓN FINANCIERA -->
         <!-- ============================== -->
 
-        <section class="bg-white rounded-2xl shadow-sm
-                        border border-gray-200 p-8">
+        <section class="bg-white rounded-xl border border-gray-100
+                        shadow-sm p-6 md:p-8">
 
             <div class="mb-6">
-                <h2 class="text-xl font-bold text-gray-800">
+                <h2 class="text-xl font-bold text-blue-950">
                     Información financiera
                 </h2>
 
@@ -362,8 +386,8 @@
                         autocomplete="off"
                         class="w-full border border-gray-300 rounded-lg
                                px-4 py-2.5
-                               focus:ring-2 focus:ring-blue-500
-                               focus:border-blue-500"
+                               focus:ring-2 focus:ring-blue-900
+                                focus:border-blue-900
                         placeholder="$0"
                     >
 
@@ -399,8 +423,8 @@
                         autocomplete="off"
                         class="w-full border border-gray-300 rounded-lg
                                px-4 py-2.5
-                               focus:ring-2 focus:ring-blue-500
-                               focus:border-blue-500"
+                               focus:ring-2 focus:ring-blue-900
+                                focus:border-blue-900
                         placeholder="$0"
                     >
 
@@ -427,11 +451,11 @@
         <!-- CONTACTO DE RESPALDO -->
         <!-- ============================== -->
 
-        <section class="bg-white rounded-2xl shadow-sm
-                        border border-gray-200 p-8">
+        <section class="bg-white rounded-xl border border-gray-100
+                        shadow-sm p-6 md:p-8">
 
             <div class="mb-6">
-                <h2 class="text-xl font-bold text-gray-800">
+                <h2 class="text-xl font-bold text-blue-950">
                     Contacto de respaldo
                 </h2>
 
@@ -504,22 +528,20 @@
         <!-- BOTONES -->
         <!-- ============================== -->
 
-        <div class="flex justify-end gap-4">
+        <div class="flex flex-col sm:flex-row sm:justify-end gap-4">
 
             <a href="{% url 'cliente_dashboard' %}"
-               class="px-6 py-3 rounded-xl border
-                      border-gray-300 text-gray-700
-                      font-medium hover:bg-gray-100
-                      transition">
+               class="px-6 py-3 rounded-lg border border-blue-900
+                    text-blue-900 font-semibold
+                    hover:bg-blue-50 transition">
                 Cancelar
             </a>
 
             <button type="submit"
-                    class="px-8 py-3 rounded-xl
-                           bg-blue-600 text-white
-                           font-semibold
-                           hover:bg-blue-700
-                           transition shadow-sm">
+                class="px-8 py-3 rounded-lg
+                    bg-blue-900 text-white
+                    font-semibold hover:bg-blue-800
+                    transition shadow-sm">
                 Guardar cambios
             </button>
 
@@ -527,7 +549,11 @@
 
     </form>
 
-</main>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
 
 
 <!-- ============================== -->
@@ -774,6 +800,4 @@ function prepararCampoPesos(displayId, hiddenId) {
 </script>
 
 
-
-</body>
-</html>
+{% endblock %}

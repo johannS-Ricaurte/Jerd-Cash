@@ -1,0 +1,34 @@
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %}JERD-Cash{% endblock %}</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    {% block extra_head %}{% endblock %}
+</head>
+
+<body class="min-h-screen bg-gray-50 text-gray-800 flex flex-col">
+
+    <!-- Navegación específica de cada página -->
+    {% block navbar %}{% endblock %}
+
+    <!-- Contenido principal -->
+    <main class="flex-1 w-full">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Pie de página opcional -->
+    {% block footer %}{% endblock %}
+
+    <!-- Scripts específicos -->
+    {% block extra_js %}{% endblock %}
+
+</body>
+
+</html>

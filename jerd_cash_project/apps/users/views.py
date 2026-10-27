@@ -26,6 +26,9 @@ from .models import CustomUser, ConsentimientoLegal
 
 from jerd_cash_project.apps.cliente.models import PerfilCliente
 
+class PoliticaDatosView(TemplateView):
+    template_name = 'users/politica_datos.html'
+
 
 def home_view(request):
 

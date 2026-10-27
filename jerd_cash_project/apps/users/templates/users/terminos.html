@@ -1,31 +1,414 @@
-<!-- apps/users/templates/users/terminos.html -->
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Términos y Condiciones - JERD-Cash</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-50 text-gray-800">
-    <div class="max-w-4xl mx-auto p-8 bg-white shadow-lg my-8 rounded-lg">
-        <a href="{% url 'registro' %}" class="text-blue-600 hover:underline mb-4 inline-block">&larr; Volver al registro</a>
-        
-        <h1 class="text-3xl font-bold text-blue-900 mb-6">TÉRMINOS Y CONDICIONES DE USO DE LA PLATAFORMA JERD-CASH</h1>
-        
-        <div class="prose max-w-none text-sm leading-relaxed space-y-4">
-            <!-- Aquí pegamos el contenido del archivo de texto, formateado para HTML -->
-            <p><strong>Versión:</strong> 1.0 | <strong>Fecha de entrada en vigencia:</strong> [FECHA]</p>
-            
-            <h2 class="text-xl font-semibold text-blue-800 mt-6">1. INFORMACIÓN GENERAL E IDENTIFICACIÓN DEL OPERADOR</h2>
-            <p>Los presentes Términos y Condiciones regulan el acceso, registro y uso de la plataforma tecnológica denominada <strong>JERD-Cash</strong>...</p>
-            
-            <h2 class="text-xl font-semibold text-blue-800 mt-6">4. ACEPTACIÓN DE LOS TÉRMINOS Y CONDICIONES</h2>
-            <p>Al crear una cuenta, acceder, navegar o utilizar las funcionalidades de JERD-Cash, el usuario declara que ha leído, comprende y acepta las condiciones...</p>
-            
-            <!-- NOTA: Para el proyecto final, copia y pega TODO el contenido del archivo .txt que me subiste dentro de este div, usando etiquetas <h2> y <p> para mantener la legibilidad. -->
-            <p class="italic text-gray-500 mt-8">[El resto del documento legal completo se renderiza aquí...]</p>
-        </div>
+{% extends 'base.html' %}
+{% block title %}Términos y Condiciones - JERD-Cash{% endblock %}
+{% block content %}
+<div class="min-h-screen bg-gray-50 px-4 py-10 sm:px-6">
+  <div class="mx-auto max-w-5xl">
+    <a href="{% url 'registro' %}" class="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-blue-900 hover:text-blue-700">&larr; Volver al registro</a>
+    <header class="mb-7 rounded-2xl bg-blue-900 px-6 py-9 text-white sm:px-10">
+      <p class="mb-2 text-sm font-medium text-blue-200">JERD-Cash · Documentos legales</p>
+      <h1 class="text-2xl font-bold sm:text-3xl">Términos y Condiciones de Uso</h1>
+      <p class="mt-3 max-w-2xl text-sm leading-relaxed text-blue-100">Consulta las condiciones de acceso, registro y utilización de la plataforma. Lee el documento completo antes de aceptarlo.</p>
+    </header>
+    <nav aria-label="Índice de términos y condiciones" class="mb-7 rounded-2xl border border-gray-100 bg-white p-6 shadow-sm sm:p-8">
+      <h2 class="mb-4 text-lg font-bold text-blue-950">Índice de contenido</h2>
+      <ol class="grid gap-x-7 gap-y-2 text-sm sm:grid-cols-2">
+        <li><a class="text-blue-800 hover:underline" href="#apartado-1">1. Objeto</a></li>
+        <li><a class="text-blue-800 hover:underline" href="#apartado-2">2. Aceptación de los términos</a></li>
+        <li><a class="text-blue-800 hover:underline" href="#apartado-3">3. Definiciones</a></li>
+        <li><a class="text-blue-800 hover:underline" href="#apartado-4">4. Usuarios de la plataforma</a></li>
+        <li><a class="text-blue-800 hover:underline" href="#apartado-5">5. Requisitos para el registro</a></li>
+        <li><a class="text-blue-800 hover:underline" href="#apartado-6">6. Edad y capacidad</a></li>
+        <li><a class="text-blue-800 hover:underline" href="#apartado-7">7. Identificación y autenticación</a></li>
+        <li><a class="text-blue-800 hover:underline" href="#apartado-8">8. Información y documentos requeridos</a></li>
+        <li><a class="text-blue-800 hover:underline" href="#apartado-9">9. Autorización para revisión de documentos</a></li>
+        <li><a class="text-blue-800 hover:underline" href="#apartado-10">10. Autenticidad de los documentos</a></li>
+        <li><a class="text-blue-800 hover:underline" href="#apartado-11">11. Tratamiento de datos personales</a></li>
+        <li><a class="text-blue-800 hover:underline" href="#apartado-12">12. Finalidades del tratamiento</a></li>
+        <li><a class="text-blue-800 hover:underline" href="#apartado-13">13. Autorización para el tratamiento de datos</a></li>
+        <li><a class="text-blue-800 hover:underline" href="#apartado-14">14. Derechos del titular</a></li>
+        <li><a class="text-blue-800 hover:underline" href="#apartado-15">15. Información financiera, crediticia, comercial y de servicios</a></li>
+        <li><a class="text-blue-800 hover:underline" href="#apartado-16">16. Consulta de centrales de información</a></li>
+        <li><a class="text-blue-800 hover:underline" href="#apartado-17">17. Reporte de información crediticia</a></li>
+        <li><a class="text-blue-800 hover:underline" href="#apartado-18">18. Seguridad de la información</a></li>
+        <li><a class="text-blue-800 hover:underline" href="#apartado-19">19. Documentos digitales y evidencia electrónica</a></li>
+        <li><a class="text-blue-800 hover:underline" href="#apartado-20">20. Solicitud de crédito</a></li>
+        <li><a class="text-blue-800 hover:underline" href="#apartado-21">21. Información sobre las condiciones del crédito</a></li>
+        <li><a class="text-blue-800 hover:underline" href="#apartado-22">22. Tasas de interés y cargos</a></li>
+        <li><a class="text-blue-800 hover:underline" href="#apartado-23">23. Desembolso</a></li>
+        <li><a class="text-blue-800 hover:underline" href="#apartado-24">24. Pagos</a></li>
+        <li><a class="text-blue-800 hover:underline" href="#apartado-25">25. Incumplimiento</a></li>
+        <li><a class="text-blue-800 hover:underline" href="#apartado-26">26. Prohibición de información falsa</a></li>
+        <li><a class="text-blue-800 hover:underline" href="#apartado-27">27. Uso adecuado de la plataforma</a></li>
+        <li><a class="text-blue-800 hover:underline" href="#apartado-28">28. Disponibilidad del servicio</a></li>
+        <li><a class="text-blue-800 hover:underline" href="#apartado-29">29. Funcionamiento como pwa</a></li>
+        <li><a class="text-blue-800 hover:underline" href="#apartado-30">30. Información al consumidor en comercio electrónico</a></li>
+        <li><a class="text-blue-800 hover:underline" href="#apartado-31">31. Propiedad intelectual</a></li>
+        <li><a class="text-blue-800 hover:underline" href="#apartado-32">32. Servicios de terceros</a></li>
+        <li><a class="text-blue-800 hover:underline" href="#apartado-33">33. Conservación de la información</a></li>
+        <li><a class="text-blue-800 hover:underline" href="#apartado-34">34. Suspensión o terminación de cuentas</a></li>
+        <li><a class="text-blue-800 hover:underline" href="#apartado-35">35. Modificaciones de los términos</a></li>
+        <li><a class="text-blue-800 hover:underline" href="#apartado-36">36. Peticiones, quejas, reclamos y solicitudes</a></li>
+        <li><a class="text-blue-800 hover:underline" href="#apartado-37">37. Autorización para comunicaciones</a></li>
+        <li><a class="text-blue-800 hover:underline" href="#apartado-38">38. Prevención del fraude</a></li>
+        <li><a class="text-blue-800 hover:underline" href="#apartado-39">39. Decisiones automatizadas</a></li>
+        <li><a class="text-blue-800 hover:underline" href="#apartado-40">40. Responsabilidad</a></li>
+        <li><a class="text-blue-800 hover:underline" href="#apartado-41">41. Caso fortuito y fuerza mayor</a></li>
+        <li><a class="text-blue-800 hover:underline" href="#apartado-42">42. Legislación aplicable</a></li>
+        <li><a class="text-blue-800 hover:underline" href="#apartado-43">43. Solución de controversias</a></li>
+        <li><a class="text-blue-800 hover:underline" href="#apartado-44">44. Separabilidad</a></li>
+        <li><a class="text-blue-800 hover:underline" href="#apartado-45">45. No renuncia</a></li>
+        <li><a class="text-blue-800 hover:underline" href="#apartado-46">46. Integridad contractual</a></li>
+        <li><a class="text-blue-800 hover:underline" href="#apartado-47">47. Documentos relacionados</a></li>
+        <li><a class="text-blue-800 hover:underline" href="#apartado-48">48. Aceptación electrónica en jerd-cash</a></li>
+        <li><a class="text-blue-800 hover:underline" href="#apartado-49">49. Constancia de aceptación</a></li>
+      </ol>
+    </nav>
+    <article class="rounded-2xl border border-gray-100 bg-white px-5 py-7 shadow-sm sm:px-10 sm:py-10">
+      <div class="space-y-9 text-sm leading-7 text-gray-700">
+        <section id="apartado-1" class="scroll-mt-6">
+          <h2 class="mb-3 text-lg font-bold leading-snug text-blue-950">1. OBJETO</h2>
+          <p class="mb-3">Los presentes Términos y Condiciones regulan el acceso y utilización de JERD-Cash, aplicación web progresiva (PWA) destinada a apoyar la gestión de micropréstamos, solicitudes de crédito, información de clientes, créditos, historial de operaciones y procesos administrativos relacionados.</p>
+          <p class="mb-3">JERD-Cash es una herramienta tecnológica para facilitar estos procesos. El acceso a la plataforma no implica, por sí mismo, la aprobación de un crédito ni garantiza un desembolso.</p>
+          <p class="mb-3">Estos Términos se interpretan conjuntamente con la Política de Tratamiento de Datos Personales, los avisos de privacidad, las autorizaciones específicas y, cuando corresponda, el contrato o documento particular que regule cada crédito.</p>
+        </section>
+        <section id="apartado-2" class="scroll-mt-6">
+          <h2 class="mb-3 text-lg font-bold leading-snug text-blue-950">2. ACEPTACIÓN DE LOS TÉRMINOS</h2>
+          <p class="mb-3">El usuario deberá leer estos Términos antes de utilizar las funcionalidades que requieran aceptación.</p>
+          <p class="mb-3">Cuando JERD-Cash disponga de una casilla, botón u otro mecanismo electrónico de aceptación, el usuario podrá manifestar su consentimiento mediante la acción correspondiente.</p>
+          <p class="mb-3">La aceptación electrónica podrá quedar registrada junto con la identificación del usuario, fecha, hora, versión del documento aceptado y demás información técnica disponible.</p>
+          <p class="mb-3">La aceptación de estos Términos no constituye por sí sola autorización para todas las actividades de tratamiento de datos personales. Cuando una actividad requiera autorización específica, esta deberá solicitarse mediante el mecanismo correspondiente.</p>
+        </section>
+        <section id="apartado-3" class="scroll-mt-6">
+          <h2 class="mb-3 text-lg font-bold leading-snug text-blue-950">3. DEFINICIONES</h2>
+          <ul class="ml-5 list-disc space-y-2">
+            <li>JERD-Cash: aplicación web progresiva utilizada para gestionar procesos relacionados con micropréstamos.</li>
+            <li>Usuario: persona que accede, se registra o utiliza JERD-Cash.</li>
+            <li>Cliente: usuario que utiliza la plataforma para solicitar, gestionar o consultar información relacionada con un crédito.</li>
+            <li>Administrador: usuario autorizado para administrar y supervisar funcionalidades de la plataforma.</li>
+            <li>Empleado: usuario autorizado para ejecutar funciones operativas dentro de JERD-Cash.</li>
+            <li>Solicitud de crédito: petición realizada por un cliente para ser evaluada para la eventual aprobación de un crédito.</li>
+            <li>Documento de soporte: documento solicitado para verificar información proporcionada por el usuario.</li>
+            <li>Datos personales: información asociada o asociable a una persona natural determinada o determinable.</li>
+            <li>Información financiera o crediticia: información relacionada con obligaciones o comportamiento financiero o crediticio, cuando resulte aplicable.</li>
+            <li>Tratamiento: cualquier operación realizada sobre datos personales, incluyendo recolección, almacenamiento, uso, circulación, consulta, actualización, rectificación o supresión.</li>
+          </ul>
+        </section>
+        <section id="apartado-4" class="scroll-mt-6">
+          <h2 class="mb-3 text-lg font-bold leading-snug text-blue-950">4. USUARIOS DE LA PLATAFORMA</h2>
+          <p class="mb-3">JERD-Cash contempla diferentes perfiles de usuario de acuerdo con las funciones definidas para el sistema.</p>
+          <ul class="ml-5 list-disc space-y-2">
+            <li>Administrador: gestión administrativa, usuarios, clientes, consulta de información, supervisión de solicitudes, historial y análisis, según sus permisos.</li>
+            <li>Empleado: gestión de clientes, revisión de solicitudes, apoyo en evaluación y consulta o gestión de información de créditos e historial, según sus permisos.</li>
+            <li>Cliente: creación y administración de su cuenta, consulta y actualización de información autorizada, presentación de solicitudes, carga de documentación y consulta de sus créditos, pagos e historial.</li>
+          </ul>
+          <p class="mb-3">El acceso a la información estará sujeto al perfil, permisos y controles de seguridad definidos para cada usuario.</p>
+        </section>
+        <section id="apartado-5" class="scroll-mt-6">
+          <h2 class="mb-3 text-lg font-bold leading-snug text-blue-950">5. REQUISITOS PARA EL REGISTRO</h2>
+          <p class="mb-3">Para registrarse, el usuario deberá proporcionar información verdadera, completa, verificable y actualizada.</p>
+          <p class="mb-3">El usuario declara que la información suministrada le pertenece o está autorizado legalmente para suministrarla; que los documentos aportados son auténticos; que no utilizará información o documentos de terceros para suplantarlos; que mantendrá actualizada su información; y que protegerá sus credenciales.</p>
+          <p class="mb-3">JERD-Cash podrá solicitar información adicional cuando resulte necesaria para validar la identidad, completar una solicitud o atender obligaciones legales.</p>
+        </section>
+        <section id="apartado-6" class="scroll-mt-6">
+          <h2 class="mb-3 text-lg font-bold leading-snug text-blue-950">6. EDAD Y CAPACIDAD</h2>
+          <p class="mb-3">Las funcionalidades destinadas a solicitar o gestionar créditos están dirigidas a personas con capacidad legal para celebrar las operaciones correspondientes.</p>
+          <p class="mb-3">Como regla de operación, las solicitudes de crédito deberán ser realizadas por personas mayores de dieciocho (18) años.</p>
+          <p class="mb-3">JERD-Cash no está diseñado para recopilar o tratar datos personales de niños, niñas o adolescentes como usuarios solicitantes de crédito.</p>
+        </section>
+        <section id="apartado-7" class="scroll-mt-6">
+          <h2 class="mb-3 text-lg font-bold leading-snug text-blue-950">7. IDENTIFICACIÓN Y AUTENTICACIÓN</h2>
+          <p class="mb-3">JERD-Cash podrá utilizar mecanismos de autenticación para proteger las cuentas.</p>
+          <p class="mb-3">El usuario será responsable de mantener bajo reserva sus credenciales e informar cualquier sospecha de acceso no autorizado.</p>
+          <p class="mb-3">Está prohibido utilizar credenciales de otra persona, acceder a cuentas ajenas, evadir controles de seguridad o manipular mecanismos de autenticación.</p>
+        </section>
+        <section id="apartado-8" class="scroll-mt-6">
+          <h2 class="mb-3 text-lg font-bold leading-snug text-blue-950">8. INFORMACIÓN Y DOCUMENTOS REQUERIDOS</h2>
+          <p class="mb-3">Durante una solicitud de crédito podrán solicitarse documentos necesarios para verificar la identidad y evaluar la solicitud.</p>
+          <ul class="ml-5 list-disc space-y-2">
+            <li>Documento de identidad, incluyendo cédula de ciudadanía.</li>
+            <li>Certificación bancaria.</li>
+            <li>Recibo o factura de servicios públicos.</li>
+            <li>Información de contacto, ingresos, capacidad de pago u otra información necesaria para completar la solicitud.</li>
+            <li>Otros documentos razonablemente necesarios para las finalidades informadas.</li>
+          </ul>
+        </section>
+        <section id="apartado-9" class="scroll-mt-6">
+          <h2 class="mb-3 text-lg font-bold leading-snug text-blue-950">9. AUTORIZACIÓN PARA REVISIÓN DE DOCUMENTOS</h2>
+          <p class="mb-3">La evaluación y gestión de una solicitud puede requerir verificar la información proporcionada. Cuando JERD-Cash solicite documentación, el usuario deberá recibir información clara sobre el propósito de su revisión y, cuando sea jurídicamente necesario, otorgar la autorización correspondiente antes del tratamiento.</p>
+          <p class="mb-3">La autorización podrá comprender la recepción, almacenamiento, consulta y revisión de los documentos aportados, exclusivamente para las finalidades informadas.</p>
+          <p class="mb-3">En particular, cuando sean solicitados, el usuario podrá autorizar la revisión de:</p>
+          <ul class="ml-5 list-disc space-y-2">
+            <li>Cédula u otro documento de identidad: para verificar identidad, comparar información, prevenir suplantaciones y detectar inconsistencias.</li>
+            <li>Certificación bancaria: para verificar la información bancaria y, cuando corresponda, la titularidad de la cuenta y procesos de desembolso.</li>
+            <li>Recibos o facturas de servicios públicos: para apoyar la validación del domicilio o residencia y comparar la información suministrada.</li>
+          </ul>
+          <p class="mb-3">La revisión de estos documentos no autoriza su utilización para finalidades diferentes de las informadas al usuario.</p>
+        </section>
+        <section id="apartado-10" class="scroll-mt-6">
+          <h2 class="mb-3 text-lg font-bold leading-snug text-blue-950">10. AUTENTICIDAD DE LOS DOCUMENTOS</h2>
+          <p class="mb-3">El usuario declara que los documentos aportados son auténticos, legítimos y corresponden a su información.</p>
+          <p class="mb-3">Está prohibido alterar documentos, manipular imágenes para modificar información relevante, presentar documentos falsos o de terceros, o manipular soportes para obtener un beneficio.</p>
+          <p class="mb-3">Ante inconsistencias, JERD-Cash podrá solicitar nuevamente el documento, información adicional o suspender temporalmente el proceso mientras se realiza la verificación.</p>
+        </section>
+        <section id="apartado-11" class="scroll-mt-6">
+          <h2 class="mb-3 text-lg font-bold leading-snug text-blue-950">11. TRATAMIENTO DE DATOS PERSONALES</h2>
+          <p class="mb-3">El tratamiento de datos personales realizado mediante JERD-Cash deberá sujetarse a la legislación colombiana aplicable, incluyendo la Ley 1581 de 2012 y sus normas reglamentarias y complementarias.</p>
+          <p class="mb-3">El tratamiento se orientará por los principios de legalidad, finalidad, libertad, veracidad, transparencia, acceso restringido, seguridad y confidencialidad.</p>
+          <p class="mb-3">Los datos serán tratados para finalidades legítimas, determinadas y relacionadas con la operación de JERD-Cash y con las obligaciones legales o contractuales que correspondan.</p>
+        </section>
+        <section id="apartado-12" class="scroll-mt-6">
+          <h2 class="mb-3 text-lg font-bold leading-snug text-blue-950">12. FINALIDADES DEL TRATAMIENTO</h2>
+          <p class="mb-3">De acuerdo con la autorización otorgada y las bases jurídicas aplicables, los datos podrán ser tratados para:</p>
+          <ul class="ml-5 list-disc space-y-2">
+            <li>Registrar y administrar la cuenta.</li>
+            <li>Verificar identidad.</li>
+            <li>Gestionar y evaluar solicitudes de crédito.</li>
+            <li>Recibir, revisar y validar documentos.</li>
+            <li>Gestionar créditos aprobados, pagos e historial.</li>
+            <li>Prevenir fraude y suplantación.</li>
+            <li>Proteger la seguridad de la plataforma.</li>
+            <li>Atender peticiones, consultas, quejas y reclamos.</li>
+            <li>Cumplir obligaciones legales y requerimientos de autoridades.</li>
+            <li>Ejercer o defender derechos.</li>
+            <li>Mantener evidencia de operaciones electrónicas.</li>
+            <li>Ejecutar obligaciones contractuales y actividades administrativas relacionadas.</li>
+          </ul>
+        </section>
+        <section id="apartado-13" class="scroll-mt-6">
+          <h2 class="mb-3 text-lg font-bold leading-snug text-blue-950">13. AUTORIZACIÓN PARA EL TRATAMIENTO DE DATOS</h2>
+          <p class="mb-3">Cuando el tratamiento requiera autorización del titular, esta deberá obtenerse de manera previa, expresa e informada mediante un mecanismo que permita conservar prueba de ella.</p>
+          <p class="mb-3">El titular deberá conocer quién es el responsable, qué datos serán tratados, las finalidades, sus derechos y los canales para ejercerlos.</p>
+          <p class="mb-3">La autorización para tratamiento de datos deberá mantenerse diferenciada de la aceptación general de estos Términos cuando ello sea necesario para que el consentimiento sea claro y específico.</p>
+        </section>
+        <section id="apartado-14" class="scroll-mt-6">
+          <h2 class="mb-3 text-lg font-bold leading-snug text-blue-950">14. DERECHOS DEL TITULAR</h2>
+          <p class="mb-3">El titular podrá ejercer los derechos reconocidos por la legislación colombiana, incluyendo:</p>
+          <ul class="ml-5 list-disc space-y-2">
+            <li>Conocer sus datos personales.</li>
+            <li>Solicitar actualización o rectificación.</li>
+            <li>Solicitar información sobre el tratamiento.</li>
+            <li>Presentar consultas y reclamos.</li>
+            <li>Solicitar supresión cuando legalmente proceda.</li>
+            <li>Solicitar revocatoria de la autorización cuando legalmente proceda.</li>
+            <li>Acceder gratuitamente a sus datos en los casos previstos por la ley.</li>
+          </ul>
+        </section>
+        <section id="apartado-15" class="scroll-mt-6">
+          <h2 class="mb-3 text-lg font-bold leading-snug text-blue-950">15. INFORMACIÓN FINANCIERA, CREDITICIA, COMERCIAL Y DE SERVICIOS</h2>
+          <p class="mb-3">Cuando JERD-Cash trate información financiera, crediticia, comercial o de servicios, se aplicarán las disposiciones especiales correspondientes, incluyendo la Ley 1266 de 2008 y sus modificaciones.</p>
+          <p class="mb-3">Cuando corresponda, el tratamiento observará los principios y derechos establecidos para este tipo de información.</p>
+        </section>
+        <section id="apartado-16" class="scroll-mt-6">
+          <h2 class="mb-3 text-lg font-bold leading-snug text-blue-950">16. CONSULTA DE CENTRALES DE INFORMACIÓN</h2>
+          <p class="mb-3">La consulta ante operadores o centrales de información financiera y crediticia requerirá el cumplimiento de las condiciones legales correspondientes.</p>
+          <p class="mb-3">Cuando la consulta requiera autorización del titular, esta deberá solicitarse mediante una autorización específica y claramente diferenciada.</p>
+          <p class="mb-3">La aceptación de estos Términos no constituye automáticamente autorización general para consultar o reportar información ante centrales de riesgo.</p>
+          <p class="mb-3">La documentación de JERD-Cash establece la consulta de entidades externas de información crediticia como funcionalidad futura; solo podrá activarse cuando haya sido implementada técnica y jurídicamente.</p>
+        </section>
+        <section id="apartado-17" class="scroll-mt-6">
+          <h2 class="mb-3 text-lg font-bold leading-snug text-blue-950">17. REPORTE DE INFORMACIÓN CREDITICIA</h2>
+          <p class="mb-3">Si en el futuro JERD-Cash incorpora mecanismos de reporte a operadores de información, estos deberán realizarse únicamente cuando exista fundamento jurídico y se cumplan los requisitos aplicables.</p>
+          <p class="mb-3">La información reportada deberá ser verdadera, completa, actualizada y verificable.</p>
+        </section>
+        <section id="apartado-18" class="scroll-mt-6">
+          <h2 class="mb-3 text-lg font-bold leading-snug text-blue-950">18. SEGURIDAD DE LA INFORMACIÓN</h2>
+          <p class="mb-3">JERD-Cash deberá adoptar medidas técnicas, humanas y administrativas razonables y apropiadas para proteger la información frente a acceso no autorizado, pérdida, alteración, divulgación indebida, uso fraudulento, destrucción no autorizada o tratamiento incompatible con las finalidades informadas.</p>
+          <p class="mb-3">Los administradores y empleados con acceso a información estarán sujetos a obligaciones de confidencialidad y seguridad.</p>
+        </section>
+        <section id="apartado-19" class="scroll-mt-6">
+          <h2 class="mb-3 text-lg font-bold leading-snug text-blue-950">19. DOCUMENTOS DIGITALES Y EVIDENCIA ELECTRÓNICA</h2>
+          <p class="mb-3">Los documentos y registros generados o aceptados mediante JERD-Cash podrán conservarse como evidencia de las operaciones.</p>
+          <p class="mb-3">La plataforma podrá registrar identificación del usuario, fecha y hora, acción realizada, versión del documento aceptado, registro de aceptación e información técnica relacionada.</p>
+          <p class="mb-3">Los registros se conservarán durante el tiempo necesario para obligaciones legales, contractuales, contables, probatorias y de seguridad.</p>
+        </section>
+        <section id="apartado-20" class="scroll-mt-6">
+          <h2 class="mb-3 text-lg font-bold leading-snug text-blue-950">20. SOLICITUD DE CRÉDITO</h2>
+          <p class="mb-3">El envío de una solicitud no garantiza su aprobación.</p>
+          <p class="mb-3">La solicitud podrá estar sujeta a validación de identidad, revisión documental, verificación de información, evaluación de capacidad de pago, políticas internas, disponibilidad de recursos, requisitos legales y otros criterios previamente informados.</p>
+          <p class="mb-3">La decisión deberá basarse en criterios legítimos y no discriminatorios.</p>
+        </section>
+        <section id="apartado-21" class="scroll-mt-6">
+          <h2 class="mb-3 text-lg font-bold leading-snug text-blue-950">21. INFORMACIÓN SOBRE LAS CONDICIONES DEL CRÉDITO</h2>
+          <p class="mb-3">Antes de aceptar una obligación crediticia deberán informarse claramente las condiciones aplicables.</p>
+          <ul class="ml-5 list-disc space-y-2">
+            <li>Valor del crédito y valor desembolsado.</li>
+            <li>Tasa de interés aplicable.</li>
+            <li>Número y periodicidad de cuotas.</li>
+            <li>Valor y fechas de pago.</li>
+            <li>Valor total a pagar.</li>
+            <li>Costos o cargos aplicables.</li>
+            <li>Condiciones de desembolso.</li>
+            <li>Consecuencias del incumplimiento.</li>
+            <li>Demás condiciones relevantes.</li>
+          </ul>
+        </section>
+        <section id="apartado-22" class="scroll-mt-6">
+          <h2 class="mb-3 text-lg font-bold leading-snug text-blue-950">22. TASAS DE INTERÉS Y CARGOS</h2>
+          <p class="mb-3">Las tasas de interés deberán respetar los límites máximos legalmente permitidos para la modalidad correspondiente.</p>
+          <p class="mb-3">No podrán cobrarse intereses, comisiones, gastos o conceptos prohibidos por la legislación aplicable.</p>
+          <p class="mb-3">Cuando exista un límite legal variable, deberá aplicarse el límite vigente correspondiente al momento de la operación.</p>
+          <p class="mb-3">Los valores aplicables deberán informarse antes de aceptar la obligación.</p>
+        </section>
+        <section id="apartado-23" class="scroll-mt-6">
+          <h2 class="mb-3 text-lg font-bold leading-snug text-blue-950">23. DESEMBOLSO</h2>
+          <p class="mb-3">El desembolso estará sujeto al cumplimiento de las condiciones establecidas para el crédito.</p>
+          <p class="mb-3">Cuando se utilice una cuenta bancaria proporcionada por el usuario, la información deberá corresponder a la cuenta indicada para recibir el desembolso.</p>
+          <p class="mb-3">JERD-Cash no solicitará claves de banca electrónica, contraseñas bancarias, códigos OTP ni credenciales privadas de servicios financieros.</p>
+        </section>
+        <section id="apartado-24" class="scroll-mt-6">
+          <h2 class="mb-3 text-lg font-bold leading-snug text-blue-950">24. PAGOS</h2>
+          <p class="mb-3">El cliente deberá realizar los pagos conforme a las condiciones particulares de la obligación aceptada.</p>
+          <p class="mb-3">Los canales y medios de pago disponibles deberán ser informados al cliente.</p>
+          <p class="mb-3">Cuando la plataforma registre un pago, deberá procurar que la información registrada sea exacta y se actualice conforme a sus procesos.</p>
+        </section>
+        <section id="apartado-25" class="scroll-mt-6">
+          <h2 class="mb-3 text-lg font-bold leading-snug text-blue-950">25. INCUMPLIMIENTO</h2>
+          <p class="mb-3">El incumplimiento podrá generar las consecuencias establecidas en el contrato o documento particular y en la legislación aplicable.</p>
+          <p class="mb-3">Cualquier cobro, interés de mora, gestión de cobranza o consecuencia deberá respetar los límites y condiciones legales.</p>
+        </section>
+        <section id="apartado-26" class="scroll-mt-6">
+          <h2 class="mb-3 text-lg font-bold leading-snug text-blue-950">26. PROHIBICIÓN DE INFORMACIÓN FALSA</h2>
+          <p class="mb-3">El usuario no podrá utilizar JERD-Cash para obtener un crédito mediante suplantación, información falsa, documentación adulterada o de terceros, manipulación de soportes, ocultamiento deliberado de información relevante o cualquier mecanismo fraudulento.</p>
+          <p class="mb-3">Ante indicios razonables de fraude o suplantación podrán adoptarse medidas de seguridad, incluida la suspensión preventiva de la solicitud o cuenta, sin perjuicio de las actuaciones legales correspondientes.</p>
+        </section>
+        <section id="apartado-27" class="scroll-mt-6">
+          <h2 class="mb-3 text-lg font-bold leading-snug text-blue-950">27. USO ADECUADO DE LA PLATAFORMA</h2>
+          <p class="mb-3">El usuario deberá utilizar JERD-Cash exclusivamente para fines lícitos.</p>
+          <p class="mb-3">Está prohibido acceder a cuentas de terceros, vulnerar la seguridad, introducir código malicioso, interferir con la plataforma, extraer información sin autorización, realizar ingeniería inversa cuando esté legalmente prohibida, automatizar accesos no autorizados, suplantar usuarios o manipular registros.</p>
+        </section>
+        <section id="apartado-28" class="scroll-mt-6">
+          <h2 class="mb-3 text-lg font-bold leading-snug text-blue-950">28. DISPONIBILIDAD DEL SERVICIO</h2>
+          <p class="mb-3">JERD-Cash procurará mantener la disponibilidad del servicio.</p>
+          <p class="mb-3">Podrán presentarse interrupciones por mantenimiento, actualizaciones, fallas de infraestructura o conectividad, proveedores, incidentes de seguridad, fuerza mayor, caso fortuito o circunstancias externas no controlables razonablemente.</p>
+        </section>
+        <section id="apartado-29" class="scroll-mt-6">
+          <h2 class="mb-3 text-lg font-bold leading-snug text-blue-950">29. FUNCIONAMIENTO COMO PWA</h2>
+          <p class="mb-3">JERD-Cash funciona como una aplicación web progresiva. Algunas funcionalidades pueden depender del navegador, sistema operativo, dispositivo, conectividad, disponibilidad del servidor y configuración técnica.</p>
+          <p class="mb-3">La instalación de la PWA no implica acceso libre a archivos, cámara, micrófono, ubicación u otros recursos del dispositivo. El acceso estará limitado a funcionalidades implementadas y permisos otorgados por el usuario.</p>
+        </section>
+        <section id="apartado-30" class="scroll-mt-6">
+          <h2 class="mb-3 text-lg font-bold leading-snug text-blue-950">30. INFORMACIÓN AL CONSUMIDOR EN COMERCIO ELECTRÓNICO</h2>
+          <p class="mb-3">Cuando la operación se encuentre dentro del ámbito del comercio electrónico y del Estatuto del Consumidor, se observarán las obligaciones aplicables.</p>
+          <p class="mb-3">Cuando resulte aplicable, JERD-Cash deberá disponer de un enlace visible y fácilmente identificable hacia la página oficial de la Superintendencia de Industria y Comercio.</p>
+        </section>
+        <section id="apartado-31" class="scroll-mt-6">
+          <h2 class="mb-3 text-lg font-bold leading-snug text-blue-950">31. PROPIEDAD INTELECTUAL</h2>
+          <p class="mb-3">El software, código fuente, estructura, interfaces, elementos gráficos, textos, marcas, logotipos y demás elementos protegibles de JERD-Cash pertenecen a sus respectivos titulares.</p>
+          <p class="mb-3">El acceso no transfiere derechos de propiedad intelectual al usuario. Está prohibida la explotación de elementos protegidos sin autorización cuando esta sea necesaria.</p>
+        </section>
+        <section id="apartado-32" class="scroll-mt-6">
+          <h2 class="mb-3 text-lg font-bold leading-snug text-blue-950">32. SERVICIOS DE TERCEROS</h2>
+          <p class="mb-3">JERD-Cash podrá utilizar proveedores tecnológicos externos para infraestructura, almacenamiento, comunicaciones, seguridad u otras funciones.</p>
+          <p class="mb-3">Cuando un tercero actúe como encargado del tratamiento, deberán establecerse condiciones para proteger la información.</p>
+          <p class="mb-3">Cuando exista transferencia o transmisión internacional de datos personales, deberán cumplirse las condiciones y garantías exigidas por la legislación colombiana.</p>
+        </section>
+        <section id="apartado-33" class="scroll-mt-6">
+          <h2 class="mb-3 text-lg font-bold leading-snug text-blue-950">33. CONSERVACIÓN DE LA INFORMACIÓN</h2>
+          <p class="mb-3">La información será conservada durante el período necesario para cumplir las finalidades para las cuales fue recolectada y, cuando corresponda, durante los períodos establecidos por obligaciones legales, contractuales, contables, fiscales, probatorias, de seguridad o defensa de derechos.</p>
+          <p class="mb-3">La eliminación de una cuenta no implica necesariamente la eliminación inmediata de toda la información relacionada con el usuario.</p>
+        </section>
+        <section id="apartado-34" class="scroll-mt-6">
+          <h2 class="mb-3 text-lg font-bold leading-snug text-blue-950">34. SUSPENSIÓN O TERMINACIÓN DE CUENTAS</h2>
+          <p class="mb-3">JERD-Cash podrá suspender o restringir temporalmente una cuenta cuando sea necesario para proteger la seguridad, prevenir fraude, investigar una posible suplantación, verificar información, cumplir requerimientos legales, evitar accesos no autorizados o atender incumplimientos.</p>
+          <p class="mb-3">La suspensión no extingue automáticamente obligaciones contractuales previamente adquiridas.</p>
+        </section>
+        <section id="apartado-35" class="scroll-mt-6">
+          <h2 class="mb-3 text-lg font-bold leading-snug text-blue-950">35. MODIFICACIONES DE LOS TÉRMINOS</h2>
+          <p class="mb-3">Estos Términos podrán modificarse por cambios legislativos, regulatorios, tecnológicos, de la plataforma, nuevas funcionalidades o cambios operativos.</p>
+          <p class="mb-3">Las modificaciones deberán publicarse mediante mecanismos que permitan conocer la versión vigente.</p>
+          <p class="mb-3">Cuando una modificación requiera nueva aceptación, deberá solicitarse la aceptación correspondiente.</p>
+        </section>
+        <section id="apartado-36" class="scroll-mt-6">
+          <h2 class="mb-3 text-lg font-bold leading-snug text-blue-950">36. PETICIONES, QUEJAS, RECLAMOS Y SOLICITUDES</h2>
+          <p class="mb-3">El usuario podrá presentar peticiones, quejas, reclamos y solicitudes mediante los canales oficiales establecidos por Jerd Soluciones Alternativas.</p>
+          <p class="mb-3">Las solicitudes relacionadas con datos personales serán atendidas conforme a los procedimientos y términos legales aplicables.</p>
+        </section>
+        <section id="apartado-37" class="scroll-mt-6">
+          <h2 class="mb-3 text-lg font-bold leading-snug text-blue-950">37. AUTORIZACIÓN PARA COMUNICACIONES</h2>
+          <p class="mb-3">Las comunicaciones necesarias para gestionar la cuenta, seguridad, solicitud, aprobación o rechazo, crédito, pagos, vencimientos y obligaciones contractuales podrán realizarse mediante los canales suministrados por el usuario cuando exista fundamento legal o contractual.</p>
+          <p class="mb-3">Las comunicaciones comerciales o publicitarias que requieran autorización específica deberán manejarse mediante autorización independiente.</p>
+        </section>
+        <section id="apartado-38" class="scroll-mt-6">
+          <h2 class="mb-3 text-lg font-bold leading-snug text-blue-950">38. PREVENCIÓN DEL FRAUDE</h2>
+          <p class="mb-3">JERD-Cash podrá implementar medidas razonables de prevención, detección y gestión del fraude, incluyendo validación de identidad, revisión documental, detección de inconsistencias, controles de acceso, análisis de actividad, registros de seguridad y bloqueos preventivos.</p>
+          <p class="mb-3">Los controles antifraude deberán respetar los principios de protección de datos y las finalidades informadas.</p>
+        </section>
+        <section id="apartado-39" class="scroll-mt-6">
+          <h2 class="mb-3 text-lg font-bold leading-snug text-blue-950">39. DECISIONES AUTOMATIZADAS</h2>
+          <p class="mb-3">La versión actual de JERD-Cash no deberá presentarse como un sistema que utiliza inteligencia artificial para determinar automáticamente la aprobación o rechazo de créditos si dicha funcionalidad no se encuentra implementada.</p>
+          <p class="mb-3">Si en el futuro se implementa un mecanismo automatizado con efectos relevantes sobre los usuarios, deberán revisarse previamente sus implicaciones jurídicas, técnicas y de protección de datos, así como los mecanismos de información y revisión humana aplicables.</p>
+        </section>
+        <section id="apartado-40" class="scroll-mt-6">
+          <h2 class="mb-3 text-lg font-bold leading-snug text-blue-950">40. RESPONSABILIDAD</h2>
+          <p class="mb-3">JERD-Cash deberá implementar las medidas razonables correspondientes a la naturaleza de la información y de los servicios.</p>
+          <p class="mb-3">El usuario será responsable de la información suministrada, autenticidad de documentos, uso de credenciales, operaciones atribuibles a su actuación y obligaciones aceptadas.</p>
+          <p class="mb-3">Nada en estos Términos pretende excluir derechos, garantías u obligaciones que no puedan ser excluidos o limitados conforme a la legislación colombiana.</p>
+        </section>
+        <section id="apartado-41" class="scroll-mt-6">
+          <h2 class="mb-3 text-lg font-bold leading-snug text-blue-950">41. CASO FORTUITO Y FUERZA MAYOR</h2>
+          <p class="mb-3">No se considerarán incumplimientos imputables aquellas interrupciones o afectaciones ocasionadas directamente por circunstancias imprevisibles o irresistibles fuera del control razonable del responsable, sin perjuicio de las obligaciones legales aplicables.</p>
+        </section>
+        <section id="apartado-42" class="scroll-mt-6">
+          <h2 class="mb-3 text-lg font-bold leading-snug text-blue-950">42. LEGISLACIÓN APLICABLE</h2>
+          <p class="mb-3">Estos Términos se regirán por las leyes de la República de Colombia.</p>
+          <p class="mb-3">Entre las disposiciones relevantes, según su ámbito de aplicación, se encuentran la Constitución Política de Colombia, Ley 527 de 1999, Ley 1266 de 2008, Ley 1581 de 2012, Decreto 1074 de 2015, Ley 1480 de 2011, Ley 2157 de 2021, Ley 2439 de 2024 y demás normas, decretos, circulares e instrucciones aplicables.</p>
+          <p class="mb-3">En materia de tratamiento de datos personales en servicios de financiación mediante tecnologías digitales deberán observarse las instrucciones regulatorias aplicables, incluidas las emitidas por la Superintendencia de Industria y Comercio.</p>
+        </section>
+        <section id="apartado-43" class="scroll-mt-6">
+          <h2 class="mb-3 text-lg font-bold leading-snug text-blue-950">43. SOLUCIÓN DE CONTROVERSIAS</h2>
+          <p class="mb-3">Las controversias se procurarán resolver inicialmente mediante los canales de atención y mecanismos de arreglo directo disponibles. Esto no limita el derecho del usuario a acudir ante las autoridades administrativas o judiciales competentes.</p>
+        </section>
+        <section id="apartado-44" class="scroll-mt-6">
+          <h2 class="mb-3 text-lg font-bold leading-snug text-blue-950">44. SEPARABILIDAD</h2>
+          <p class="mb-3">Si alguna disposición es declarada inválida, ilegal o inaplicable, las demás conservarán su validez en la medida permitida por la ley.</p>
+          <p class="mb-3">La disposición afectada deberá interpretarse o sustituirse preservando, en la medida jurídicamente posible, su finalidad legítima.</p>
+        </section>
+        <section id="apartado-45" class="scroll-mt-6">
+          <h2 class="mb-3 text-lg font-bold leading-snug text-blue-950">45. NO RENUNCIA</h2>
+          <p class="mb-3">La falta de ejercicio inmediato de un derecho por parte de Jerd Soluciones Alternativas no constituirá, por sí sola, renuncia a dicho derecho.</p>
+        </section>
+        <section id="apartado-46" class="scroll-mt-6">
+          <h2 class="mb-3 text-lg font-bold leading-snug text-blue-950">46. INTEGRIDAD CONTRACTUAL</h2>
+          <p class="mb-3">Estos Términos, junto con la Política de Tratamiento de Datos Personales, autorizaciones específicas, documentos de crédito y demás documentos aplicables, constituyen el marco documental de la relación respecto de la utilización de la plataforma.</p>
+          <p class="mb-3">En caso de contradicción entre un documento general y las condiciones particulares de un crédito, prevalecerán las condiciones particulares válidamente aceptadas, siempre que no contradigan normas imperativas.</p>
+        </section>
+        <section id="apartado-47" class="scroll-mt-6">
+          <h2 class="mb-3 text-lg font-bold leading-snug text-blue-950">47. DOCUMENTOS RELACIONADOS</h2>
+          <ul class="ml-5 list-disc space-y-2">
+            <li>Política de Tratamiento de Datos Personales.</li>
+            <li>Aviso de Privacidad.</li>
+            <li>Autorización para tratamiento de datos personales.</li>
+            <li>Autorización específica para revisión y verificación documental.</li>
+            <li>Autorización para consulta y reporte de información financiera y crediticia, únicamente cuando dicha funcionalidad exista y resulte aplicable.</li>
+            <li>Contrato o documento particular del crédito.</li>
+            <li>Política o procedimiento de PQRS.</li>
+            <li>Información de contacto del responsable del tratamiento.</li>
+          </ul>
+          <p class="mb-3">La existencia de estos documentos separados permite que cada autorización tenga una finalidad clara y evita convertir los Términos en una autorización genérica de tratamiento de información.</p>
+        </section>
+        <section id="apartado-48" class="scroll-mt-6">
+          <h2 class="mb-3 text-lg font-bold leading-snug text-blue-950">48. ACEPTACIÓN ELECTRÓNICA EN JERD-CASH</h2>
+          <p class="mb-3">Antes de completar el registro o una solicitud de crédito, la plataforma deberá presentar de forma visible los documentos y autorizaciones correspondientes.</p>
+          <p class="mb-3">Se recomienda utilizar casillas independientes:</p>
+          <ul class="ml-5 list-disc space-y-2">
+            <li>[ ] He leído y acepto los Términos y Condiciones de JERD-Cash.</li>
+            <li>[ ] He leído la Política de Tratamiento de Datos Personales y autorizo el tratamiento de mis datos personales para las finalidades informadas.</li>
+            <li>[ ] Autorizo la recepción, revisión y verificación de los documentos que aporte para mi solicitud, incluyendo, cuando sean solicitados, mi documento de identidad, certificación bancaria y recibos o facturas de servicios públicos, exclusivamente para las finalidades informadas.</li>
+            <li>[ ] Declaro que la información y los documentos que proporciono son verdaderos, legítimos y corresponden a mi identidad.</li>
+            <li>[ ] Cuando exista la funcionalidad correspondiente y sea jurídicamente necesaria: autorizo específicamente la consulta y/o reporte de información financiera, crediticia, comercial o de servicios, de acuerdo con la finalidad y condiciones informadas.</li>
+          </ul>
+        </section>
+        <section id="apartado-49" class="scroll-mt-6">
+          <h2 class="mb-3 text-lg font-bold leading-snug text-blue-950">49. CONSTANCIA DE ACEPTACIÓN</h2>
+          <p class="mb-3">Al completar las acciones de aceptación correspondientes, el usuario declara que tuvo acceso a los documentos antes de continuar; pudo consultar su contenido; comprende las condiciones de uso; conoce que una solicitud no garantiza aprobación; declara que la información y documentos proporcionados son verdaderos y auténticos; ha sido informado sobre el tratamiento de sus datos; conoce los mecanismos para ejercer sus derechos; ha otorgado las autorizaciones específicas que correspondan; y comprende que la aceptación de estos Términos no sustituye las autorizaciones específicas que la legislación exija.</p>
+        </section>
+      </div>
+    </article>
+    <div class="mt-7 flex flex-wrap items-center justify-between gap-4">
+      <a href="{% url 'registro' %}" class="inline-flex items-center justify-center rounded-lg bg-blue-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-800">&larr; Volver al registro</a>
+      <a href="#" class="text-sm font-medium text-blue-900 hover:underline">Volver al inicio &uarr;</a>
     </div>
-</body>
-</html>
+    <p class="mt-7 text-center text-xs text-gray-400">JERD-Cash · Términos y Condiciones</p>
+  </div>
+</div>
+{% endblock %}

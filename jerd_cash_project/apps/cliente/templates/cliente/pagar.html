@@ -1,62 +1,82 @@
+
+{% extends 'base.html' %}
 {% load formatos %}
 
-<!DOCTYPE html>
-<html lang="es">
+{% block title %}Realizar pago - JERD-Cash{% endblock %}
 
-<head>
+{% block navbar %}
 
-    <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <title>Realizar pago - JERD-Cash</title>
-
-    <script src="https://cdn.tailwindcss.com"></script>
-
-</head>
-
-
-<body class="bg-gray-100 min-h-screen">
 
 
     <!-- ===================================================== -->
     <!-- ENCABEZADO -->
     <!-- ===================================================== -->
 
-    <header class="bg-blue-700 text-white">
+    
+    <nav class="bg-white border-b border-gray-200">
 
-        <div class="max-w-5xl mx-auto px-6 py-5">
+        <div class="max-w-7xl mx-auto px-6 py-4">
 
-            <div class="flex items-center justify-between">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
 
-                <div>
+                <!-- LOGO Y NOMBRE -->
+                <div class="flex items-center gap-3">
 
-                    <h1 class="text-2xl font-bold">
-                        JERD-Cash
-                    </h1>
+                    <div class="w-10 h-10 bg-blue-900 rounded-xl flex items-center justify-center">
+                        <span class="text-white text-xl font-bold">
+                            J
+                        </span>
+                    </div>
 
-                    <p class="text-blue-100 text-sm">
-                        Realizar pago
-                    </p>
+                    <div>
+                        <h1 class="text-xl font-bold text-blue-950">
+                            JERD-Cash
+                        </h1>
+
+                        <p class="text-xs text-gray-500">
+                            Portal del cliente
+                        </p>
+                    </div>
 
                 </div>
 
+                <!-- USUARIO Y NAVEGACIÓN -->
+                <div class="flex flex-wrap items-center gap-4">
 
-                <a
-                    href="{% url 'mis_creditos' %}"
-                    class="bg-white text-blue-700 px-4 py-2 rounded-lg font-semibold hover:bg-blue-50"
-                >
-                    Volver
-                </a>
+                    <span class="text-sm text-gray-600">
+                        Hola,
+                        <span class="font-semibold text-gray-900">
+                            {{ request.user.first_name|default:request.user.username }}
+                        </span>
+                    </span>
+
+                    <a href="{% url 'cliente_dashboard' %}"
+                    class="text-blue-900 hover:text-blue-700 font-semibold transition">
+                        Volver al inicio
+                    </a>
+
+                    <form method="POST" action="{% url 'logout' %}">
+                        {% csrf_token %}
+
+                        <button type="submit"
+                                class="px-4 py-2 bg-blue-900 text-white text-sm font-semibold rounded-lg hover:bg-blue-800 transition">
+                            Cerrar sesión
+                        </button>
+                    </form>
+
+                </div>
 
             </div>
 
         </div>
 
-    </header>
+    </nav>
+
+    
+{% endblock %}
+
+{% block content %}
+
 
 
 
@@ -65,6 +85,26 @@
     <!-- ===================================================== -->
 
     <main class="max-w-5xl mx-auto px-6 py-8">
+        
+        <!-- TÍTULO DE LA PANTALLA -->
+        <div class="mb-8">
+
+            <a href="{% url 'mis_creditos' %}"
+            class="inline-flex items-center text-sm font-semibold text-blue-900 hover:text-blue-700 transition mb-4">
+                ← Volver a mis créditos
+            </a>
+
+            <h2 class="text-3xl font-bold text-blue-950">
+                Realizar pago
+            </h2>
+
+            <p class="text-gray-600 mt-2">
+                Consulta los datos de transferencia, realiza tu pago
+                y envía el comprobante para su confirmación.
+            </p>
+
+        </div>
+
 
 
         <!-- ================================================= -->
@@ -263,27 +303,16 @@
         <!-- ================================================= -->
 
         <div
-            class="
-                bg-white
-                rounded-2xl
-                shadow-sm
-                p-6
-                mb-6
-            "
+            class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 md:p-8 mb-6"
         >
 
-            <p class="text-gray-500 text-sm">
+            <p class="text-sm font-semibold text-blue-900">
                 Total a pagar
             </p>
 
 
             <p
-                class="
-                    text-4xl
-                    font-bold
-                    text-gray-900
-                    mt-2
-                "
+                class="text-4xl font-bold text-blue-950 mt-2"
             >
                 {{ total_a_pagar|pesos }}
             </p>
@@ -377,21 +406,11 @@
                 <!-- ========================================= -->
 
                 <div
-                    class="
-                        bg-white
-                        rounded-2xl
-                        shadow-sm
-                        p-6
-                    "
+                    class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 md:p-8"
                 >
 
                     <h2
-                        class="
-                            text-xl
-                            font-bold
-                            text-gray-900
-                            mb-4
-                        "
+                        class="text-xl font-bold text-blue-950 mb-4"
                     >
                         Escanea el código QR
                     </h2>
@@ -428,19 +447,14 @@
                 <!-- ========================================= -->
 
                 <div
-                    class="
-                        bg-white
-                        rounded-2xl
-                        shadow-sm
-                        p-6
-                    "
+                    class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 md:p-8"
                 >
 
                     <h2
                         class="
                             text-xl
                             font-bold
-                            text-gray-900
+                            text-blue-950
                             mb-5
                         "
                     >
@@ -472,7 +486,7 @@
                             <p
                                 class="
                                     font-semibold
-                                    text-gray-900
+                                    text-blue-950
                                     break-all
                                 "
                             >
@@ -543,20 +557,14 @@
             <!-- ============================================= -->
 
             <div
-                class="
-                    bg-white
-                    rounded-2xl
-                    shadow-sm
-                    p-6
-                    mt-6
-                "
+                class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 md:p-8 mt-6"
             >
 
                 <h2
                     class="
                         text-xl
                         font-bold
-                        text-gray-900
+                        text-blue-950
                         mb-2
                     "
                 >
@@ -629,16 +637,7 @@
 
                     <button
                         type="submit"
-                        class="
-                            mt-5
-                            w-full
-                            bg-blue-700
-                            text-white
-                            py-3
-                            rounded-lg
-                            font-semibold
-                            hover:bg-blue-800
-                        "
+                        class="mt-5 w-full bg-blue-900 text-white py-3 rounded-lg font-semibold hover:bg-blue-800 transition"
                     >
                         Enviar comprobante
                     </button>
@@ -689,9 +688,9 @@
 
         <div class="mt-8 mb-10">
 
-            <div class="bg-white rounded-2xl shadow-sm p-6">
+            <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 md:p-8">
 
-                <h2 class="text-2xl font-bold text-gray-900 mb-6">
+                <h2 class="text-2xl font-bold text-blue-950 mb-6">
                     Historial de pagos
                 </h2>
 
@@ -859,23 +858,14 @@
 
                                     <div class="mt-4">
 
-                                        <a
-                                            href="{% url 'documento_pago' pago.id %}"
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            class="
-                                                inline-block
-                                                bg-blue-600
-                                                text-white
-                                                px-4
-                                                py-2
-                                                rounded-lg
-                                                hover:bg-blue-700
-                                                text-sm
-                                            "
-                                        >
-                                            Ver comprobante
-                                        </a>
+                                        
+                                    <a href="{% url 'documento_pago' pago.id %}"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        class="inline-flex items-center px-4 py-2 bg-white border border-blue-900 text-blue-900 rounded-lg text-sm font-semibold hover:bg-blue-50 transition">
+                                        Ver comprobante
+                                    </a>
+
 
                                     </div>
 
@@ -916,7 +906,4 @@
 
     </main>
 
-
-</body>
-
-</html>
+{% endblock %}

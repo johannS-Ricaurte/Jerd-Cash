@@ -1,136 +1,190 @@
+
+{% extends 'base.html' %}
 {% load formatos %}
 
-<!DOCTYPE html>
-<html lang="es">
+{% block title %}Mis solicitudes - JERD-Cash{% endblock %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% block navbar %}
 
-    <title>Mis solicitudes - JERD-Cash</title>
+<nav class="bg-white border-b border-gray-200">
 
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
+    <div class="max-w-7xl mx-auto px-6 py-4">
 
-<body class="bg-gray-100 min-h-screen">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
 
-    <nav class="bg-blue-700 text-white px-6 py-4">
+            <!-- LOGO Y NOMBRE -->
+            <div class="flex items-center gap-3">
 
-        <div class="max-w-5xl mx-auto flex justify-between items-center">
+                <div class="w-10 h-10 bg-blue-900 rounded-xl flex items-center justify-center">
+                    <span class="text-white text-xl font-bold">J</span>
+                </div>
 
-            <h1 class="text-2xl font-bold">
-                JERD-Cash
-            </h1>
+                <div>
+                    <h1 class="text-xl font-bold text-blue-950">
+                        JERD-Cash
+                    </h1>
 
-            <a
-                href="{% url 'cliente_dashboard' %}"
-                class="text-sm text-white-600 hover:text-blue-800"
-            >
-                Volver al inicio
-            </a>
+                    <p class="text-xs text-gray-500">
+                        Portal del cliente
+                    </p>
+                </div>
+
+            </div>
+
+            <!-- USUARIO Y NAVEGACIÓN -->
+            <div class="flex flex-wrap items-center gap-4">
+
+                <span class="text-sm text-gray-600">
+                    Hola,
+                    <span class="font-semibold text-gray-900">
+                        {{ request.user.first_name|default:request.user.username }}
+                    </span>
+                </span>
+
+                <a href="{% url 'cliente_dashboard' %}"
+                   class="text-blue-900 hover:text-blue-700 font-semibold transition">
+                    Volver al inicio
+                </a>
+
+                <form method="POST" action="{% url 'logout' %}">
+                    {% csrf_token %}
+
+                    <button type="submit"
+                            class="px-4 py-2 bg-blue-900 text-white text-sm font-semibold rounded-lg hover:bg-blue-800 transition">
+                        Cerrar sesión
+                    </button>
+                </form>
+
+            </div>
 
         </div>
 
-    </nav>
+    </div>
+
+</nav>
+
+{% endblock %}
 
 
-    <main class="max-w-5xl mx-auto px-4 py-8">
+{% block content %}
 
-        <div class="bg-white rounded-xl shadow-md p-8">
+<main class="max-w-5xl mx-auto px-4 sm:px-6 py-8">
 
-            <h2 class="text-3xl font-bold text-gray-800 mb-2">
-                Mis solicitudes
-            </h2>
+    <!-- ENCABEZADO -->
+    <div class="mb-8">
 
-            <p class="text-gray-600 mb-8">
-                Aquí puedes consultar el estado de tus solicitudes de crédito.
-            </p>
+        <h2 class="text-3xl font-bold text-blue-950 mb-2">
+            Mis solicitudes
+        </h2>
+
+        <p class="text-gray-600">
+            Aquí puedes consultar el estado de tus solicitudes de crédito.
+        </p>
+
+    </div>
 
 
-            {% if solicitudes %}
+    <!-- CONTENEDOR PRINCIPAL -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 md:p-8">
 
-                <div class="space-y-4">
+        {% if solicitudes %}
 
-                    {% for solicitud in solicitudes %}
+            <div class="space-y-4">
 
-                        <div class="border rounded-lg p-5">
+                {% for solicitud in solicitudes %}
 
-                            <div class="flex justify-between items-center">
+                    <!-- TARJETA DE SOLICITUD -->
+                    <div class="border border-gray-100 rounded-xl p-5 hover:shadow-md transition">
 
-                                <div>
+                        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
 
-                                    <h3 class="text-lg font-bold text-gray-800">
-                                        Solicitud {{ solicitud.id }}
-                                    </h3>
+                            <!-- INFORMACIÓN -->
+                            <div>
 
-                                    <p class="text-gray-600">
+                                <h3 class="text-lg font-bold text-blue-950 mb-2">
+                                    Solicitud {{ solicitud.id }}
+                                </h3>
+
+                                <p class="text-gray-700 mb-1">
+                                    <span class="font-medium">
                                         Monto solicitado:
+                                    </span>
+
+                                    <span class="font-semibold text-blue-900">
                                         {{ solicitud.monto_solicitado|pesos }}
-                                    </p>
+                                    </span>
+                                </p>
 
-                                    <p class="text-sm text-gray-500">
-                                        Fecha:
-                                        {{ solicitud.fecha_solicitud|date:"d/m/Y H:i" }}
-                                    </p>
+                                <p class="text-sm text-gray-500">
+                                    Fecha:
+                                    {{ solicitud.fecha_solicitud|date:"d/m/Y H:i" }}
+                                </p>
 
-                                </div>
+                            </div>
 
 
-                                <div>
+                            <!-- ESTADO -->
+                            <div class="flex-shrink-0">
 
-                                    {% if solicitud.estado == 'PENDIENTE' %}
+                                {% if solicitud.estado == 'PENDIENTE' %}
 
-                                        <span class="bg-yellow-100 text-yellow-800 px-4 py-2 rounded-lg font-semibold">
-                                            Pendiente
-                                        </span>
+                                    <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-yellow-100 text-yellow-800">
+                                        Pendiente
+                                    </span>
 
-                                    {% elif solicitud.estado == 'APROBADA' %}
+                                {% elif solicitud.estado == 'APROBADA' %}
 
-                                        <span class="bg-green-100 text-green-800 px-4 py-2 rounded-lg font-semibold">
-                                            Aprobada
-                                        </span>
+                                    <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-green-100 text-green-800">
+                                        Aprobada
+                                    </span>
 
-                                    {% elif solicitud.estado == 'RECHAZADA' %}
+                                {% elif solicitud.estado == 'RECHAZADA' %}
 
-                                        <span class="bg-red-100 text-red-800 px-4 py-2 rounded-lg font-semibold">
-                                            Rechazada
-                                        </span>
+                                    <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-red-100 text-red-800">
+                                        Rechazada
+                                    </span>
 
-                                    {% endif %}
-
-                                </div>
+                                {% endif %}
 
                             </div>
 
                         </div>
 
-                    {% endfor %}
+                    </div>
 
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <!-- SIN SOLICITUDES -->
+            <div class="bg-gray-50 border border-gray-100 rounded-xl p-8 text-center">
+
+                <div class="text-4xl mb-4">
+                    📄
                 </div>
 
-            {% else %}
+                <h3 class="text-lg font-bold text-blue-950 mb-2">
+                    No tienes solicitudes registradas
+                </h3>
 
-                <div class="bg-gray-50 border rounded-lg p-6 text-center">
+                <p class="text-gray-600 mb-6">
+                    Todavía no tienes solicitudes de crédito.
+                    Puedes realizar tu primera solicitud cuando lo desees.
+                </p>
 
-                    <p class="text-gray-600 mb-4">
-                        Todavía no tienes solicitudes de crédito.
-                    </p>
+                <a href="{% url 'solicitar_credito' %}"
+                   class="inline-flex items-center justify-center px-6 py-3 bg-blue-900 text-white rounded-lg font-semibold hover:bg-blue-800 transition">
+                    Solicitar mi primer crédito
+                </a>
 
-                    <a
-                        href="{% url 'solicitar_credito' %}"
-                        class="inline-block bg-blue-700 text-white px-5 py-3 rounded-lg font-semibold hover:bg-blue-800"
-                    >
-                        Solicitar mi primer crédito
-                    </a>
+            </div>
 
-                </div>
+        {% endif %}
 
-            {% endif %}
+    </div>
 
-        </div>
+</main>
 
-    </main>
-
-</body>
-
-</html>
+{% endblock %}

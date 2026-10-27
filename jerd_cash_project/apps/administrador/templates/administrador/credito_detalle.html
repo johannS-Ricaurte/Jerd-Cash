@@ -1,64 +1,57 @@
+{% extends 'base.html' %}
 {% load formatos %}
 
+{% block title %}Detalle del crédito - JERD-Cash{% endblock %}
 
-<!DOCTYPE html>
-<html lang="es">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Detalle del crédito - JERD Cash</title>
-
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-
-<body class="bg-gray-50 min-h-screen">
-
-    <nav class="bg-white border-b">
-        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-
-            <div>
-                <h1 class="text-2xl font-bold text-gray-900">
-                    JERD<span class="text-blue-600">-Cash</span>
-                </h1>
-
-                <p class="text-xs text-gray-500">
-                    Administración de créditos
-                </p>
+{% block navbar %}
+<nav class="bg-white border-b border-gray-200">
+    <div class="max-w-7xl mx-auto px-6 py-4">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-blue-900 rounded-xl flex items-center justify-center">
+                    <span class="text-white text-xl font-bold">J</span>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-blue-950">JERD-Cash</h1>
+                    <p class="text-xs text-gray-500">Panel administrativo</p>
+                </div>
             </div>
-
-            <div class="flex items-center gap-4">
-
+            <div class="flex flex-wrap items-center gap-4">
                 <span class="text-sm text-gray-600">
                     Hola,
-                    {{ request.user.first_name|default:request.user.username }}
+                    <span class="font-semibold text-gray-900">{{ request.user.first_name|default:request.user.username }}</span>
                 </span>
-
-                <a
-                    href="{% url 'administrador_creditos' %}"
-                    class="text-sm text-blue-600 hover:text-blue-800"
-                >
-                    Volver a créditos
-                </a>
-
+                <a href="{% url 'administrador_dashboard' %}"
+                   class="text-blue-900 hover:text-blue-700 font-semibold transition">Volver al panel</a>
+                <form method="POST" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button type="submit"
+                            class="px-4 py-2 bg-blue-900 text-white text-sm font-semibold rounded-lg hover:bg-blue-800 transition">
+                        Cerrar sesión
+                    </button>
+                </form>
             </div>
-
         </div>
-    </nav>
+    </div>
+</nav>
+{% endblock %}
 
-
-    <main class="max-w-7xl mx-auto px-6 py-10">
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 pt-6">
+    <a href="{% url 'administrador_creditos' %}"
+       class="text-sm font-semibold text-blue-900 hover:text-blue-700">← Volver a créditos</a>
+</div>
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
 
         <!-- ENCABEZADO DEL CLIENTE -->
 
-        <div class="bg-white rounded-xl shadow-sm border p-6 mb-8">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-8">
 
             <p class="text-sm text-gray-500">
                 Cliente
             </p>
 
-            <h2 class="text-3xl font-bold text-gray-900 mt-1">
+            <h2 class="text-3xl font-bold text-blue-950 mt-1">
                 {{ nombre_cliente }}
             </h2>
 
@@ -68,21 +61,19 @@
 
         </div>
 
-
         <!-- CRÉDITOS DEL CLIENTE -->
 
         <div class="mb-8">
 
-            <h3 class="text-2xl font-bold text-gray-900 mb-4">
+            <h3 class="text-2xl font-bold text-blue-950 mb-4">
                 Créditos
             </h3>
-
 
             <div class="space-y-6">
 
                 {% for prestamo_cliente in prestamos_cliente %}
 
-                    <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
 
                         <div class="p-6 border-b bg-gray-50">
 
@@ -90,7 +81,7 @@
 
                                 <div>
 
-                                    <h4 class="text-xl font-bold text-gray-900">
+                                    <h4 class="text-xl font-bold text-blue-950">
                                         Crédito {{ prestamo_cliente.id }}
                                     </h4>
 
@@ -101,14 +92,13 @@
 
                                 </div>
 
-
                                 <div class="text-left md:text-right">
 
                                     <p class="text-sm text-gray-500">
                                         Monto solicitado
                                     </p>
 
-                                    <p class="text-xl font-bold text-gray-900">
+                                    <p class="text-xl font-bold text-blue-950">
                                         {{ prestamo_cliente.monto_solicitado|pesos }}
                                     </p>
 
@@ -117,7 +107,6 @@
                             </div>
 
                         </div>
-
 
                         <!-- INFORMACIÓN DEL CRÉDITO -->
 
@@ -135,7 +124,6 @@
 
                             </div>
 
-
                             <div class="bg-green-50 rounded-lg p-4">
 
                                 <p class="text-sm text-gray-500">
@@ -150,7 +138,6 @@
 
                             </div>
 
-
                             <div class="bg-yellow-50 rounded-lg p-4">
 
                                 <p class="text-sm text-gray-500">
@@ -162,7 +149,6 @@
                                 </p>
 
                             </div>
-
 
                             <div class="bg-purple-50 rounded-lg p-4">
 
@@ -183,7 +169,6 @@
                             </div>
 
                         </div>
-
 
                         <!-- TABLA DE CUOTAS -->
 
@@ -224,7 +209,7 @@
 
                             <div class="overflow-x-auto border rounded-lg">
 
-                                <table class="w-full">
+                                <table class="w-full min-w-[720px] text-sm">
 
                                     <thead class="bg-gray-100 border-b">
 
@@ -254,10 +239,9 @@
 
                                     </thead>
 
-
                                     <tbody class="divide-y">
 
-                                        {% for cuota in prestamo.cuotas.all %}
+                                        {% for cuota in prestamo_cliente.cuotas.all %}
 
                                             <tr>
 
@@ -365,15 +349,13 @@
 
         </div>
 
-
         <!-- PAGOS PENDIENTES -->
 
         <div class="mb-8">
 
-            <h3 class="text-2xl font-bold text-gray-900 mb-4">
+            <h3 class="text-2xl font-bold text-blue-950 mb-4">
                 Pagos pendientes de confirmación
             </h3>
-
 
             {% if pagos_pendientes %}
 
@@ -381,7 +363,7 @@
 
                     {% for pago in pagos_pendientes %}
 
-                        <div class="bg-white rounded-xl shadow-sm border p-6">
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
 
                             <div class="flex flex-col lg:flex-row lg:justify-between gap-6">
 
@@ -401,7 +383,6 @@
                                     </p>
 
                                 </div>
-
 
                                 <div>
 
@@ -426,7 +407,6 @@
                                 </div>
 
                             </div>
-
 
                             <!-- CUOTAS QUE INCLUYE EL PAGO -->
 
@@ -456,7 +436,6 @@
 
                             </div>
 
-
                             <!-- ACCIONES -->
 
                             <div class="mt-6 pt-5 border-t flex flex-col sm:flex-row gap-3">
@@ -475,7 +454,6 @@
                                     </button>
 
                                 </form>
-
 
                                 <form
                                     method="POST"
@@ -529,8 +507,6 @@
 
                                 </form>
 
-
-
                             </div>
 
                         </div>
@@ -562,7 +538,4 @@
         </div>
 
     </main>
-
-</body>
-
-</html>
+{% endblock %}

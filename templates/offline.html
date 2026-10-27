@@ -1,0 +1,51 @@
+
+{% extends 'base.html' %}
+
+{% block title %}
+Sin conexión - JERD-Cash
+{% endblock %}
+
+{% block content %}
+
+<div class="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-12">
+
+    <div class="w-full max-w-lg bg-white rounded-2xl shadow-sm border border-gray-100 p-8 sm:p-10 text-center">
+
+        <div class="w-16 h-16 mx-auto mb-6 bg-blue-900 rounded-2xl flex items-center justify-center">
+            <span class="text-white text-3xl font-bold">J</span>
+        </div>
+
+        <h1 class="text-3xl font-bold text-blue-950">
+            Sin conexión a internet
+        </h1>
+
+        <p class="text-gray-600 mt-4 leading-relaxed">
+            En este momento no podemos conectarnos con JERD-Cash.
+            Comprueba tu conexión a internet para continuar
+            utilizando los servicios de la plataforma.
+        </p>
+
+        <div class="mt-6 bg-blue-50 border border-blue-100 rounded-xl p-4">
+            <p class="text-sm text-blue-900">
+                Por seguridad, las operaciones relacionadas con
+                créditos, pagos y datos personales requieren
+                conexión con el servidor.
+            </p>
+        </div>
+
+        <button
+            type="button"
+            onclick="window.location.reload()"
+            class="mt-8 w-full bg-blue-900 text-white font-semibold px-6 py-3 rounded-xl hover:bg-blue-800 transition">
+            Intentar nuevamente
+        </button>
+
+        <p class="text-xs text-gray-400 mt-6">
+            JERD-Cash · Jerd Soluciones Alternativas
+        </p>
+
+    </div>
+
+</div>
+
+{% endblock %}
